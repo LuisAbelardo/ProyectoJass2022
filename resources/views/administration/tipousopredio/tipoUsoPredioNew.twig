@@ -1,0 +1,197 @@
+{% set menuLItem = 'tipousopredio' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevo tipo de uso de predio #}
+	<form class="f_inputflat" id="formNuevoTipoUsoPredio" method="post" action="{{ PUBLIC_PATH }}/tipousopredio/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-warehouse mr-3"></i>Tipos de uso de predio
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_tabs">
+          			<div class="f_tabunactive">
+          				<a href="{{ PUBLIC_PATH }}/tipousopredio/lista" class="f_link">Lista</a>
+          			</div>
+          			<div class="f_tabactive">
+          				<a href="#" class="f_link">Nuevo</a>
+          			</div>
+              	</div>
+      		</div>
+      	</div><!-- /.tabs de contenido -->
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNombre">Nombre</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpNombre" name="nombre" required
+                        			value='{% if data.formNuevoTipoUsoPredio.nombre is defined %}{{ data.formNuevoTipoUsoPredio.nombre }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTarifaAgua">Tarifa Agua</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="number" step="0.01" class="f_minwidth150" id="inpTarifaAgua" name="tarifaAgua" required
+                        			value='{% if data.formNuevoTipoUsoPredio.tarifaAgua is defined %}{{ data.formNuevoTipoUsoPredio.tarifaAgua}}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTarifaDesague">Tarifa Desague</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="number" step="0.01" class="f_minwidth150" id="inpTarifaDesague" name="tarifaDesague" required
+                        			value='{% if data.formNuevoTipoUsoPredio.tarifaDesague is defined %}{{ data.formNuevoTipoUsoPredio.tarifaDesague }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbTipoPredio">Tipo de Predio</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            <select name="tipoPredio" class="f_minwidth300" id="cmbTipoPredio" required>
+                            	{% set selectedTipoPredio = false %}
+                                {% for tipoPredio in data.tiposPredio %}
+                                	<option value="{{ tipoPredio.TIP_CODIGO }}"
+                            				{% if not selectedTipoPredio 
+                            				        and data.formNuevoTipoUsoPredio is defined 
+                            				        and data.formNuevoTipoUsoPredio.tipoPredio ==  tipoPredio.TIP_CODIGO %}
+                            					{{ 'selected' }}{% set selectedTipoPredio = true %}
+                        					{% endif %}>
+                        				{{ tipoPredio.TIP_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+					<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTarifaAmbos">Tarifa Ambos Servicios</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth150" id="inpTarifaAmbos" name="tarifaAmbos" required
+                        			value='{% if data.formNuevoTipoUsoPredio.tarifaAmbos is defined %}{{ data.formNuevoTipoUsoPredio.tarifaAmbos }}{% endif %}'>
+                        </div>
+                    </div>
+					<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTarifaManten">Tarifa Mantenimiento</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth150" id="inpTarifaManten" name="tarifaManten" required
+                        			value='{% if data.formNuevoTipoUsoPredio.tarifaManten is defined %}{{ data.formNuevoTipoUsoPredio.tarifaManten }}{% endif %}'>
+                        </div>
+                    </div>
+
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar</button>
+        			<a href="{{ PUBLIC_PATH }}/tipousopredio/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo tipo de uso de predio #}
+  
+</div><!-- /.card -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+    
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  
+	<script type="text/javascript">
+		$('#formNuevoTipoUsoPredio').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+		
+		f_select2("#cmbTipoPredio");
+
+
+		function getTarifaAmbosServicios(){
+			if($("#cmbTipoPredio").val() != 1){
+				var tarifaAgua = 0;
+				var tarifaDesague = 0;
+				if($("#inpTarifaAgua").val() != ""){tarifaAgua = parseFloat($("#inpTarifaAgua").val())}
+				if($("#inpTarifaDesague").val() != ""){tarifaDesague = parseFloat($("#inpTarifaDesague").val())}
+				$("#inpTarifaAmbos").val(tarifaAgua + tarifaDesague);
+
+			}
+		}
+
+		$("#inpTarifaAgua").change(function(){
+			getTarifaAmbosServicios();
+		});
+
+		$("#inpTarifaDesague").change(function(){
+			getTarifaAmbosServicios();
+		});
+
+		if($("#cmbTipoPredio").val() == 1){
+    		$("#inpTarifaAmbos").prop("disabled", false);
+			$("#inpTarifaManten").prop("disabled", false);
+			$("#inpTarifaAmbos").val("");
+    	}else{
+    		getTarifaAmbosServicios();
+    		$("#inpTarifaAmbos").prop("disabled", true);
+			$("#inpTarifaManten").prop("disabled", true);
+			$("#inpTarifaManten").val("0");
+    	}
+        
+        $("#cmbTipoPredio").change(function(){
+        	if($("#cmbTipoPredio").val() == 1){
+        		$("#inpTarifaAmbos").prop("disabled", false);
+				$("#inpTarifaManten").prop("disabled", false);
+				$("#inpTarifaAmbos").val("");
+        	}else{
+        		getTarifaAmbosServicios();
+        		$("#inpTarifaAmbos").prop("disabled", true);
+				$("#inpTarifaManten").prop("disabled", true);
+				$("#inpTarifaManten").val("0");
+        	}
+        });
+	</script>
+{% endblock %}

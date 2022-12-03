@@ -1,0 +1,194 @@
+{% set menuLItem = 'usuario' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Editar usuario #}
+	<form class="f_inputflat" id="formEditarUsuario" method="post" action="{{ PUBLIC_PATH }}/usuario/update">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-user-shield mr-3"></i>Editar usuario
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+      	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_tabs">
+          			<div class="f_tabactive">
+          				<a href="#" class="f_link">Usuario</a>
+          			</div>
+          			<div class="f_tabunactive">
+          			    {% set codigo = "" %}
+                    	{% if data.usuario is defined %}{% set codigo = data.usuario.USU_CODIGO %}
+                    	{% elseif data.formEditarUsuario is defined %}{% set codigo = data.formEditarUsuario.codigo %}{% endif %}
+          				<a href="{{ PUBLIC_PATH }}/usuario/editar/password/{{ codigo }}" class="f_link">Password</a>
+          			</div>
+              	</div>
+      		</div>
+      	</div><!-- /.tabs de contenido -->
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field">Ref.</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set codigo = "" %}
+                        	{% if data.usuario is defined %}{% set codigo = data.usuario.USU_CODIGO %}{{ data.usuario.USU_CODIGO }}
+                        	{% elseif data.formEditarUsuario is defined %}
+                        	    {% set codigo = data.formEditarUsuario.codigo %}{{ data.formEditarUsuario.codigo }}{% endif %}
+                        	<input type="hidden" class="f_minwidth300" id="inpCodigo" name="codigo" value='{{ codigo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNombres">Nombres</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set nombres = "" %}
+                        	{% if data.usuario is defined %}{% set nombres = data.usuario.USU_NOMBRES %}
+                        	{% elseif data.formEditarUsuario is defined %}{% set nombres = data.formEditarUsuario.nombres %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpNombres" name="nombres" value='{{ nombres }}' required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpApellidos">Apellidos</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set apellidos = "" %}
+                        	{% if data.usuario is defined %}{% set apellidos = data.usuario.USU_APELLIDOS %}
+                        	{% elseif data.formEditarUsuario is defined %}{% set apellidos = data.formEditarUsuario.apellidos %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpApellidos" name="apellidos" value='{{ apellidos }}' required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpUsuario">Usuario</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set usuario = "" %}
+                        	{% if data.usuario is defined %}{% set usuario = data.usuario.USU_USUARIO %}
+                        	{% elseif data.formEditarUsuario is defined %}{% set usuario = data.formEditarUsuario.usuario %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpUsuario" name="usuario" value='{{ usuario }}' required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpEmail">Email</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<i class="fas fa-at mr-1"></i>
+                        	{% set email = "" %}
+                        	{% if data.usuario is defined %}{% set email = data.usuario.USU_EMAIL %}
+                        	{% elseif data.formEditarUsuario is defined %}{% set email = data.formEditarUsuario.email %}{% endif %}
+                        	<input type="email" class="f_minwidth300" id="inpEmail" name="email" value='{{ email }}' required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbTipo">Tipo</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            <select name="tipo" class="f_minwidth200" id="cmbTipo" required>
+                            	{% if data.usuarioTipos is defined %}
+                            		{% set selectedTipo = false %}
+                            		{% for tipoUsuario in data.usuarioTipos %}
+                                    	<option value="{{ tipoUsuario.TPU_CODIGO }}"
+                                        		{% if not selectedTipo %}
+                                    				{% if data.usuario is defined and data.usuario.TPU_CODIGO ==  tipoUsuario.TPU_CODIGO %}
+                                    					{{ 'selected' }}{% set selectedTipo = true %}
+                                					{% elseif data.formEditarUsuario is defined 
+                                					            and data.formEditarUsuario.tipo ==  tipoUsuario.TPU_CODIGO %}
+                        					            {{ 'selected' }}{% set selectedTipo = true %}{% endif %}
+                    					         {% endif %}>
+                            				 {{ tipoUsuario.TPU_NOMBRE }}
+                        				</option>
+                                    {% endfor %}
+                            	{% endif %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbEstado">Estado</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            <select name="estado" class="f_minwidth200" id="cmbEstado" required>
+                            	{% if data.usuario is defined or data.formEditarUsuario is defined %}
+                                	<option value="0"
+                                				{% if data.usuario is defined and data.usuario.USU_ESTADO ==  "0" %}
+                                					{{ 'selected' }}
+                            					{% elseif data.formEditarUsuario is defined and data.formEditarUsuario.estado ==  "0" %}
+                            					    {{ 'selected' }}{% endif %}>
+                                		Suspendido
+                            		</option>
+                                	<option value="1"
+                                				{% if data.usuario is defined and data.usuario.USU_ESTADO ==  "1" %}
+                                					{{ 'selected' }}
+                            					{% elseif data.formEditarUsuario is defined and data.formEditarUsuario.estado ==  "1" %}
+                            					    {{ 'selected' }}{% endif %}>
+                                		Activo
+                            		</option>
+                        		{% endif %}
+                            </select>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cambios</button>
+        			<a href="{{ PUBLIC_PATH }}/usuario/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo usuario #}
+  
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formEditarUsuario').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbTipo");
+        f_select2("#cmbEstado");
+	</script>
+{% endblock %}

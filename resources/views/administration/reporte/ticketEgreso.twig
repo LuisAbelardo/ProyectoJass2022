@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=1.0, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>{{ SITE_NAME }}</title>
+    <link rel="stylesheet" href="{{ PUBLIC_PATH }}/css/ticket_style.css">
+</head>
+<body> 
+    <header class="t_center">
+        <div id="logo">
+            <img src="{{ PUBLIC_PATH }}/img/logo.png" style="width:50px">
+            <div class="t_center">MZ. D1 LT. 62 </div>
+            <div class="t_center">CHOSICA DEL NORTE - LA VICTORIA - CHICLAYO</div>
+            <div class="t_center">TELF. 074 - 431993</div>
+            <div class="t_center">RUC 20479771856</div>
+        </div>
+    </header>
+    <br>
+    {% if data.datosTicket is not empty %}
+        {% set datosGenerales = data.datosTicket[0] %}
+        <main>
+            <div class="t_center name">RECIBO DE EGRESO</div>
+            <div class="t_center num">ND-{{ datosGenerales.CODIGO }}</div>
+            <div class="t_right">OP.: {{ datosGenerales.FEC_EMISION }}</div>
+            <div class="datos">
+                <div>NRO. COMPROBANTE: {{ datosGenerales.COMPROBANTE }}</div>
+                <div>RECIBO DE: {{ datosGenerales.CAJERO }}</div>
+                <div>LA SUMA DE: {{ data.cantidadLetras }}</div>
+                <div>CONCEPTO: {{ datosGenerales.CONCEPTO }}</div>
+            </div>
+            </br>
+            <table class="t_detalles">
+                <tr>    
+                    <td>TOTAL </td>
+                    <td>: S/. **********</td>
+                    <td class="total">{{ datosGenerales.CANTIDAD|number_format(2, '.', ',') }}</td>
+                </tr>
+                <tr>    
+                <td>DOC. EMITIDO</td>
+                <td colspan="2">: {{ datosGenerales.TIPO_EMISION }}</td>
+            </tr>
+            </table>
+        </main>
+        <footer>
+            <p>NOTA: Este ticket es constancia de la operación efectuado.</p>
+        </footer>
+    {% endif %}
+</body>
+</html>

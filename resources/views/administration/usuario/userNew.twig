@@ -1,0 +1,149 @@
+{% set menuLItem, menuLLink = 'usuario', 'nuevo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevo usuario #}
+	<form class="f_inputflat" id="formNuevoUsuario" method="post" action="{{ PUBLIC_PATH }}/usuario/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-user-shield mr-3"></i>Nuevo usuario
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+                    
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNombres">Nombres</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpNombres" name="nombres" required
+                        			value='{% if data.formNuevoUsuario.nombres is defined %}{{ data.formNuevoUsuario.nombres }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpApellidos">Apellidos</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpApellidos" name="apellidos" required
+                        			value='{% if data.formNuevoUsuario.apellidos is defined %}{{ data.formNuevoUsuario.apellidos }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpUsuario">Usuario</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpUsuario" name="usuario" required
+                        			value='{% if data.formNuevoUsuario.usuario is defined %}{{ data.formNuevoUsuario.usuario }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpEmail">Email</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<i class="fas fa-at mr-1"></i>
+                        	<input type="email" class="f_minwidth300" id="inpEmail" name="email" required
+                        			value='{% if data.formNuevoUsuario.email is defined %}{{ data.formNuevoUsuario.email }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpPassword">Contraseña</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<i class="fas fa-key mr-1"></i>
+                        	<input type="password" class="f_minwidth250" id="inpPassword" name="password" required
+                        			value='{% if data.formNuevoUsuario.password is defined %}{{ data.formNuevoUsuario.password }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpConfirmarPassword">Confirmar contraseña</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<i class="fas fa-key mr-1"></i>
+                        	<input type="password" class="f_minwidth250" id="inpConfirmarPassword" name="confirmPassword" required
+                        			value='{% if data.formNuevoUsuario.confirmPassword is defined %}{{data.formNuevoUsuario.confirmPassword }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbTipo">Tipo</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            <select name="tipo" class="f_minwidth200" id="cmbTipo" required>
+                            	{% set selectedTipo = false %}
+                                {% for tipoUsuario in data.usuarioTipos %}
+                                	<option value="{{ tipoUsuario.TPU_CODIGO }}"
+                            				{% if not selectedTipo 
+                            				        and data.formNuevoUsuario is defined 
+                            				        and data.formNuevoUsuario.tipo ==  tipoUsuario.TPU_CODIGO %}
+                            					{{ 'selected' }}{% set selectedTipo = true %}
+                        					{% endif %}>
+                        				{{ tipoUsuario.TPU_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar usuario</button>
+        			<a href="{{ PUBLIC_PATH }}/usuario/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo usuario #}
+  
+</div><!-- /.card -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoUsuario').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbTipo");
+	</script>
+{% endblock %}

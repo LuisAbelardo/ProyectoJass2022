@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINANCIAMIENTO</title>
+    <link href="{{ PUBLIC_PATH }}/css/financiamiento_style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <header class="clearfix" >
+        <div id="logo">
+            <img src="{{ PUBLIC_PATH }}/img/logo.png">
+        </div>
+        <div id="company">
+            <h2 class="name">JUNTA ADMINISTRADORA DE SERVICIO DE SANEAMIENTO</h2>
+            <div>MZ. D1 LT. 62 - CHOSICA DEL NORTE</div>
+            <div>TELF. 074 - 431993</div>
+            <div>R.U.C. 20479771856</div>
+        </div>
+    </header>
+    <main>
+    
+        {% if data.clienteDatos is not empty and data.financiamientoDatos is not empty %}
+	        {% set datosCliente = data.clienteDatos[0] %}
+	        {% set datosFinanciamiento = data.financiamientoDatos[0] %}
+	        
+            <p class="titulo">DOCUMENTO DE RECONOCIMIENTO DE DEUDA Y COMPROMISO DE PAGO</p>
+            <p></p>
+            <p>Siendo las horas del día de hoy {{ datosFinanciamiento.FECHA }}, se encuentra presente el Sr. <span>FLORENCIO MISCAN LLUEN</span>, 
+                identificado con DNI N° 16594561 Presidente del CD de la <span>JUNTA ADMISTRADORA DEL SERVICIO DE SANEAMIENTO
+                en adelante JASS</span>, con domicilio legal en la Mz. D1 LT.62-CP. Chiclayo - Chosica del Norte, Distrito de la Victoria,
+                Provincia de Chiclayo, Departamento de Lambayeque, el Sr(a). {{ datosCliente.USUARIO }} identificado con DNI 
+                N° {{ datosCliente.DOCUMENTO }} con con domicilio legal en la {{ datosCliente.DIRECCION }} - Distrito de La Victoria, 
+                Provincia de Chiclayo, Departamento de Lambayeque, en adelante <span>EL DEUDOR</span>.</p>
+
+            <p>Por el presente documento, <span>EL DEUDOR</span> reconoce que tiene una deuda pendiente pago a 
+                favor de <span>JASS</span>, la cual deviene de los Estatutos de la Institución, aprobado por la 
+                asamblea de día 28 de Marzo del 2016 por concepto de los servicios de Agua y Alcantarillado.</p>
+
+            <p>La suma total adeudado asciende a {{ data.deudaLetras }}
+                <span>(S/. {{ datosCliente.DEUDA|number_format(2, '.', ',') }})</span>, 
+                sin intereses moratorios ni otro tipo de gastos.</p>
+
+            <p>Asimismo, <span>EL DEUDOR</span> se compromete a cancelar la mencionada deuda de acuerdo al 
+                <span>PLAN DE PAGO 1</span>, y a su cronograma de pagos que se adjunta 
+                y el cual forma parte del presente documento.</p>
+        
+            
+            <div class="sub_titulo negrita">PLAN DE PAGO 1: </div><br/>
+    		
+            
+            <ul>
+                <li style="padding-bottom:4px;">
+                	Cuota Inicial: S/. {{ datosFinanciamiento.INICIAL|number_format(2, '.', ',') }}</li>
+                <li style="padding-bottom:4px;">
+                	Deuda a Financiar: S/. {{ datosCliente.DEUDA|number_format(2, '.', ',') }}</li>
+                <li style="padding-bottom:4px;">
+                	La diferencia: {{ datosFinanciamiento.CUOTA }} cuotas</li>
+                <li style="padding-bottom:4px;">
+                	Monto de la Cuota: S/. {{ datosFinanciamiento.MONTO_CUOTA|number_format(2, '.', ',') }}</li>
+                <li style="padding-bottom:4px;">
+                	Más la Cuota del mes: S/. {{ datosCliente.IMPORTE_CONSUMO|number_format(2, '.', ',') }}</li>
+                <li style="padding-bottom:4px;">
+                	Total a pagar por Mes: S/. {{ (datosFinanciamiento.MONTO_CUOTA + datosCliente.IMPORTE_CONSUMO)|number_format(2, '.', ',') }}</li>
+            </ul>
+        
+        {% endif %}
+
+        <div class="">
+            <p>A falta de pago de cualquier de las cuotas a las que hace alusion el cronograma de pagos, la <span>JASS</span> se reserva el derecho de dar por vencidos
+            todos los plazos concedidos a <span>EL DEUDOR</span> y proceder a cortar el servicio de forma definitiva y no se reinstalara el servicio hasta que cancele 
+            el integro de la deuda acumulada.</p> 
+        </div>
+    </main>
+    
+    
+    {% if data.financiamiento is defined and data.financiamiento.FTO_ESTADO == 2 and data.recibosFinanciados is defined 
+            and data.cuotasFinanciamiento is defined %}
+            
+        {# Salto de pagina en dompdf #}
+		<div style="page-break-after:always;"></div>
+		
+		<header class="clearfix" >
+            <div id="logo">
+                <img src="{{ PUBLIC_PATH }}/img/logo.png">
+            </div>
+            <div id="company">
+                <h2 class="name">CRONOGRAMA DE PAGOS DEL SERVICIO DE AGUA Y</h2>
+                <h2 class="name">ALCANTARILLADO</h2>
+            </div>
+        </header>
+        <main>
+            <p class="sub_titulo negrita">1.- Cuenta corriente del servicio</p>
+            <p>Usuario:</p>
+            <p></p>
+            <table style="width:70%">
+                <tr>
+                    <th>MESES</th>
+                    <th>TARIFA</th>
+                </tr>
+                	
+            	{% for recibo in data.recibosFinanciados %}
+            		<tr>
+                        <td style="text-align:center">{{ recibo.PERIODO }}</td>
+                        <td class="">{{ recibo.TOTAL|number_format(2, '.', ',') }}</td>
+                    </tr>
+            	{% endfor %}
+            	
+            	<tr>
+                    <td class="grand total">Deuda Total:</td>
+                    <td class="grand total">{{ data.financiamiento.FTO_DEUDA|number_format(2, '.', ',') }}</td>
+                </tr>
+                
+            </table>
+        
+            <p class="sub_titulo negrita">2.- FInanciamiento</p>
+            <p>DEUDA A FINANCIAR: 
+            	<span class="negrita">{{ (data.financiamiento.FTO_DEUDA - data.financiamiento.FTO_CUOTA_INICIAL)|number_format(2, '.', ',') }}) }}</span>
+        	</p>    
+    
+            <table class="">
+                <thead>
+                    <tr>
+                        <th>N° CUOTA</th>
+                        <th>FECHA</th>
+                        <th>MONTO (S/.)</th>
+                        <th>CUOTA DEL MES (S/.)</th>
+                        <th>TOTAL A PAGAR (S/.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                	{% set pagoMensual = 0 %}
+                
+                	{% for cuota in data.cuotasFinanciamiento %}
+                		<tr>
+                            <td>{{ cuota.CUOTA }}</td>
+                            <td>{{ cuota.FECHA }}</td>
+                            <td>{{ cuota.MONTO|number_format(2, '.', ',') }}</td>
+                            <td>{{ cuota.IMPORTE_CONSUMO|number_format(2, '.', ',') }}</td>
+                            <td>{{ (cuota.MONTO + cuota.IMPORTE_CONSUMO)|number_format(2, '.', ',') }}</td>
+                            {% set pagoMensual = cuota.MONTO + cuota.IMPORTE_CONSUMO %}
+                        </tr>
+                	{% endfor %}
+                
+                </tbody>
+    
+            </table>
+    
+            <p><span class="negrita">TOTAL A PAGAR : {% if pagoMensual != 0 %}{{ pagoMensual|number_format(2, '.', ',') }}{% endif %}</span></p>
+            <p>FECHA DE PAGO: MENSUAL</p>
+            <p>ATENCION: LUNES A SABADO 08:00 AM. - 12.30 PM. </p>
+        </main>
+	{% endif %}
+</body>
+</html>

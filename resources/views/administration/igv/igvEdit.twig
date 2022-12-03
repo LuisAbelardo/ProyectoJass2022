@@ -1,0 +1,90 @@
+{% set menuLItem = 'igv' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Editar igv #}
+	<form class="f_inputflat" id="formEditarIgv" method="post" action="{{ PUBLIC_PATH }}/igv/update">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-percent mr-3"></i>Igv
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpIgv">Igv</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set igv = "" %}
+                        	{% if data.igv is defined %}{% set igv = data.igv.IGV_PORCENTAJE %}
+                        	{% elseif data.formEditarIgv is defined %}{% set igv = data.formEditarIgv.igv %}{% endif %}
+                        	<input type="text" class="f_maxwidth100" id="inpIgv" name="igv" value='{{ igv }}' required><span>%</span>
+                        </div>
+                    </div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cambios</button>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Editar igv #}
+  
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formEditarIgv').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+	</script>
+{% endblock %}

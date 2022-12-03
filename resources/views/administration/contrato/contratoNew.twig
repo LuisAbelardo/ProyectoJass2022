@@ -1,0 +1,1012 @@
+{% set menuLItem, menuLLink = 'contrato', 'nuevo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevo contrato #}
+	<form class="f_inputflat" id="formNuevoContrato" method="post" action="{{ PUBLIC_PATH }}/contrato/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-contract mr-3"></i>Nuevo contrato
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpPredio">Código de predio</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth150" id="inpPredio" name="predio" required
+                        			value='{% if data.formNuevoContrato.predio is defined %}{{ data.formNuevoContrato.predio }}{% endif %}'>
+                			<button type="button" class="f_btnflat" name="btnBuscarPredio" id="btnBuscarPredio">
+                				<span class="fas fa-search"></span>
+            				</button>
+                			<span><i class="fas fa-spinner f_classforrotatespinner d-none" id="spinnerBuscarPredio"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpPredioCalle">Predio calle</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth400" id="inpPredioCalle" name="predioCalle" required disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpPredioDireccion">Predio dirección</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth400" id="inpPredioDireccion" name="predioDireccion" required disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpClienteDocumento">Cliente DNI / RUC</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth150" id="inpClienteDocumento" name="clienteDocumento" required disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpClienteNombre">Cliente nombre</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth400" id="inpClienteNombre" name="clienteNombre" required disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbTipoUsoPredio">Tipo de uso del predio</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="tipoUsoPredio" class="f_minwidth300" id="cmbTipoUsoPredio" required>
+                            	{% set selectedTipoUsoPredio = false %}
+                                {% for tipoUsoPredio in data.tiposUsoPredio %}
+                                	<option value="{{ tipoUsoPredio.TUP_CODIGO }}"
+                            				{% if not selectedTipoUsoPredio and data.formNuevoContrato is defined 
+                            				        and data.formNuevoContrato.tipoUsoPredio ==  tipoUsoPredio.TUP_CODIGO %}
+                            					{{ 'selected' }}{% set selectedTipoUsoPredio = true %}
+                                            {% endif %}>
+                        				{{ tipoUsoPredio.TUP_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbServicios">Servicios</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<i class="fas fa-cube"></i>
+                            <select name="servicios[]" class="f_minwidth400" id="cmbServicios" multiple required>
+                            {% for servicio in data.servicios %}
+                            	<option value="{{ servicio.SRV_CODIGO }}"
+                        				{% if data.formNuevoContrato is defined and data.formNuevoContrato.servicios is defined %}
+                    				        {% for selectedServicio in data.formNuevoContrato.servicios %}
+                    				        	{% if selectedServicio ==  servicio.SRV_CODIGO %}
+                    				        	    {{ 'selected' }}
+                    				        	{% endif %}
+                    				        {% endfor %}
+                    					{% endif %}>
+                    				{{ servicio.SRV_NOMBRE }}
+                				</option>
+                            {% endfor %}
+                            </select>
+                            <button type="button" class="f_btngenerico" style="padding:4px 8px; font-size:.8rem" 
+                            		data-toggle="modal" data-target="#modalMasDetalleServicio" id="btnMasDetalleServicios">
+                				Más detalles
+            				</button>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbEstadoContrato">Estado contrato</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="estado" class="f_minwidth300" id="cmbEstadoContrato" required>
+                            	<option value="{{ 0 }}"
+                        				{% if data.formNuevoContrato is defined 
+                        				        and data.formNuevoContrato.estado ==  0 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'TRAMITE' }}
+                				</option>
+                				<option value="{{ 1 }}"
+                        				{% if data.formNuevoContrato is defined 
+                        				        and data.formNuevoContrato.estado ==  1 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'ACTIVO' }}
+								</option>
+								<option value="{{ 5 }}"
+									{% if data.formNuevoContrato is defined 
+												and data.formNuevoContrato.estado ==  5 %}{{ 'selected' }}{% endif %}>
+									{{ 'PASIVO' }}
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="txaObservacion">Observación</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set observacion = '' %}
+                        	{% if data.formNuevoContrato.observacion is defined %}
+                        	    {% set observacion = data.formNuevoContrato.observacion %}{% endif %}
+                        	<textarea class="f_minwidth400" id="txaObservacion" rows="2" maxlength="256" 
+                        				name="observacion">{{ observacion }}</textarea>
+                        </div>
+                    </div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar</button>
+        			<a href="{{ PUBLIC_PATH }}/contrato/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+      	
+      	
+      	{# Modal mas detalles de servicios #}
+        <div class="modal fade f_modal" id="modalMasDetalleServicio" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="modal-title">Detalle de servicios</span>
+                    </div>
+                    <div class="modal-body">
+                    
+                    	{# Contenedor mas detalles de servicios #}
+                    	<div id="divNuevoContratoMasDetalles">
+                    	
+                            {# Contenedor mas detalles de agua #}
+                    		<div id="divNuevoContratoMasDetallesAgua">
+                        		<h5 style="color:#23878c" class="mb-4">Servicio de Agua</h5>
+                        		<div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="inpAguaFechaInstalacion">Fecha de instalación</label>
+                                    <div class="col-12 col-md-9">
+                                    	{% set aguaFechaInstalacion = '' %}
+                                    	{% if data.formNuevoContrato.aguaFechaInstalacion is defined %}
+                                    	    {% set aguaFechaInstalacion = data.formNuevoContrato.aguaFechaInstalacion %}{% endif %}
+                                    	<input type="date" class="f_minwidth300" id="inpAguaFechaInstalacion" name="aguaFechaInstalacion" 
+                                    			value="{{ aguaFechaInstalacion }}">
+                                    </div>
+                                </div>
+                        		<div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Característica de la conexion</label>
+                                    <div class="col-12 col-md-9">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaConexionCaracteristica" 
+                                            		id="inpAguaConexionCaracteristicaSC" value="sin caja"
+                                            		{% if data.formNuevoContrato.aguaConexionCaracteristica is defined 
+                                				        and data.formNuevoContrato.aguaConexionCaracteristica ==  "sin caja" %}
+                                    					{{ 'checked' }}
+                                                    {% endif %}>
+                                            <label class="form-check-label" for="inpAguaConexionCaracteristicaSC">Sin caja</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaConexionCaracteristica" 
+                                            		id="inpAguaConexionCaracteristicaCC" value="con caja"
+                                            		{% if data.formNuevoContrato.aguaConexionCaracteristica is defined 
+                                				        and data.formNuevoContrato.aguaConexionCaracteristica ==  "con caja" %}
+                                    					{{ 'checked' }}
+                                                    {% endif %}>
+                                            <label class="form-check-label" for="inpAguaConexionCaracteristicaCC">Con caja</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Diametro de la conexion</label>
+                                    <div class="col-12 col-md-9">
+                                    	<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaConexionDiametro" 
+                                            		id="inpAguaConexionDiametro1-2" value="1/2"
+                                            		{% if data.formNuevoContrato.aguaConexionDiametro is defined 
+                                				        and data.formNuevoContrato.aguaConexionDiametro ==  "1/2" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaConexionDiametro1-2">1/2"</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaConexionDiametro" 
+                                            		id="inpAguaConexionDiametro3-4" value="3/4"
+                                            		{% if data.formNuevoContrato.aguaConexionDiametro is defined 
+                                				        and data.formNuevoContrato.aguaConexionDiametro ==  "3/4" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaConexionDiametro3-4">3/4"</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Diametro de la red</label>
+                                    <div class="col-12 col-md-9">
+                                    	<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaDiametroRed" 
+                                            		id="inpAguaDiametroRed2" value="2"
+                                            		{% if data.formNuevoContrato.aguaDiametroRed is defined 
+                                				        and data.formNuevoContrato.aguaDiametroRed ==  "2" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaDiametroRed2">2"</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaDiametroRed" 
+                                            		id="inpAguaDiametroRed3" value="3"
+                                            		{% if data.formNuevoContrato.aguaDiametroRed is defined 
+                                				        and data.formNuevoContrato.aguaDiametroRed ==  "3" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaDiametroRed3">3"</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaDiametroRed" 
+                                            		id="inpAguaDiametroRed4" value="4"
+                                            		{% if data.formNuevoContrato.aguaDiametroRed is defined 
+                                				        and data.formNuevoContrato.aguaDiametroRed ==  "4" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaDiametroRed4">4"</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Material de conexion</label>
+                                    <div class="col-12 col-md-9">
+                                    	<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaMaterialConexion" 
+                                            		id="inpAguaMaterialConexionPVC" value="pvc"
+                                            		{% if data.formNuevoContrato.aguaMaterialConexion is defined 
+                                				        and data.formNuevoContrato.aguaMaterialConexion ==  "pvc" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaMaterialConexionPVC">PVC</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaMaterialConexion" 
+                                            		id="inpAguaMaterialConexionF" value="fierro"
+                                            		{% if data.formNuevoContrato.aguaMaterialConexion is defined 
+                                				        and data.formNuevoContrato.aguaMaterialConexion ==  "fierro" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaMaterialConexionF">Fierro</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Material de abrazadera</label>
+                                    <div class="col-12 col-md-9">
+                                    	<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaMaterialAbrazadera" 
+                                            		id="inpAguaMaterialAbrazaderaPVC" value="pvc"
+                                            		{% if data.formNuevoContrato.aguaMaterialAbrazadera is defined 
+                                				        and data.formNuevoContrato.aguaMaterialAbrazadera ==  "pvc" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaMaterialAbrazaderaPVC">PVC</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="aguaMaterialAbrazadera" 
+                                            		id="inpAguaMaterialAbrazaderaF" value="fierro"
+                                            		{% if data.formNuevoContrato.aguaMaterialAbrazadera is defined 
+                                				        and data.formNuevoContrato.aguaMaterialAbrazadera ==  "fierro" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAguaMaterialAbrazaderaF">Fierro</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAguaUbicacionCaja">Ubicacion de la caja</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="aguaUbicacionCaja" class="f_minwidth300" id="cmbAguaUbicacionCaja"> 
+                                    		<option value="-1"></option>
+                                        	<option value="vereda"
+                                    				{% if data.formNuevoContrato.aguaUbicacionCaja is defined 
+                                    				        and data.formNuevoContrato.aguaUbicacionCaja ==  "vereda" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Vereda
+                            				</option>
+                            				<option value="jardin"
+                                    				{% if data.formNuevoContrato.aguaUbicacionCaja is defined 
+                                    				        and data.formNuevoContrato.aguaUbicacionCaja ==  "jardin" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Jardin
+                            				</option>
+                            				<option value="interior casa"
+                                    				{% if data.formNuevoContrato.aguaUbicacionCaja is defined 
+                                    				        and data.formNuevoContrato.aguaUbicacionCaja ==  "interior casa" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Interior casa
+                            				</option>
+                            				<option value="no tiene"
+                                    				{% if data.formNuevoContrato.aguaUbicacionCaja is defined 
+                                    				        and data.formNuevoContrato.aguaUbicacionCaja ==  "no tiene" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    No tiene
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAguaMaterialCaja">Material de la caja</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="aguaMaterialCaja" class="f_minwidth300" id="cmbAguaMaterialCaja"> 
+                                    		<option value="-1"></option>
+                                        	<option value="concreto"
+                                    				{% if data.formNuevoContrato.aguaMaterialCaja is defined 
+                                    				        and data.formNuevoContrato.aguaMaterialCaja ==  "concreto" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Concreto
+                            				</option>
+                            				<option value="ladrillo"
+                                    				{% if data.formNuevoContrato.aguaMaterialCaja is defined 
+                                    				        and data.formNuevoContrato.aguaMaterialCaja ==  "ladrillo" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Ladrillo
+                            				</option>
+                            				<option value="termoplastico"
+                                    				{% if data.formNuevoContrato.aguaMaterialCaja is defined 
+                                    				        and data.formNuevoContrato.aguaMaterialCaja ==  "termoplastico" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Termoplastico
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAguaEstadoCaja">Estado de la caja</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="aguaEstadoCaja" class="f_minwidth300" id="cmbAguaEstadoCaja"> 
+                                    		<option value="-1"></option>
+                                        	<option value="buena"
+                                    				{% if data.formNuevoContrato.aguaEstadoCaja is defined 
+                                    				        and data.formNuevoContrato.aguaEstadoCaja ==  "buena" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Buena
+                            				</option>
+                            				<option value="sucia"
+                                    				{% if data.formNuevoContrato.aguaEstadoCaja is defined 
+                                    				        and data.formNuevoContrato.aguaEstadoCaja ==  "sucia" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Sucia
+                            				</option>
+                            				<option value="mal estado"
+                                    				{% if data.formNuevoContrato.aguaEstadoCaja is defined 
+                                    				        and data.formNuevoContrato.aguaEstadoCaja ==  "mal estado" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Mal estado
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAguaMaterialTapa">Material de la tapa</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="aguaMaterialTapa" class="f_minwidth300" id="cmbAguaMaterialTapa"> 
+                                    		<option value="-1"></option>
+                                        	<option value="concreto"
+                                    				{% if data.formNuevoContrato.aguaMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.aguaMaterialTapa ==  "concreto" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Concreto
+                            				</option>
+                            				<option value="ladrillo"
+                                    				{% if data.formNuevoContrato.aguaMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.aguaMaterialTapa ==  "ladrillo" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Ladrillo
+                            				</option>
+                            				<option value="fierro"
+                                    				{% if data.formNuevoContrato.aguaMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.aguaMaterialTapa ==  "fierro" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Fierro
+                            				</option>
+                            				<option value="termoplastico"
+                                    				{% if data.formNuevoContrato.aguaMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.aguaMaterialTapa ==  "termoplastico" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Termoplastico
+                            				</option>
+                            				<option value="no tiene"
+                                    				{% if data.formNuevoContrato.aguaMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.aguaMaterialTapa ==  "no tiene" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    No Tiene
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAguaEstadoTapa">Estado de la tapa</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="aguaEstadoTapa" class="f_minwidth300" id="cmbAguaEstadoTapa"> 
+                                    		<option value="-1"></option>
+                                        	<option value="buena"
+                                    				{% if data.formNuevoContrato.aguaEstadoTapa is defined 
+                                    				        and data.formNuevoContrato.aguaEstadoTapa ==  "buena" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Buena
+                            				</option>
+                            				<option value="sellada"
+                                    				{% if data.formNuevoContrato.aguaEstadoTapa is defined 
+                                    				        and data.formNuevoContrato.aguaEstadoTapa ==  "sellada" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Sellada
+                            				</option>
+                            				<option value="mal estado"
+                                    				{% if data.formNuevoContrato.aguaEstadoTapa is defined 
+                                    				        and data.formNuevoContrato.aguaEstadoTapa ==  "mal estado" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Mal estado
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>{# /Contenedor mas detalles de agua #}
+                            
+                            
+                            {# Contenedor mas detalles de alcantarillado #}
+                            <div id="divNuevoContratoMasDetallesAlc">
+                                <h5 style="color:#23878c" class="my-4">Servicio de Alcantarillado</h5>
+                        		<div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="inpAlcFechaConexion">Fecha de conexion</label>
+                                    <div class="col-12 col-md-9">
+                                    	{% set alcFechaConexion = '' %}
+                                    	{% if data.formNuevoContrato.alcFechaConexion is defined %}
+                                    	    {% set alcFechaConexion = data.formNuevoContrato.alcFechaConexion %}{% endif %}
+                                    	<input type="date" class="f_minwidth300" id="inpAlcFechaConexion" name="alcFechaConexion" 
+                                    			value="{{ alcFechaConexion }}">
+                                    </div>
+                                </div>
+                        		<div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Característica de la conexion</label>
+                                    <div class="col-12 col-md-9">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcConexionCaracteristica" 
+                                            		id="inpAlcConexionCaracteristicaSC" value="sin caja"
+                                            		{% if data.formNuevoContrato.alcConexionCaracteristica is defined 
+                                				        and data.formNuevoContrato.alcConexionCaracteristica ==  "sin caja" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcConexionCaracteristicaSC">Sin caja</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcConexionCaracteristica" 
+                                            		id="inpAlcConexionCaracteristicaCC" value="con caja"
+                                            		{% if data.formNuevoContrato.alcConexionCaracteristica is defined 
+                                				        and data.formNuevoContrato.alcConexionCaracteristica ==  "con caja" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcConexionCaracteristicaCC">Con caja</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Tipo de conexion</label>
+                                    <div class="col-12 col-md-9">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcTipoConexion" 
+                                            		id="inpAlcTipoConexionCV" value="convencional"
+                                            		{% if data.formNuevoContrato.alcTipoConexion is defined 
+                                				        and data.formNuevoContrato.alcTipoConexion ==  "convencional" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcTipoConexionCV">Convencional</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcTipoConexion" 
+                                            		id="inpAlcTipoConexionCD" value="condominial"
+                                            		{% if data.formNuevoContrato.alcTipoConexion is defined 
+                                				        and data.formNuevoContrato.alcTipoConexion ==  "condominial" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcTipoConexionCD">Condominial</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Diametro de la conexion</label>
+                                    <div class="col-12 col-md-9">
+                                    	<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcConexionDiametro" 
+                                            		id="inpAlcConexionDiametro4" value="4"
+                                            		{% if data.formNuevoContrato.alcConexionDiametro is defined 
+                                				        and data.formNuevoContrato.alcConexionDiametro ==  "4" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcConexionDiametro4">4"</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcConexionDiametro" 
+                                            		id="inpAlcConexionDiametro6" value="6"
+                                            		{% if data.formNuevoContrato.alcConexionDiametro is defined 
+                                				        and data.formNuevoContrato.alcConexionDiametro ==  "6" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcConexionDiametro6">6"</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Diametro de la red</label>
+                                    <div class="col-12 col-md-9">
+                                    	<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcDiametroRed" 
+                                            		id="inpAlcDiametroRed4" value="4"
+                                            		{% if data.formNuevoContrato.alcDiametroRed is defined 
+                                				        and data.formNuevoContrato.alcDiametroRed ==  "4" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcDiametroRed4">4"</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcDiametroRed" 
+                                            		id="inpAlcDiametroRed6" value="6"
+                                            		{% if data.formNuevoContrato.alcDiametroRed is defined 
+                                				        and data.formNuevoContrato.alcDiametroRed ==  "6" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcDiametroRed6">6"</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcDiametroRed" 
+                                            		id="inpAlcDiametroRed8" value="8"
+                                            		{% if data.formNuevoContrato.alcDiametroRed is defined 
+                                				        and data.formNuevoContrato.alcDiametroRed ==  "8" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcDiametroRed8">8"</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcDiametroRed" 
+                                            		id="inpAlcDiametroRed10" value="10"
+                                            		{% if data.formNuevoContrato.alcDiametroRed is defined 
+                                				        and data.formNuevoContrato.alcDiametroRed ==  "10" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcDiametroRed10">10"</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field">Material de conexion</label>
+                                    <div class="col-12 col-md-9">
+                                    	<div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcMaterialConexion" 
+                                            		id="inpAlcMaterialConexionPVC" value="pvc"
+                                            		{% if data.formNuevoContrato.alcMaterialConexion is defined 
+                                				        and data.formNuevoContrato.alcMaterialConexion ==  "pvc" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcMaterialConexionPVC">PVC</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="alcMaterialConexion" 
+                                            		id="inpAlcMaterialConexionF" value="fierro"
+                                            		{% if data.formNuevoContrato.alcMaterialConexion is defined 
+                                				        and data.formNuevoContrato.alcMaterialConexion ==  "fierro" %}
+                                					{{ 'checked' }}
+                                                {% endif %}>
+                                            <label class="form-check-label" for="inpAlcMaterialConexionF">Fierro</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAlcUbicacionCaja">Ubicacion de la caja</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="alcUbicacionCaja" class="f_minwidth300" id="cmbAlcUbicacionCaja"> 
+                                    		<option value="-1"></option>
+                                        	<option value="vereda"
+                                    				{% if data.formNuevoContrato.alcUbicacionCaja is defined 
+                                    				        and data.formNuevoContrato.alcUbicacionCaja ==  "vereda" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Vereda
+                            				</option>
+                            				<option value="jardin"
+                                    				{% if data.formNuevoContrato.alcUbicacionCaja is defined 
+                                    				        and data.formNuevoContrato.alcUbicacionCaja ==  "jardin" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Jardin
+                            				</option>
+                            				<option value="interior casa"
+                                    				{% if data.formNuevoContrato.alcUbicacionCaja is defined 
+                                    				        and data.formNuevoContrato.alcUbicacionCaja ==  "interior casa" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Interior casa
+                            				</option>
+                            				<option value="no tiene"
+                                    				{% if data.formNuevoContrato.alcUbicacionCaja is defined 
+                                    				        and data.formNuevoContrato.alcUbicacionCaja ==  "no tiene" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    No tiene
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAlcMaterialCaja">Material de la caja</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="alcMaterialCaja" class="f_minwidth300" id="cmbAlcMaterialCaja"> 
+                                    		<option value="-1"></option>
+                                        	<option value="concreto"
+                                    				{% if data.formNuevoContrato.alcMaterialCaja is defined 
+                                    				        and data.formNuevoContrato.alcMaterialCaja ==  "concreto" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Concreto
+                            				</option>
+                            				<option value="ladrillo"
+                                    				{% if data.formNuevoContrato.alcMaterialCaja is defined 
+                                    				        and data.formNuevoContrato.alcMaterialCaja ==  "ladrillo" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Ladrillo
+                            				</option>
+                            				<option value="termoplastico"
+                                    				{% if data.formNuevoContrato.alcMaterialCaja is defined 
+                                    				        and data.formNuevoContrato.alcMaterialCaja ==  "termoplastico" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Termoplastico
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAlcEstadoCaja">Estado de la caja</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="alcEstadoCaja" class="f_minwidth300" id="cmbAlcEstadoCaja"> 
+                                    		<option value="-1"></option>
+                                        	<option value="buena"
+                                    				{% if data.formNuevoContrato.alcEstadoCaja is defined 
+                                    				        and data.formNuevoContrato.alcEstadoCaja ==  "buena" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Buena
+                            				</option>
+                            				<option value="sucia"
+                                    				{% if data.formNuevoContrato.alcEstadoCaja is defined 
+                                    				        and data.formNuevoContrato.alcEstadoCaja ==  "sucia" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Sucia
+                            				</option>
+                            				<option value="mal estado"
+                                    				{% if data.formNuevoContrato.alcEstadoCaja is defined 
+                                    				        and data.formNuevoContrato.alcEstadoCaja ==  "mal estado" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Mal estado
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAlcDimencionCaja">Dimención de la caja</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="alcDimencionCaja" class="f_minwidth300" id="cmbAlcDimencionCaja"> 
+                                    		<option value="-1"></option>
+                                        	<option value="70x40 cm"
+                                    				{% if data.formNuevoContrato.alcDimencionCaja is defined 
+                                    				        and data.formNuevoContrato.alcDimencionCaja ==  "70x40 cm" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    70 x 40 cm
+                            				</option>
+                            				<option value="60x40 cm"
+                                    				{% if data.formNuevoContrato.alcDimencionCaja is defined 
+                                    				        and data.formNuevoContrato.alcDimencionCaja ==  "60x40 cm" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    60 x 40 cm
+                            				</option>
+                            				<option value="otro"
+                                    				{% if data.formNuevoContrato.alcDimencionCaja is defined 
+                                    				        and data.formNuevoContrato.alcDimencionCaja ==  "otro" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Otro
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAlcMaterialTapa">Material de la tapa</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="alcMaterialTapa" class="f_minwidth300" id="cmbAlcMaterialTapa"> 
+                                    		<option value="-1"></option>
+                                        	<option value="concreto"
+                                    				{% if data.formNuevoContrato.alcMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.alcMaterialTapa ==  "concreto" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Concreto
+                            				</option>
+                            				<option value="fierro"
+                                    				{% if data.formNuevoContrato.alcMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.alcMaterialTapa ==  "fierro" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Fierro
+                            				</option>
+                            				<option value="madera"
+                                    				{% if data.formNuevoContrato.alcMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.alcMaterialTapa ==  "madera" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Madera
+                            				</option>
+                            				<option value="no tiene"
+                                    				{% if data.formNuevoContrato.alcMaterialTapa is defined 
+                                    				        and data.formNuevoContrato.alcMaterialTapa ==  "no tiene" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    No Tiene
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAlcEstadoTapa">Estado de la tapa</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="alcEstadoTapa" class="f_minwidth300" id="cmbAlcEstadoTapa"> 
+                                    		<option value="-1"></option>
+                                        	<option value="buena"
+                                    				{% if data.formNuevoContrato.alcEstadoTapa is defined 
+                                    				        and data.formNuevoContrato.alcEstadoTapa ==  "buena" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Buena
+                            				</option>
+                            				<option value="sellada"
+                                    				{% if data.formNuevoContrato.alcEstadoTapa is defined 
+                                    				        and data.formNuevoContrato.alcEstadoTapa ==  "sellada" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Sellada
+                            				</option>
+                            				<option value="mal estado"
+                                    				{% if data.formNuevoContrato.alcEstadoTapa is defined 
+                                    				        and data.formNuevoContrato.alcEstadoTapa ==  "mal estado" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Mal estado
+                            				</option>
+                            				<option value="no tiene"
+                                    				{% if data.formNuevoContrato.alcEstadoTapa is defined 
+                                    				        and data.formNuevoContrato.alcEstadoTapa ==  "no tiene" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    No tiene
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                	<label class="col-12 col-md-3 f_field" for="cmbAlcMedidasTapa">Medidas de la tapa</label>
+                                    <div class="col-12 col-md-9">
+                                    	<select name="alcMedidasTapa" class="f_minwidth300" id="cmbAlcMedidasTapa"> 
+                                    		<option value="-1"></option>
+                                        	<option value="62x32 cm"
+                                    				{% if data.formNuevoContrato.alcMedidasTapa is defined 
+                                    				        and data.formNuevoContrato.alcMedidasTapa ==  "62x32 cm" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    62 x 32 cm
+                            				</option>
+                            				<option value="54x34 cm"
+                                    				{% if data.formNuevoContrato.alcMedidasTapa is defined 
+                                    				        and data.formNuevoContrato.alcMedidasTapa ==  "54x34 cm" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    54 x 34 cm
+                            				</option>
+                            				<option value="53x53 cm"
+                                    				{% if data.formNuevoContrato.alcMedidasTapa is defined 
+                                    				        and data.formNuevoContrato.alcMedidasTapa ==  "53x53 cm" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    53 x 53 cm
+                            				</option>
+                            				<option value="otro"
+                                    				{% if data.formNuevoContrato.alcMedidasTapa is defined 
+                                    				        and data.formNuevoContrato.alcMedidasTapa ==  "otro" %}
+                                    					{{ 'selected' }}
+                                                    {% endif %}>
+                                                    Otro
+                            				</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>{# /Contenedor mas detalles de alcantarillado #}
+                            
+                    	</div>{# /Contenedor mas detalles de servicios #}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="f_btnactionmodal" id="btnCancelarMasDetallesServ" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="f_btnactionmodal" id="btnGuardarMasDetallesServ" data-dismiss="modal">Hecho</button>
+                    </div>
+                </div>
+            </div>
+        </div>{# /Modal mas detalles de servicio #}
+  	
+  	</form>{# /Formulario Nuevo contrato #}
+  
+</div><!-- /.card -->
+
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoContrato').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2('#cmbServicios');
+        f_select2('#cmbTipoUsoPredio');
+        f_select2('#cmbEstadoContrato');
+        
+        f_select2('#cmbConexionCaracteristica');
+        
+        
+        
+        $("#btnBuscarPredio").click(function(){
+        
+        	$("#inpPredioCalle").val("");
+			$("#inpPredioDireccion").val("");
+			$("#inpClienteDocumento").val("");
+			$("#inpClienteNombre").val("");
+        	
+        	$("#inpPredio").val($("#inpPredio").val().trim());
+        	var inpPredio = $("#inpPredio").val();
+        	
+        	if(inpPredio != ""){
+        	
+        		var spinnerBuscarPredio = $("#spinnerBuscarPredio");
+        		spinnerBuscarPredio.removeClass("d-none");
+        	
+        		$.ajax({
+                    method: "GET",
+                    url: "{{ PUBLIC_PATH }}/predio/detalle/json/"+inpPredio,
+                    dataType: "json",
+                    complete: function(){
+                    	spinnerBuscarPredio.addClass("d-none");
+                    },
+        			error: function(jqXHR){
+        				var msj = "";
+        				if(jqXHR.status == 404){
+        					msj = "No se encontro el predio solicitado";
+        					console.log(msj);
+        				}else{
+        					msj = "Ocurrio un error inesperado, vuelva a intentarlo";
+        					console.log(msj);
+        				}
+        				$(document).Toasts('create', {
+                            	class: 'bg-danger',
+                                title: 'Respuesta de busqueda',
+                                position: 'topRight',
+                                autohide: true,
+       							delay: 4000,
+                                body: msj
+                            })
+        			},
+        			success: function(respons){
+        				$("#inpPredioCalle").val(respons.data.calle.nombre);
+        				$("#inpPredioDireccion").val(respons.data.predio.direccion);
+        				$("#inpClienteDocumento").val(respons.data.cliente.documento);
+        				$("#inpClienteNombre").val(respons.data.cliente.nombre);
+        			}
+                });
+        	}
+        });
+        
+        
+        $("#btnCancelarMasDetallesServ").click(function(){
+        	document.querySelectorAll('#divNuevoContratoMasDetalles input[type="date"]').forEach(function(inp){inp.value='';});
+        	document.querySelectorAll('#divNuevoContratoMasDetalles input[type="radio"]').forEach(function(inp){inp.checked=false;});
+        	document.querySelectorAll('#divNuevoContratoMasDetalles select').forEach(function(slt){slt.selectedIndex=-1;});
+        });
+        
+        
+        
+        if($('#cmbServicios option:selected').length == 0){
+        	$('#btnMasDetalleServicios').addClass("d-none");
+        }
+        
+        $("#cmbServicios").change(function(){
+        	if($('#cmbServicios option:selected').length == 0){
+        		document.querySelectorAll('#divNuevoContratoMasDetalles input[type="date"]').forEach(function(inp){inp.value='';});
+        		document.querySelectorAll('#divNuevoContratoMasDetalles input[type="radio"]').forEach(function(inp){inp.checked=false;});
+        		document.querySelectorAll('#divNuevoContratoMasDetalles select').forEach(function(slt){slt.selectedIndex=-1;});
+        		$('#btnMasDetalleServicios').removeClass("d-inline-block");
+        		$('#btnMasDetalleServicios').addClass("d-none");
+        	}else if($('#cmbServicios option:selected').length == 1){
+        		$('#cmbServicios option:selected').each(function() {
+                    if($(this).val() == 1){
+                    	document.querySelectorAll('#divNuevoContratoMasDetallesAlc input[type="date"]').forEach(function(inp){inp.value='';});
+                    	document.querySelectorAll('#divNuevoContratoMasDetallesAlc input[type="radio"]').forEach(function(inp){inp.checked=false;});
+        				document.querySelectorAll('#divNuevoContratoMasDetallesAlc select').forEach(function(slt){slt.selectedIndex=-1;});
+        				$('#divNuevoContratoMasDetallesAlc').removeClass("d-block");
+        				$('#divNuevoContratoMasDetallesAlc').addClass("d-none");
+        				$('#divNuevoContratoMasDetallesAgua').removeClass("d-none");
+        				$('#divNuevoContratoMasDetallesAgua').addClass("d-block");
+                    }else if($(this).val() == 2){
+                    	document.querySelectorAll('#divNuevoContratoMasDetallesAgua input[type="date"]').forEach(function(inp){inp.value='';});
+                    	document.querySelectorAll('#divNuevoContratoMasDetallesAgua input[type="radio"]').forEach(function(inp){inp.checked=false;});
+        				document.querySelectorAll('#divNuevoContratoMasDetallesAgua select').forEach(function(slt){slt.selectedIndex=-1;});
+        				$('#divNuevoContratoMasDetallesAgua').removeClass("d-block");
+        				$('#divNuevoContratoMasDetallesAgua').addClass("d-none");
+        				$('#divNuevoContratoMasDetallesAlc').removeClass("d-none");
+        				$('#divNuevoContratoMasDetallesAlc').addClass("d-block");
+                    }
+                });
+                $('#btnMasDetalleServicios').removeClass("d-none");
+                $('#btnMasDetalleServicios').addClass("d-inline-block");
+        	}else if($('#cmbServicios option:selected').length == 2){
+        		$('#divNuevoContratoMasDetallesAgua').removeClass("d-none");
+        		$('#divNuevoContratoMasDetallesAgua').addClass("d-block");
+        		$('#divNuevoContratoMasDetallesAlc').removeClass("d-none");
+        		$('#divNuevoContratoMasDetallesAlc').addClass("d-block");
+        		$('#btnMasDetalleServicios').removeClass("d-none");
+        		$('#btnMasDetalleServicios').addClass("d-inline-block");
+        	}
+        });
+        
+	</script>
+	
+{% endblock %}

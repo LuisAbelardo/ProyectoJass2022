@@ -1,0 +1,880 @@
+{% set menuLItem = 'contrato' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Editar contrato #}
+	<form class="f_inputflat" id="formEditarContrato" method="post" action="{{ PUBLIC_PATH }}/contrato/update">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-contract mr-3"></i>Editar contrato
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  		<div class="f_divwithbartop f_divwithbarbottom">
+          	<div class="row">
+          		<div class="col-12 col-lg-7">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 f_field">Ref.</label>
+                        <div class="col-12 col-md-9">
+                        	{% set codigoContrato = "" %}
+                        	{% if data.contrato is defined %}{% set codigoContrato = data.contrato.CTO_CODIGO %}{{ data.contrato.CTO_CODIGO }}
+                        	{% elseif data.formEditarContrato is defined %}
+                        	    {% set codigoContrato = data.formEditarContrato.codigo %}{{ data.formEditarContrato.codigo }}{% endif %}
+                        	<input type="hidden" class="f_minwidth300" id="inpCodigo" name="codigo" value='{{ codigoContrato }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 f_field" for="inpPredio">Código de predio</label>
+                        <div class="col-12 col-md-9">
+                        	{% set predioCodigo = "" %}
+                        	{% if data.predio is defined %}{% set predioCodigo = data.predio.PRE_CODIGO %}
+                        	{% elseif data.formEditarContrato is defined %}{% set predioCodigo = data.formEditarContrato.predioCodigo %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpPredio" disabled value='{{ predioCodigo }}'>
+                        	<input type="hidden" name="predioCodigo" value='{{ predioCodigo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 f_field" for="inpPredioCalle">Predio calle</label>
+                        <div class="col-12 col-md-9">
+                        	{% set predioCalle = "" %}
+                        	{% if data.calle is defined %}{% set predioCalle = data.calle.CAL_NOMBRE %}
+                        	{% elseif data.formEditarContrato is defined %}{% set predioCalle = data.formEditarContrato.predioCalle %}{% endif %}
+                        	<input type="text" class="f_minwidth400" id="inpPredioCalle" disabled value='{{ predioCalle }}'>
+                        	<input type="hidden" name="predioCalle" value='{{ predioCalle }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 f_field" for="inpPredioDireccion">Predio dirección</label>
+                        <div class="col-12 col-md-9">
+                        	{% set predioDireccion = "" %}
+                        	{% if data.predio is defined %}{% set predioDireccion = data.predio.PRE_DIRECCION %}
+                        	{% elseif data.formEditarContrato is defined %}
+                        	    {% set predioDireccion = data.formEditarContrato.predioDireccion %}{% endif %}
+                        	<input type="text" class="f_minwidth400" id="inpPredioDireccion" disabled value='{{ predioDireccion }}'>
+                        	<input type="hidden" name="predioDireccion" value='{{ predioDireccion }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 f_field" for="inpClienteDocumento">Cliente DNI / RUC</label>
+                        <div class="col-12 col-md-9">
+                        	{% set clienteDocumento = "" %}
+                        	{% if data.cliente is defined %}{% set clienteDocumento = data.cliente.CLI_DOCUMENTO %}
+                        	{% elseif data.formEditarContrato is defined %}
+                        	    {% set clienteDocumento = data.formEditarContrato.clienteDocumento %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpClienteDocumento" disabled value='{{ clienteDocumento }}'>
+                        	<input type="hidden" name="clienteDocumento" value='{{ clienteDocumento }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 f_field" for="inpClienteNombre">Cliente nombre</label>
+                        <div class="col-12 col-md-9">
+                        	{% set clienteNombre = "" %}
+                        	{% if data.cliente is defined %}{% set clienteNombre = data.cliente.CLI_NOMBRES %}
+                        	{% elseif data.formEditarContrato is defined %}
+                        	    {% set clienteNombre = data.formEditarContrato.clienteNombre %}{% endif %}
+                        	<input type="text" class="f_minwidth400" id="inpClienteNombre" disabled value='{{ clienteNombre }}'>
+                        	<input type="hidden" name="clienteNombre" value='{{ clienteNombre }}'>
+                        </div>
+                    </div>
+                    {# Campo auxiliar para almacenar estado original del contrato #}
+                    <div class="form-group row d-none">
+                    	<label class="col-12 col-md-3 f_field" for="inpEstado">Old Estate</label>
+                        <div class="col-12 col-md-9">
+                    		{% set estado = "" %}
+                        	{% if data.contrato is defined %}{% set estado = data.contrato.CTO_ESTADO %}
+                        	{% elseif data.formEditarContrato is defined %}{% set estado = data.formEditarContrato.estado %}{% endif %}
+                        	<input type="hidden" class="f_minwidth300" id="inpEstado" name="estado" value='{{ estado }}'>
+                        </div>
+                    </div>{# /Campo auxiliar para almacenar estado original del contrato #}
+                    
+                    {% if (data.contrato is defined and data.contrato.CTO_ESTADO == 0) or (data.contrato is defined and data.contrato.CTO_ESTADO == 5)
+                            or (data.formEditarContrato is defined and data.formEditarContrato.estado == 0) %}
+                    <div class="form-group row">
+                    	<span class="col-12 col-md-3 f_field" for="chkContratoInicio">Estado</span>
+                        <div class="col-12 col-md-9">
+                        	{% set chkEstado = "" %}
+                        	{% if data.formEditarContrato.estadoNuevo is defined and data.formEditarContrato.estadoNuevo == 1 %}
+                        	    {% set chkEstado = "checked" %}{% endif %}
+                        	<input type="checkbox" id="chkContratoInicio" name="estadoNuevo" {{ chkEstado }} value="1">
+                        	<label class="f_field" for="chkContratoInicio">Contrato activo</label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 f_field" for="inpFechaInicio">Fecha Inicio</label>
+                        <div class="col-12 col-md-9">
+                    		{% set fechaInicio = "" %}
+                        	{% if data.contrato is defined %}{% set fechaInicio = data.contrato.CTO_FECHA_INICIO %}
+                        	{% elseif data.formEditarContrato.fechaInicio is defined %}
+                        	    {% set fechaInicio = data.formEditarContrato.fechaInicio %}{% endif %}
+                        	<input type="date" class="f_minwidth300" id="inpFechaInicio" name="fechaInicio" value='{{ fechaInicio }}'>
+                        </div>
+                    </div>
+                    {% endif %}
+          		
+
+    				<div class="form-group row">
+    					<label class="col-12 col-md-3 f_fieldrequired" for="cmbTipoUsoPredio">Tipo de uso del predio</label>
+    					<div class="col-12 col-md-9">
+    						<select name="tipoUsoPredio" class="f_minwidth300" id="cmbTipoUsoPredio" required>
+    						    {% set tipoUsoPredio = '' %}
+    							{% if data.tipoUsoPredio is defined %}{% set tipoUsoPredio = data.tipoUsoPredio.TUP_CODIGO %}
+    							{% elseif data.formEditarContrato.tipoUsoPredio is defined %}
+    							{% set tipoUsoPredio = data.formEditarContrato.tipoUsoPredio %}{% endif %}
+    							
+    							{% set selectedTipoUsoPredio = false %}
+    							{% for auxTipoUsoPredio in data.tiposUsoPredio %}
+    								<option value="{{ auxTipoUsoPredio.TUP_CODIGO }}"
+    										{% if not selectedTipoUsoPredio and tipoUsoPredio ==  auxTipoUsoPredio.TUP_CODIGO %}
+    											{{ 'selected' }}{% set selectedTipoUsoPredio = true %}
+    										{% endif %}>
+    									{{ auxTipoUsoPredio.TUP_NOMBRE }}
+    								</option>
+    							{% endfor %}
+    						</select>
+    					</div>
+    				</div>
+    				
+    				
+    				<div class="form-group row">
+                    	<label class="col-12 col-md-3 f_fieldrequired" for="cmbServicios">Servicios</label>
+                        <div class="col-12 col-md-9">
+                        	<i class="fas fa-cube"></i>
+                            <select name="servicios[]" class="f_minwidth400" id="cmbServicios" multiple required>
+                            {% set serviciosActivos = '' %}
+                            {% if data.serviciosActivos is defined %}{% set serviciosActivos = data.serviciosActivos %}
+                            {% elseif data.formEditarContrato.servicios is defined %}
+                            {% set serviciosActivos = data.formEditarContrato.servicios %}{% endif %}
+                            
+                            {% for servicio in data.servicios %}
+                            	<option value="{{ servicio.SRV_CODIGO }}"
+                				        {% for servicioActivo in serviciosActivos %}
+                				        	{% if servicioActivo.SRV_CODIGO ==  servicio.SRV_CODIGO %}
+                				        	    {{ 'selected' }}
+                				        	{% endif %}
+                				        {% endfor %}>
+                    				{{ servicio.SRV_NOMBRE }}
+                				</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+    				
+    				
+    				<div class="form-group row">
+                    	<label class="col-12 col-md-3 f_field" for="txaObservacion">Observación</label>
+                        <div class="col-12 col-md-9">
+                        	{% set observacion = "" %}
+                        	{% if data.contrato is defined %}{% set observacion = data.contrato.CTO_OBSERVACION %}
+                        	{% elseif data.formEditarContrato is defined %}{% set observacion = data.formEditarContrato.observacion %}{% endif %}
+                        	<textarea class="f_minwidth400" id="txaObservacion" rows="2" maxlength="256" 
+                        		name="observacion">{{ observacion }}</textarea>
+                        </div>
+                    </div>
+    				
+				</div>
+
+				
+				{# 
+          		<div class="form-group row">
+					<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbServicios">Servicios</label>
+					<div class="col-12 col-md-9 col-lg-10">
+						<i class="fas fa-cube"></i>
+						<select name="servicios[]" class="f_minwidth400" id="cmbServicios" multiple required>
+						{% for contratos in data.contrato %}
+							<option value="{{ servicio.SRV_CODIGO }}"
+									{% if data.formEditarContrato is defined and data.formEditarContrato.servicios is defined %}
+										{% for selectedServicio in data.formEditarContrato.servicios %}
+											{% if selectedServicio ==  servicio.SRV_CODIGO %}
+												{{ 'selected' }}
+											{% endif %}
+										{% endfor %}
+									{% endif %}>
+								{{ servicio.SRV_NOMBRE }}
+							</option>
+						{% endfor %}
+						</select>
+					</div>
+				</div>
+          		#}
+          		
+          		{% set tieneAgua = false %}
+              	{% set tieneDesague = false %}
+              	
+              	{% if data.servicios is defined  %}
+              		{% set cantServicios = 0 %}
+              	    {% for servicio in data.serviciosActivos %}
+              	    	{% if servicio.SRV_CODIGO == 1 %}{% set tieneAgua = true %}
+              	    	{% elseif servicio.SRV_CODIGO == 2 %}{% set tieneDesague = true %}{% endif %}
+              	    {% endfor %}
+              	{% endif %}
+          		<div class="col-12 col-lg-5">
+          			{# Contenedor mas detalles de servicios #}
+                	<div id="divNuevoContratoMasDetalles">
+                	
+                		{% if tieneAgua %}
+                        {# Contenedor mas detalles de agua #}
+                		<div id="divNuevoContratoMasDetallesAgua">
+                    		<h6 class="mb-4 text-bold">Servicio de Agua</h6>
+                    		<div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="inpAguaFechaInstalacion">Fecha de instalación</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaFechaInstalacion = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaFechaInstalacion = data.contrato.CTO_AGU_FEC_INS %}
+                                	{% elseif data.formEditarContrato.aguaFechaInstalacion is defined %}
+                                	    {% set aguaFechaInstalacion = data.formEditarContrato.aguaFechaInstalacion %}{% endif %}
+                                	<input type="date" class="f_minwidth300" id="inpAguaFechaInstalacion" name="aguaFechaInstalacion" 
+                                			value="{{ aguaFechaInstalacion }}">
+                                </div>
+                            </div>
+                    		<div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Característica de la conexion</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaConexionCaracteristica = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaConexionCaracteristica = data.contrato.CTO_AGU_CAR_CNX %}
+                                	{% elseif data.formEditarContrato.aguaConexionCaracteristica is defined %}
+                                	    {% set aguaConexionCaracteristica = data.formEditarContrato.aguaConexionCaracteristica %}{% endif %}
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaConexionCaracteristica" 
+                                        		id="inpAguaConexionCaracteristicaSC" value="sin caja"
+                                        		{% if aguaConexionCaracteristica ==  "sin caja" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaConexionCaracteristicaSC">Sin caja</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaConexionCaracteristica" 
+                                        		id="inpAguaConexionCaracteristicaCC" value="con caja"
+                                        		{% if aguaConexionCaracteristica ==  "con caja" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaConexionCaracteristicaCC">Con caja</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Diametro de la conexion</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaConexionDiametro = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaConexionDiametro = data.contrato.CTO_AGU_DTO_CNX %}
+                                	{% elseif data.formEditarContrato.aguaConexionDiametro is defined %}
+                                	    {% set aguaConexionDiametro = data.formEditarContrato.aguaConexionDiametro %}{% endif %}
+                                	<div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaConexionDiametro" 
+                                        		id="inpAguaConexionDiametro1-2" value="1/2"
+                                        		{% if aguaConexionDiametro ==  "1/2" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaConexionDiametro1-2">1/2"</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaConexionDiametro" 
+                                        		id="inpAguaConexionDiametro3-4" value="3/4"
+                                        		{% if aguaConexionDiametro ==  "3/4" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaConexionDiametro3-4">3/4"</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Diametro de la red</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaDiametroRed = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaDiametroRed = data.contrato.CTO_AGU_DTO_RED %}
+                                	{% elseif data.formEditarContrato.aguaDiametroRed is defined %}
+                                	    {% set aguaDiametroRed = data.formEditarContrato.aguaDiametroRed %}{% endif %}
+                                	<div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaDiametroRed" 
+                                        		id="inpAguaDiametroRed2" value="2"
+                                        		{% if aguaDiametroRed ==  "2" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaDiametroRed2">2"</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaDiametroRed" 
+                                        		id="inpAguaDiametroRed3" value="3"
+                                        		{% if aguaDiametroRed ==  "3" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaDiametroRed3">3"</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaDiametroRed" 
+                                        		id="inpAguaDiametroRed4" value="4"
+                                        		{% if aguaDiametroRed ==  "4" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaDiametroRed4">4"</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Material de conexion</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaMaterialConexion = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaMaterialConexion = data.contrato.CTO_AGU_MAT_CNX %}
+                                	{% elseif data.formEditarContrato.aguaMaterialConexion is defined %}
+                                	    {% set aguaMaterialConexion = data.formEditarContrato.aguaMaterialConexion %}{% endif %}
+                                	<div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaMaterialConexion" 
+                                        		id="inpAguaMaterialConexionPVC" value="pvc"
+                                        		{% if aguaMaterialConexion ==  "pvc" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaMaterialConexionPVC">PVC</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaMaterialConexion" 
+                                        		id="inpAguaMaterialConexionF" value="fierro"
+                                        		{% if aguaMaterialConexion ==  "fierro" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaMaterialConexionF">Fierro</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Material de abrazadera</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaMaterialAbrazadera = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaMaterialAbrazadera = data.contrato.CTO_AGU_MAT_ABA %}
+                                	{% elseif data.formEditarContrato.aguaMaterialAbrazadera is defined %}
+                                	    {% set aguaMaterialAbrazadera = data.formEditarContrato.aguaMaterialAbrazadera %}{% endif %}
+                                	<div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaMaterialAbrazadera" 
+                                        		id="inpAguaMaterialAbrazaderaPVC" value="pvc"
+                                        		{% if aguaMaterialAbrazadera ==  "pvc" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaMaterialAbrazaderaPVC">PVC</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="aguaMaterialAbrazadera" 
+                                        		id="inpAguaMaterialAbrazaderaF" value="fierro"
+                                        		{% if aguaMaterialAbrazadera ==  "fierro" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAguaMaterialAbrazaderaF">Fierro</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAguaUbicacionCaja">Ubicacion de la caja</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaUbicacionCaja = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaUbicacionCaja = data.contrato.CTO_AGU_UBI_CAJ %}
+                                	{% elseif data.formEditarContrato.aguaUbicacionCaja is defined %}
+                                	    {% set aguaUbicacionCaja = data.formEditarContrato.aguaUbicacionCaja %}{% endif %}
+                                	<select name="aguaUbicacionCaja" class="f_minwidth300" id="cmbAguaUbicacionCaja"> 
+                                		<option value="-1"></option>
+                                    	<option value="vereda"
+                                				{% if aguaUbicacionCaja ==  "vereda" %}{{ 'selected' }}{% endif %}>
+                                                Vereda
+                        				</option>
+                        				<option value="jardin"
+                                				{% if aguaUbicacionCaja ==  "jardin" %}{{ 'selected' }}{% endif %}>
+                                                Jardin
+                        				</option>
+                        				<option value="interior casa"
+                                				{% if aguaUbicacionCaja ==  "interior casa" %}{{ 'selected' }}{% endif %}>
+                                                Interior casa
+                        				</option>
+                        				<option value="no tiene"
+                                				{% if aguaUbicacionCaja ==  "no tiene" %}{{ 'selected' }}{% endif %}>
+                                                No tiene
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAguaMaterialCaja">Material de la caja</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaMaterialCaja = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaMaterialCaja = data.contrato.CTO_AGU_MAT_CAJ %}
+                                	{% elseif data.formEditarContrato.aguaMaterialCaja is defined %}
+                                	    {% set aguaMaterialCaja = data.formEditarContrato.aguaMaterialCaja %}{% endif %}
+                                	<select name="aguaMaterialCaja" class="f_minwidth300" id="cmbAguaMaterialCaja"> 
+                                		<option value="-1"></option>
+                                    	<option value="concreto"
+                                				{% if aguaMaterialCaja ==  "concreto" %}{{ 'selected' }}{% endif %}>
+                                                Concreto
+                        				</option>
+                        				<option value="ladrillo"
+                                				{% if aguaMaterialCaja ==  "ladrillo" %}{{ 'selected' }}{% endif %}>
+                                                Ladrillo
+                        				</option>
+                        				<option value="termoplastico"
+                                				{% if aguaMaterialCaja ==  "termoplastico" %}{{ 'selected' }}{% endif %}>
+                                                Termoplastico
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAguaEstadoCaja">Estado de la caja</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaEstadoCaja = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaEstadoCaja = data.contrato.CTO_AGU_EST_CAJ %}
+                                	{% elseif data.formEditarContrato.aguaEstadoCaja is defined %}
+                                	    {% set aguaEstadoCaja = data.formEditarContrato.aguaEstadoCaja %}{% endif %}
+                                	<select name="aguaEstadoCaja" class="f_minwidth300" id="cmbAguaEstadoCaja"> 
+                                		<option value="-1"></option>
+                                    	<option value="buena"
+                                				{% if aguaEstadoCaja ==  "buena" %}{{ 'selected' }}{% endif %}>
+                                                Buena
+                        				</option>
+                        				<option value="sucia"
+                                				{% if aguaEstadoCaja ==  "sucia" %}{{ 'selected' }}{% endif %}>
+                                                Sucia
+                        				</option>
+                        				<option value="mal estado"
+                                				{% if aguaEstadoCaja ==  "mal estado" %}{{ 'selected' }}{% endif %}>
+                                                Mal estado
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAguaMaterialTapa">Material de la tapa</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaMaterialTapa = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaMaterialTapa = data.contrato.CTO_AGU_MAT_TAP %}
+                                	{% elseif data.formEditarContrato.aguaMaterialTapa is defined %}
+                                	    {% set aguaMaterialTapa = data.formEditarContrato.aguaMaterialTapa %}{% endif %}
+                                	<select name="aguaMaterialTapa" class="f_minwidth300" id="cmbAguaMaterialTapa"> 
+                                		<option value="-1"></option>
+                                    	<option value="concreto"
+                                				{% if aguaMaterialTapa ==  "concreto" %}{{ 'selected' }}{% endif %}>
+                                                Concreto
+                        				</option>
+                        				<option value="ladrillo"
+                                				{% if aguaMaterialTapa ==  "ladrillo" %}{{ 'selected' }}{% endif %}>
+                                                Ladrillo
+                        				</option>
+                        				<option value="fierro"
+                                				{% if aguaMaterialTapa ==  "fierro" %}{{ 'selected' }}{% endif %}>
+                                                Fierro
+                        				</option>
+                        				<option value="termoplastico"
+                                				{% if aguaMaterialTapa ==  "termoplastico" %}{{ 'selected' }}{% endif %}>
+                                                Termoplastico
+                        				</option>
+                        				<option value="no tiene"
+                                				{% if aguaMaterialTapa ==  "no tiene" %}{{ 'selected' }}{% endif %}>
+                                                No Tiene
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAguaEstadoTapa">Estado de la tapa</label>
+                                <div class="col-12 col-md-9">
+                                	{% set aguaEstadoTapa = '' %}
+                        	        {% if data.contrato is defined %}{% set aguaEstadoTapa = data.contrato.CTO_AGU_EST_TAP %}
+                                	{% elseif data.formEditarContrato.aguaEstadoTapa is defined %}
+                                	    {% set aguaEstadoTapa = data.formEditarContrato.aguaEstadoTapa %}{% endif %}
+                                	<select name="aguaEstadoTapa" class="f_minwidth300" id="cmbAguaEstadoTapa"> 
+                                		<option value="-1"></option>
+                                    	<option value="buena"
+                                				{% if aguaEstadoTapa ==  "buena" %}{{ 'selected' }}{% endif %}>
+                                                Buena
+                        				</option>
+                        				<option value="sellada"
+                                				{% if aguaEstadoTapa ==  "sellada" %}{{ 'selected' }}{% endif %}>
+                                                Sellada
+                        				</option>
+                        				<option value="mal estado"
+                                				{% if aguaEstadoTapa ==  "mal estado" %}{{ 'selected' }}{% endif %}>
+                                                Mal estado
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>{# /Contenedor mas detalles de agua #}
+                        {% endif %}
+                        
+                        
+                        {% if tieneDesague %}
+                        {# Contenedor mas detalles de alcantarillado #}
+                        <div id="divNuevoContratoMasDetallesAlc">
+                            <h5 class="my-4 text-bold">Servicio de Alcantarillado</h5>
+                    		<div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="inpAlcFechaConexion">Fecha de conexion</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcFechaConexion = '' %}
+                                	{% if data.contrato is defined %}{% set alcFechaConexion = data.contrato.CTO_ALC_FEC_INS %}
+                                	{% elseif data.formEditarContrato.alcFechaConexion is defined %}
+                                	    {% set alcFechaConexion = data.formEditarContrato.alcFechaConexion %}{% endif %}
+                                	<input type="date" class="f_minwidth300" id="inpAlcFechaConexion" name="alcFechaConexion" 
+                                			value="{{ alcFechaConexion }}">
+                                </div>
+                            </div>
+                    		<div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Característica de la conexion</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcConexionCaracteristica = '' %}
+                        	        {% if data.contrato is defined %}{% set alcConexionCaracteristica = data.contrato.CTO_ALC_CAR_CNX %}
+                                	{% elseif data.formEditarContrato.alcConexionCaracteristica is defined %}
+                                	    {% set alcConexionCaracteristica = data.formEditarContrato.alcConexionCaracteristica %}{% endif %}
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcConexionCaracteristica" 
+                                        		id="inpAlcConexionCaracteristicaSC" value="sin caja"
+                                        		{% if alcConexionCaracteristica ==  "sin caja" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcConexionCaracteristicaSC">Sin caja</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcConexionCaracteristica" 
+                                        		id="inpAlcConexionCaracteristicaCC" value="con caja"
+                                        		{% if alcConexionCaracteristica ==  "con caja" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcConexionCaracteristicaCC">Con caja</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Tipo de conexion</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcTipoConexion = '' %}
+                        	        {% if data.contrato is defined %}{% set alcTipoConexion = data.contrato.CTO_ALC_TIP_CNX %}
+                                	{% elseif data.formEditarContrato.alcTipoConexion is defined %}
+                                	    {% set alcTipoConexion = data.formEditarContrato.alcTipoConexion %}{% endif %}
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcTipoConexion" 
+                                        		id="inpAlcTipoConexionCV" value="convencional"
+                                        		{% if alcTipoConexion ==  "convencional" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcTipoConexionCV">Convencional</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcTipoConexion" 
+                                        		id="inpAlcTipoConexionCD" value="condominial"
+                                        		{% if alcTipoConexion ==  "condominial" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcTipoConexionCD">Condominial</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Diametro de la conexion</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcConexionDiametro = '' %}
+                        	        {% if data.contrato is defined %}{% set alcConexionDiametro = data.contrato.CTO_ALC_DTO_CNX %}
+                                	{% elseif data.formEditarContrato.alcConexionDiametro is defined %}
+                                	    {% set alcConexionDiametro = data.formEditarContrato.alcConexionDiametro %}{% endif %}
+                                	<div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcConexionDiametro" 
+                                        		id="inpAlcConexionDiametro4" value="4"
+                                        		{% if alcConexionDiametro ==  "4" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcConexionDiametro4">4"</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcConexionDiametro" 
+                                        		id="inpAlcConexionDiametro6" value="6"
+                                        		{% if alcConexionDiametro ==  "6" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcConexionDiametro6">6"</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Diametro de la red</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcDiametroRed = '' %}
+                        	        {% if data.contrato is defined %}{% set alcDiametroRed = data.contrato.CTO_ALC_DTO_RED %}
+                                	{% elseif data.formEditarContrato.alcDiametroRed is defined %}
+                                	    {% set alcDiametroRed = data.formEditarContrato.alcDiametroRed %}{% endif %}
+                                	<div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcDiametroRed" 
+                                        		id="inpAlcDiametroRed4" value="4"
+                                        		{% if alcDiametroRed ==  "4" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcDiametroRed4">4"</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcDiametroRed" 
+                                        		id="inpAlcDiametroRed6" value="6"
+                                        		{% if alcDiametroRed ==  "6" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcDiametroRed6">6"</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcDiametroRed" 
+                                        		id="inpAlcDiametroRed8" value="8"
+                                        		{% if alcDiametroRed ==  "8" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcDiametroRed8">8"</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcDiametroRed" 
+                                        		id="inpAlcDiametroRed10" value="10"
+                                        		{% if alcDiametroRed ==  "10" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcDiametroRed10">10"</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field">Material de conexion</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcMaterialConexion = '' %}
+                        	        {% if data.contrato is defined %}{% set alcMaterialConexion = data.contrato.CTO_ALC_MAT_CNX %}
+                                	{% elseif data.formEditarContrato.alcMaterialConexion is defined %}
+                                	    {% set alcMaterialConexion = data.formEditarContrato.alcMaterialConexion %}{% endif %}
+                                	<div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcMaterialConexion" 
+                                        		id="inpAlcMaterialConexionPVC" value="pvc"
+                                        		{% if alcMaterialConexion ==  "pvc" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcMaterialConexionPVC">PVC</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="alcMaterialConexion" 
+                                        		id="inpAlcMaterialConexionF" value="fierro"
+                                        		{% if alcMaterialConexion ==  "fierro" %}{{ 'checked' }}{% endif %}>
+                                        <label class="form-check-label" for="inpAlcMaterialConexionF">Fierro</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAlcUbicacionCaja">Ubicacion de la caja</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcUbicacionCaja = '' %}
+                        	        {% if data.contrato is defined %}{% set alcUbicacionCaja = data.contrato.CTO_ALC_UBI_CAJ %}
+                                	{% elseif data.formEditarContrato.alcUbicacionCaja is defined %}
+                                	    {% set alcUbicacionCaja = data.formEditarContrato.alcUbicacionCaja %}{% endif %}
+                                	<select name="alcUbicacionCaja" class="f_minwidth300" id="cmbAlcUbicacionCaja"> 
+                                		<option value="-1"></option>
+                                    	<option value="vereda"
+                                				{% if alcUbicacionCaja ==  "vereda" %}{{ 'selected' }}{% endif %}>
+                                                Vereda
+                        				</option>
+                        				<option value="jardin"
+                                				{% if alcUbicacionCaja ==  "jardin" %}{{ 'selected' }}{% endif %}>
+                                                Jardin
+                        				</option>
+                        				<option value="interior casa"
+                                				{% if alcUbicacionCaja ==  "interior casa" %}{{ 'selected' }}{% endif %}>
+                                                Interior casa
+                        				</option>
+                        				<option value="no tiene"
+                                				{% if alcUbicacionCaja ==  "no tiene" %}{{ 'selected' }}{% endif %}>
+                                                No tiene
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAlcMaterialCaja">Material de la caja</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcMaterialCaja = '' %}
+                        	        {% if data.contrato is defined %}{% set alcMaterialCaja = data.contrato.CTO_ALC_MAT_CAJ %}
+                                	{% elseif data.formEditarContrato.alcMaterialCaja is defined %}
+                                	    {% set alcMaterialCaja = data.formEditarContrato.alcMaterialCaja %}{% endif %}
+                                	<select name="alcMaterialCaja" class="f_minwidth300" id="cmbAlcMaterialCaja"> 
+                                		<option value="-1"></option>
+                                    	<option value="concreto"
+                                				{% if alcMaterialCaja ==  "concreto" %}{{ 'selected' }}{% endif %}>
+                                                Concreto
+                        				</option>
+                        				<option value="ladrillo"
+                                				{% if alcMaterialCaja ==  "ladrillo" %}{{ 'selected' }}{% endif %}>
+                                                Ladrillo
+                        				</option>
+                        				<option value="termoplastico"
+                                				{% if alcMaterialCaja ==  "termoplastico" %}{{ 'selected' }}{% endif %}>
+                                                Termoplastico
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAlcEstadoCaja">Estado de la caja</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcEstadoCaja = '' %}
+                        	        {% if data.contrato is defined %}{% set alcEstadoCaja = data.contrato.CTO_ALC_EST_CAJ %}
+                                	{% elseif data.formEditarContrato.alcEstadoCaja is defined %}
+                                	    {% set alcEstadoCaja = data.formEditarContrato.alcEstadoCaja %}{% endif %}
+                                	<select name="alcEstadoCaja" class="f_minwidth300" id="cmbAlcEstadoCaja"> 
+                                		<option value="-1"></option>
+                                    	<option value="buena"
+                                				{% if alcEstadoCaja ==  "buena" %}{{ 'selected' }}{% endif %}>
+                                                Buena
+                        				</option>
+                        				<option value="sucia"
+                                				{% if alcEstadoCaja ==  "sucia" %}{{ 'selected' }}{% endif %}>
+                                                Sucia
+                        				</option>
+                        				<option value="mal estado"
+                                				{% if alcEstadoCaja ==  "mal estado" %}{{ 'selected' }}{% endif %}>
+                                                Mal estado
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAlcDimencionCaja">Dimención de la caja</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcDimencionCaja = '' %}
+                        	        {% if data.contrato is defined %}{% set alcDimencionCaja = data.contrato.CTO_ALC_DIM_CAJ %}
+                                	{% elseif data.formEditarContrato.alcDimencionCaja is defined %}
+                                	    {% set alcDimencionCaja = data.formEditarContrato.alcDimencionCaja %}{% endif %}
+                                	<select name="alcDimencionCaja" class="f_minwidth300" id="cmbAlcDimencionCaja"> 
+                                		<option value="-1"></option>
+                                    	<option value="70x40 cm"
+                                				{% if alcDimencionCaja ==  "70x40 cm" %}{{ 'selected' }}{% endif %}>
+                                                70 x 40 cm
+                        				</option>
+                        				<option value="60x40 cm"
+                                				{% if alcDimencionCaja ==  "60x40 cm" %}{{ 'selected' }}{% endif %}>
+                                                60 x 40 cm
+                        				</option>
+                        				<option value="otro"
+                                				{% if alcDimencionCaja ==  "otro" %}{{ 'selected' }}{% endif %}>
+                                                Otro
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAlcMaterialTapa">Material de la tapa</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcMaterialTapa = '' %}
+                        	        {% if data.contrato is defined %}{% set alcMaterialTapa = data.contrato.CTO_ALC_MAT_TAP %}
+                                	{% elseif data.formEditarContrato.alcMaterialTapa is defined %}
+                                	    {% set alcMaterialTapa = data.formEditarContrato.alcMaterialTapa %}{% endif %}
+                                	<select name="alcMaterialTapa" class="f_minwidth300" id="cmbAlcMaterialTapa"> 
+                                		<option value="-1"></option>
+                                    	<option value="concreto"
+                                				{% if alcMaterialTapa ==  "concreto" %}{{ 'selected' }}{% endif %}>
+                                                Concreto
+                        				</option>
+                        				<option value="fierro"
+                                				{% if alcMaterialTapa ==  "fierro" %}{{ 'selected' }}{% endif %}>
+                                                Fierro
+                        				</option>
+                        				<option value="madera"
+                                				{% if alcMaterialTapa ==  "madera" %}{{ 'selected' }}{% endif %}>
+                                                Madera
+                        				</option>
+                        				<option value="no tiene"
+                                				{% if alcMaterialTapa ==  "no tiene" %}{{ 'selected' }}{% endif %}>
+                                                No Tiene
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAlcEstadoTapa">Estado de la tapa</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcEstadoTapa = '' %}
+                        	        {% if data.contrato is defined %}{% set alcEstadoTapa = data.contrato.CTO_ALC_EST_TAP %}
+                                	{% elseif data.formEditarContrato.alcEstadoTapa is defined %}
+                                	    {% set alcEstadoTapa = data.formEditarContrato.alcEstadoTapa %}{% endif %}
+                                	<select name="alcEstadoTapa" class="f_minwidth300" id="cmbAlcEstadoTapa"> 
+                                		<option value="-1"></option>
+                                    	<option value="buena"
+                                				{% if alcEstadoTapa ==  "buena" %}{{ 'selected' }}{% endif %}>
+                                                Buena
+                        				</option>
+                        				<option value="sellada"
+                                				{% if alcEstadoTapa ==  "sellada" %}{{ 'selected' }}{% endif %}>
+                                                Sellada
+                        				</option>
+                        				<option value="mal estado"
+                                				{% if alcEstadoTapa ==  "mal estado" %}{{ 'selected' }}{% endif %}>
+                                                Mal estado
+                        				</option>
+                        				<option value="no tiene"
+                                				{% if alcEstadoTapa ==  "no tiene" %}{{ 'selected' }}{% endif %}>
+                                                No tiene
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            	<label class="col-12 col-md-3 f_field" for="cmbAlcMedidasTapa">Medidas de la tapa</label>
+                                <div class="col-12 col-md-9">
+                                	{% set alcMedidasTapa = '' %}
+                        	        {% if data.contrato is defined %}{% set alcMedidasTapa = data.contrato.CTO_ALC_MED_TAP %}
+                                	{% elseif data.formEditarContrato.alcMedidasTapa is defined %}
+                                	    {% set alcMedidasTapa = data.formEditarContrato.alcMedidasTapa %}{% endif %}
+                                	<select name="alcMedidasTapa" class="f_minwidth300" id="cmbAlcMedidasTapa"> 
+                                		<option value="-1"></option>
+                                    	<option value="62x32 cm"
+                                				{% if alcMedidasTapa ==  "62x32 cm" %}{{ 'selected' }}{% endif %}>
+                                                62 x 32 cm
+                        				</option>
+                        				<option value="54x34 cm"
+                                				{% if alcMedidasTapa ==  "54x34 cm" %}{{ 'selected' }}{% endif %}>
+                                                54 x 34 cm
+                        				</option>
+                        				<option value="53x53 cm"
+                                				{% if alcMedidasTapa ==  "53x53 cm" %}{{ 'selected' }}{% endif %}>
+                                                53 x 53 cm
+                        				</option>
+                        				<option value="otro"
+                                				{% if alcMedidasTapa ==  "otro" %}{{ 'selected' }}{% endif %}>
+                                                Otro
+                        				</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>{# /Contenedor mas detalles de alcantarillado #}
+                        {% endif %}
+                        
+                	</div>{# /Contenedor mas detalles de servicios #}
+          		</div>
+          	</div><!-- /.card-body -->
+      	</div>
+  	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cambios</button>
+        			<a href="{{ PUBLIC_PATH }}/contrato/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Editar contrato #}
+  
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formEditarContrato').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbTipoUsoPredio");
+        f_select2("#cmbServicios");
+        
+        
+        if($("#chkContratoInicio").prop('checked')){
+    		$("#inpFechaInicio").prop("disabled", false);
+    	}else{
+    		$("#inpFechaInicio").val("");
+    		$("#inpFechaInicio").prop("disabled", true);
+    	}
+        
+        $("#chkContratoInicio").change(function(){
+        	if($("#chkContratoInicio").prop('checked')){
+        		$("#inpFechaInicio").prop("disabled", false);
+        	}else{
+        		$("#inpFechaInicio").val("");
+        		$("#inpFechaInicio").prop("disabled", true);
+        	}
+        });
+	</script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% set menuLItem = 'servicio' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class=""> 
+                	<i class="fas fa-cube mr-3"></i>Servicios
+            	</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			{# Contenedor de alertas #}
+            {% set classAlert = "" %}
+            {% if estadoDetalle is empty %}
+            	{% set classAlert = "d-none" %}
+            {% elseif codigo >= 200 and codigo <300 %}
+                {% set classAlert = "alert-success" %}
+            {% elseif codigo >= 400 %}
+                {% set classAlert = "alert-danger" %}
+            {% endif %}
+  			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+             	<ul class="mb-0" id="f_alertsUl">
+             		{% if estadoDetalle is not empty %}
+                      {% for msj in estadoDetalle %}
+                        <li>{{ msj }}</li>
+                      {% endfor %}
+                    {% endif %}
+             	</ul>
+             	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+             		<span aria-hidden="true">&times;</span>
+             	</button>
+            </div>{# /Contenedor de alertas #}
+  		</div>
+  	</div>
+  	
+  	<div class="row">
+  		<div class="col-12">
+      		<div class="f_tabs">
+      			<div class="f_tabunactive">
+      				<a href="{{ PUBLIC_PATH }}/servicio/lista" class="f_link">Lista</a>
+      			</div>
+      			<div class="f_tabactive">
+      				<a href="#" class="f_link">Detalle</a>
+      			</div>
+          	</div>
+  		</div>
+  	</div><!-- /.tabs de contenido -->
+  	
+  	<div class="f_divwithbartop">
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="d-flex justify-content-between f_arearef">
+          			<div>
+          				<div class="d-inline-block mr-2 mr-md-4">
+                  			<div class="f_imageref"><span class="fas fa-cube" style=" color: #a69944"></span></div>
+          				</div>
+          				<div class="d-inline-block align-top">
+          					<span class="font-weight-bold f_inforef">
+          					    {% if data.servicio is defined %}{{ data.servicio.SRV_CODIGO }}{% endif %}
+          					</span><br/>
+          					<span class="font-weight-bold f_inforef">
+          					    {% if data.servicio is defined %}{{ data.servicio.SRV_NOMBRE }}{% endif %}
+        				    </span><br/>
+          				</div>
+          			</div>
+        		</div>
+      		</div>
+      		
+      		<div class="col-12 col-lg-6 table-responsive">
+      			<table class="table f_table f_tableforfield">
+                  <tbody>
+                  	<tr>
+                      <td>Ref.</td>
+                      <td>{% if data.servicio is defined %}{{ data.servicio.SRV_CODIGO }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                      <td>Nombre</td>
+                      <td>{% if data.servicio is defined %}{{ data.servicio.SRV_NOMBRE }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                    <tr>
+                      <td>Fecha de creación</td>
+                      <td>{% if data.servicio is defined %}{{ data.servicio.SRV_CREATED }}{% endif %}</td>
+                    </tr>
+                  </tbody>
+                </table>
+      		</div>
+      		
+      		<div class="col-12 col-lg-6  mt-3 mt-lg-0 table-responsive">
+      			<table class="table f_table f_tableforfield">
+                  <tbody>
+                  	<tr>
+                      <td>Predios con servicio activo</td>
+                      <td><span class="badge badge-success">{{ 135 }}</td>
+                    </tr>
+                    <tr>
+                      <td>Predios con servicio suspendido</td>
+                      <td><span class="badge badge-warning">{{ 15 }}</td>
+                    </tr>
+                    <tr>
+                      <td>Predios con recibo sin cancelar</td>
+                      <td><span class="badge badge-danger">{{ 5 }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+      		</div>
+      	</div>
+  	</div><!-- /.card-body -->
+  	
+  	<div class="row">
+  		<div class="col-12 text-right">
+  			<div class="f_cardfooter f_cardfooteractions">
+  				<a href="{{ PUBLIC_PATH }}/servicio/editar/{% if data.servicio is defined %}{{ data.servicio.SRV_CODIGO }}{% endif %}" 
+  					class="f_linkbtn f_linkbtnaction">Modificar</a>
+                {% set titleBtnEliminar = "Los servicios no pueden ser eliminados." %}
+  				<button type="button" class="f_button f_buttonactionrefused classfortooltip" data-toggle="modal" data-target="#modalEliminarServicio"
+  					title="{{ titleBtnEliminar }}">Eliminar</button>
+  			</div>
+  			
+  		</div>
+  	</div><!-- /.card-footer -->
+
+</div><!-- /.card -->
+
+{# Modal Eliminar Servicio 
+<div class="modal fade f_modal" id="modalEliminarServicio" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Eliminar un servicio</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i><span>¿Está seguro de querer eliminar este servicio?</span>
+            	<form class="d-none" id="formEliminarServicio" action="{{ PUBLIC_PATH }}/servicio/delete" method="post">
+            		<input type="hidden" name="codigo" value="{% if data.servicio is defined %}{{ data.servicio.SRV_CODIGO }}{% endif %}">
+            	</form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnEliminarServicio">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div> /Modal Eliminar Servicio #}
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#btnEliminarServicio').click(function(event){
+			$('#formEliminarServicio').submit();
+			return false;
+		});
+	</script>
+	
+{% endblock %}

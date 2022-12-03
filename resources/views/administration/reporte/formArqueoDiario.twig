@@ -1,0 +1,92 @@
+{% set menuLItem, menuLLink = 'reporteconsolidado', 'arqueodiario' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario generar arqueo diario #}
+	<form class="f_inputflat" id="formArqueoDiario" method="post" action="{{ PUBLIC_PATH }}/reporte/generararqueodiario">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-invoice mr-3"></i>Aqueo Diario
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDate">Fecha</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set date = "" %}
+                        	{% if data.date is defined %}{% set date = data.date %}
+                        	{% elseif data.formAqueoDiario is defined %}
+                        	    {% set date = data.formArqueoDiario.date %}{% endif %}
+                        	<input type="date" class="f_minwidth200" id="inpDate" name="date" required value='{{ date }}'>
+                        </div>
+                    </div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+      				<button type="submit" class="f_button f_buttonaction" id="btnVerArqueoDiaro">Ver arqueo</button>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Arqueo Diario #}
+  
+</div><!-- /.card -->
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formArqueoDiario').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+	</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% set menuLItem = 'tipopredio' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Editar tipo de predio #}
+	<form class="f_inputflat" id="formEditarTipoPredio" method="post" action="{{ PUBLIC_PATH }}/tipopredio/update">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-home mr-3"></i>Tipos de predio
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_tabs">
+          			<div class="f_tabunactive">
+          				<a href="{{ PUBLIC_PATH }}/tipopredio/lista" class="f_link">Lista</a>
+          			</div>
+          			<div class="f_tabunactive">
+          				<a href="{{ PUBLIC_PATH }}/tipopredio/nuevo" class="f_link">Nuevo</a>
+          			</div>
+          			<div class="f_tabactive">
+          				<a href="#" class="f_link">Editar</a>
+          			</div>
+              	</div>
+      		</div>
+      	</div><!-- /.tabs de contenido -->
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field">Ref.</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set codigo = "" %}
+                        	{% if data.tipoPredio is defined %}{% set codigo = data.tipoPredio.TIP_CODIGO %}{{ data.tipoPredio.TIP_CODIGO }}
+                        	{% elseif data.formEditarTipoPredio is defined %}
+                        	    {% set codigo = data.formEditarTipoPredio.codigo %}{{ data.formEditarTipoPredio.codigo }}{% endif %}
+                        	<input type="hidden" class="f_minwidth300" id="inpCodigo" name="codigo" value='{{ codigo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNombre">Nombre</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set nombre = "" %}
+                        	{% if data.tipoPredio is defined %}{% set nombre = data.tipoPredio.TIP_NOMBRE %}
+                        	{% elseif data.formEditarTipoPredio is defined %}{% set nombre = data.formEditarTipoPredio.nombre %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpNombre" name="nombre" value='{{ nombre }}' required>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cambios</button>
+        			<a href="{{ PUBLIC_PATH }}/tipopredio/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Editar tipo de predio #}
+  
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formEditarTipoPredio').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+	</script>
+{% endblock %}

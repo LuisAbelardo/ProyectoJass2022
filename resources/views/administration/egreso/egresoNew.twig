@@ -1,0 +1,181 @@
+{% set menuLItem, menuLLink = 'egreso', 'nuevo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevo egreso #}
+	<form class="f_inputflat" id="formNuevoEgreso" method="post" action="{{ PUBLIC_PATH }}/egreso/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-money-bill mr-3"></i>Nuevo egreso
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+                    
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpMonto">Monto</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            {% set monto = "" %}
+                        	{% if data.formNuevoEgreso is defined %}
+                        	    {% set monto = data.formNuevoEgreso.monto %}{% endif %}
+                        	<div style="background-color:#b9ceac" class="d-inline-block">
+                        		<span class="pl-1">S/. </span>
+                        		<input type="text" class="f_minwidth100" id="inpMonto" name="monto" required 
+                        			style="background-color:#b9ceac" value='{{ monto }}'>
+                        	</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2  f_fieldrequired" for="cmbComprobaneTipo">Comprobante</label>
+                        <div class="col-12 col-md-9">
+                        	<select name="comprobanteTipo" class="f_minwidth200" id="cmbComprobanteTipo" required>
+                            	<option value="1"
+                        				{% if data.formNuevoEgreso is defined 
+                        				        and data.formNuevoEgreso.comprobanteTipo ==  1 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'TICKED' }}
+                				</option>
+                				<option value="2"
+                        				{% if data.formNuevoEgreso is defined 
+                        				        and data.formNuevoEgreso.comprobanteTipo ==  2 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'BOLETA' }}
+                				</option>
+                				<option value="3"
+                        				{% if data.formNuevoEgreso is defined 
+                        				        and data.formNuevoEgreso.comprobanteTipo ==  3 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'FACTURA' }}
+                				</option>
+                				<option value="4"
+                        				{% if data.formNuevoEgreso is defined 
+                        				        and data.formNuevoEgreso.comprobanteTipo ==  4 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'SIN COMPROBANTE' }}
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2  f_fieldrequired" for="inpComprobanteNro">Nro. Comprobante</label>
+                        <div class="col-12 col-md-9">
+                            {% set comprobanteNro = "" %}
+                        	{% if data.formNuevoEgreso is defined and data.formNuevoEgreso.comprobanteNro is defined %}
+                        	    {% set comprobanteNro = data.formNuevoEgreso.comprobanteNro %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpComprobanteNro" name="comprobanteNro" required 
+                        			value='{{ comprobanteNro }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2  f_fieldrequired" for="cmbCaja">Caja</label>
+                        <div class="col-12 col-md-9">
+                            <select name="caja" class="f_minwidth200" id="cmbCaja" required>
+                                {% set selectedCaja= false %}
+                                {% for caja in data.cajas %}
+                                	<option value="{{ caja.CAJ_CODIGO }}"
+                            				{% if not selectedCaja and data.formNuevoEgreso is defined 
+                            				        and data.formNuevoEgreso.caja ==  caja.CAJ_CODIGO %}
+                            					{{ 'selected' }}{% set selectedCaja = true %}
+                                            {% endif %}>
+                        				{{ caja.CAJ_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDescripcion">Descripción</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set descripcion = '' %}
+                        	{% if data.formNuevoEgreso.descripcion is defined %}
+                        	    {% set descripcion = data.formNuevoEgreso.descripcion %}{% endif %}
+                        	<textarea class="f_minwidth400" id="inpDescripcion" rows="2" maxlength="256" 
+                        				name="descripcion" required>{{ descripcion }}</textarea>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar egreso</button>
+        			<a href="{{ PUBLIC_PATH }}/egreso/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo egreso #}
+  
+</div><!-- /.card -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoEgreso').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbComprobanteTipo");
+        f_select2("#cmbCaja");
+        
+        
+        if($("#cmbComprobanteTipo").val() != 4){
+    		$("#inpComprobanteNro").prop("disabled", false);
+    	}else{
+    		$("#inpComprobanteNro").val("");
+    		$("#inpComprobanteNro").prop("disabled", true);
+    	}
+        
+        $("#cmbComprobanteTipo").change(function(){
+        	if($("#cmbComprobanteTipo").val() != 4){
+        		$("#inpComprobanteNro").prop("disabled", false);
+        	}else{
+        		$("#inpComprobanteNro").val("");
+        		$("#inpComprobanteNro").prop("disabled", true);
+        	}
+        });
+        
+	</script>
+{% endblock %}

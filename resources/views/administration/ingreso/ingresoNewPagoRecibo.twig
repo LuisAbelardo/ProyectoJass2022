@@ -1,0 +1,295 @@
+{% set menuLItem = 'ingreso' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario pago de recibo #}
+	<form class="f_inputflat" id="formNuevoPagoRecibo" method="post" action="{{ PUBLIC_PATH }}/ingreso/recibo/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-contract mr-3"></i>Pago de recibo
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+      	
+  		<div class="f_divwithbartop f_divwithbarbottom pr-3">
+          	<div class="row">
+          		<div class="col-sm-12 col-md-8 col-xl-7">
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpCliente">Cliente DNI / RUC</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set clienteDocumento = "" %}
+                        	{% if data.cliente is defined %}{% set clienteDocumento = data.cliente.CLI_DOCUMENTO %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set clienteDocumento = data.formNuevoPagoRecibo.clienteDocumento %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpClienteDocumento" disabled value='{{ clienteDocumento }}'>
+                			<input type="hidden" name="clienteDocumento" value='{{ clienteDocumento }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpClienteNombre">Cliente nombre</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set clienteNombre = "" %}
+                        	{% if data.cliente is defined %}{% set clienteNombre = data.cliente.CLI_NOMBRES %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set clienteNombre = data.formNuevoPagoRecibo.clienteNombre %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpClienteNombre" disabled value='{{ clienteNombre }}'>
+                        	<input type="hidden" name="clienteNombre" value='{{ clienteNombre }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpClienteNombre">Predio dirección</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set predioDireccion = "" %}
+                        	{% if data.predio is defined %}{% set predioDireccion = data.predio.PRE_DIRECCION %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set predioDireccion = data.formNuevoPagoRecibo.predioDireccion %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpPredioDireccion" disabled value='{{ predioDireccion }}'>
+                        	<input type="hidden" name="predioDireccion" value='{{ predioDireccion }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpReciboCodigo">Recibo ref.</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set reciboCodigo = "" %}
+                        	{% if data.recibo is defined %}{% set reciboCodigo = data.recibo.RBO_CODIGO %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set reciboCodigo = data.formNuevoPagoRecibo.reciboCodigo %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpReciboCodigo" disabled value='{{ reciboCodigo }}'>
+                        	<input type="hidden" name="reciboCodigo" value='{{ reciboCodigo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpReciboPeriodo">Periodo</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set reciboPeriodo = "" %}
+                        	{% if data.recibo is defined %}{% set reciboPeriodo = data.recibo.RBO_PERIODO %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set reciboPeriodo = data.formNuevoPagoRecibo.reciboPeriodo %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpReciboPeriodo" disabled value='{{ reciboPeriodo }}'>
+                        	<input type="hidden" name="reciboPeriodo" value='{{ reciboPeriodo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpReciboEstado">Estado</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set reciboEstado = "" %}
+                        	{% if data.recibo is defined %}{% set reciboEstado = data.recibo.RBO_ESTADO %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set reciboEstado = data.formNuevoPagoRecibo.reciboEstado %}{% endif %}
+                        	    
+                    	    {% if  reciboEstado is defined %}
+                          		{% if reciboEstado == 1 %}
+                                	<span class="badge badge-warning">{{ 'Pendiente' }}</span>
+                                {% elseif  reciboEstado == 2 %}
+                                	<span class="badge badge-success">{{ 'Pagado' }}</span>
+                                {% elseif  reciboEstado == 3 %}
+                                	<span class="badge badge-info">{{ 'Refinanciado' }}</span>
+                                {% endif %}
+                          	{% endif %}
+                        	<input type="hidden" name="reciboEstado" value='{{ reciboEstado }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpReciboUltimoDiaPago">Ultimo día de pago</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set reciboUltDiaPago = "" %}
+                        	{% if data.recibo is defined %}
+                        	    {% set reciboUltDiaPago = data.recibo.RBO_ULT_DIA_PAGO %}
+                        	    {% if reciboUltDiaPago is not empty %}{% set reciboUltDiaPago = reciboUltDiaPago|date("d/m/Y") %}{% endif %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set reciboUltDiaPago = data.formNuevoPagoRecibo.reciboUltDiaPago %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpReciboUltDiaPago" disabled value='{{ reciboUltDiaPago }}'>
+                        	<input type="hidden" name="reciboUltDiaPago" value='{{ reciboUltDiaPago }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpReciboFechaCorte">Fecha corte</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set reciboFechaCorte = "" %}
+                        	{% if data.recibo is defined %}
+                        	    {% set reciboFechaCorte = data.recibo.RBO_FECHA_CORTE %}
+                                {% if reciboFechaCorte is not empty %}{% set reciboFechaCorte = reciboFechaCorte|date("d/m/Y") %}{% endif %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set reciboFechaCorte = data.formNuevoPagoRecibo.reciboFechaCorte %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpReciboFechaCorte" disabled value='{{ reciboFechaCorte }}'>
+                        	<input type="hidden" name="reciboFechaCorte" value='{{ reciboFechaCorte }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpMontoTotal">Total a pagar</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set montoTotal = "" %}
+                        	{% if data.recibo is defined %}{% set montoTotal = data.recibo.RBO_MNTO_TOTAL %}
+                        	{% elseif data.formNuevoPagoRecibo is defined %}
+                        	    {% set montoTotal = data.formNuevoPagoRecibo.montoTotal %}{% endif %}
+                    	    <span>S/. </span>
+                        	<input type="text" class="f_minwidth100" id="inpMontoTotal" disabled value='{{ montoTotal }}'>
+                        	<input type="hidden" name="montoTotal" value='{{ montoTotal }}'>
+                        </div>
+                    </div>
+          		</div>
+          		
+          		<div class="col-sm-12 col-md-4 col-xl-5">
+          			<div class="form-group row">
+                    	<label class="col-12 f_fieldrequired" for="inpMontoRecibido">Monto recibido</label>
+                        <div class="col-12">
+                            {% set montoRecibido = "" %}
+                        	{% if data.formNuevoPagoRecibo is defined %}
+                        	    {% set montoRecibido = data.formNuevoPagoRecibo.montoRecibido %}{% endif %}
+                        	<div style="background-color:#b9ceac" class="d-inline-block">
+                        		<span class="pl-1">S/. </span>
+                        		<input type="text" class="f_minwidth100" id="inpMontoRecibido" name="montoRecibido" required 
+                        			style="background-color:#b9ceac" value='{{ montoRecibido }}'>
+                        	</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 f_fieldrequired" for="cmbComprobaneTipo">Comprobante</label>
+                        <div class="col-12">
+                        	<select name="comprobanteTipo" class="f_minwidth200" id="cmbComprobanteTipo" required>
+                            	<option value="{{ 1 }}"
+                        				{% if data.formNuevoPagoRecibo is defined 
+                        				        and data.formNuevoPagoRecibo.comprobanteTipo ==  1 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'TICKED' }}
+                				</option>
+                				<option value="{{ 2 }}"
+                        				{% if data.formNuevoPagoRecibo is defined 
+                        				        and data.formNuevoPagoRecibo.comprobanteTipo ==  2 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'BOLETA' }}
+                				</option>
+                				<option value="{{ 3 }}"
+                        				{% if data.formNuevoPagoRecibo is defined 
+                        				        and data.formNuevoPagoRecibo.comprobanteTipo ==  3 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'FACTURA' }}
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 f_fieldrequired" for="inpComprobanteNro">Nro. Comprobante</label>
+                        <div class="col-12">
+                            {% set comprobanteNro = "" %}
+                        	{% if data.formNuevoPagoRecibo is defined and data.formNuevoPagoRecibo.comprobanteNro is defined %}
+                        	    {% set comprobanteNro = data.formNuevoPagoRecibo.comprobanteNro %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpComprobanteNro" name="comprobanteNro" required 
+                        			value='{{ comprobanteNro }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 f_fieldrequired" for="cmbCaja">Caja</label>
+                        <div class="col-12">
+                            <select name="caja" class="f_minwidth200" id="cmbCaja" required>
+                            	{% if data.cajas is defined %}
+                                    {% set selectedCaja = false %}
+                                    {% for caja in data.cajas %}
+                                    	<option value="{{ caja.CAJ_CODIGO }}"
+                                				{% if not selectedCaja and data.formNuevoPagoRecibo is defined 
+                                				        and data.formNuevoPagoRecibo.caja ==  caja.CAJ_CODIGO %}
+                                					{{ 'selected' }}{% set selectedCaja = true %}
+                                                {% endif %}>
+                            				{{ caja.CAJ_NOMBRE }}
+                        				</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+          		</div>
+          		
+          	</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+      				{% set styleBtnPagarRecibo, titleBtnPagarRecibo, typeBtnPagarRecibo = "f_buttonaction", "", "submit" %}
+    				{% if reciboEstado == 2 %}
+    				    {% set styleBtnPagarRecibo = "f_buttonactionrefused" %}
+    				    {% set titleBtnPagarRecibo = "Desactivado porque el recibo ya está pagado" %}
+    				    {% set typeBtnPagarRecibo = "button" %}
+                    {% elseif reciboEstado == 3 %}
+    				    {% set styleBtnPagarRecibo = "f_buttonactionrefused" %}
+    				    {% set titleBtnPagarRecibo = "Desactivado porque el recibo fue refinanciado" %}
+    				    {% set typeBtnPagarRecibo = "button" %}
+    			    {% endif %}
+        			<button type="{{ typeBtnPagarRecibo }}" class="f_button {{ styleBtnPagarRecibo }} classfortooltip"
+        					 title="{{ titleBtnPagarRecibo }}">Registra pago</button>
+        			<a href="{{ PUBLIC_PATH }}/recibo/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario pago de recibo #}
+  
+</div><!-- /.card -->
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoPagoRecibo').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbComprobanteTipo");
+        f_select2("#cmbCaja");
+        
+        
+        if($("#cmbComprobanteTipo").val() != 1){
+    		$("#inpComprobanteNro").prop("disabled", false);
+    	}else{
+    		$("#inpComprobanteNro").val("");
+    		$("#inpComprobanteNro").prop("disabled", true);
+    	}
+        
+        $("#cmbComprobanteTipo").change(function(){
+        	if($("#cmbComprobanteTipo").val() != 1){
+        		$("#inpComprobanteNro").prop("disabled", false);
+        	}else{
+        		$("#inpComprobanteNro").val("");
+        		$("#inpComprobanteNro").prop("disabled", true);
+        	}
+        });
+        
+	</script>
+{% endblock %}

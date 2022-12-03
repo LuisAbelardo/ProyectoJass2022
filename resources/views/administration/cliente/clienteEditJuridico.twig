@@ -1,0 +1,182 @@
+{% set menuLItem = 'cliente' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Editar cliente #}
+	<form class="f_inputflat" id="formEditarCliente" method="post" action="{{ PUBLIC_PATH }}/cliente/update">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-user mr-3"></i>Editar cliente
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field">Ref.</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set codigo = "" %}
+                        	{% if data.cliente is defined %}{% set codigo = data.cliente.CLI_CODIGO %}{{ data.cliente.CLI_CODIGO }}
+                        	{% elseif data.formEditarCliente is defined %}
+                        	    {% set codigo = data.formEditarCliente.codigo %}{{ data.formEditarCliente.codigo }}{% endif %}
+                        	<input type="hidden" class="f_minwidth300" id="inpCodigo" name="codigo" value='{{ codigo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row d-none">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTipo">Tipo</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="hidden" class="f_minwidth300" id="inpTipo" name="tipo" value='2'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDocumento">RUC</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set documento = "" %}
+                        	{% if data.cliente is defined %}{% set documento = data.cliente.CLI_DOCUMENTO %}
+                        	{% elseif data.formEditarCliente is defined %}{% set documento = data.formEditarCliente.documento %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpDocumento" name="documento" maxlength="11" required value='{{ documento }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNombres">Razón social</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set nombres = "" %}
+                        	{% if data.cliente is defined %}{% set nombres = data.cliente.CLI_NOMBRES %}
+                        	{% elseif data.formEditarCliente is defined %}{% set nombres = data.formEditarCliente.nombres %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpNombres" name="nombres" required value='{{ nombres }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inprepresentantelegal">Repr. Legal</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set representantelegal = "" %}
+                        	{% if data.cliente is defined %}{% set representantelegal = data.cliente.CLI_REPRES_LEGAL %}
+                        	{% elseif data.formEditarCliente is defined %}{% set representantelegal = data.formEditarCliente.representantelegal %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inprepresentantelegal" name="representantelegal" required value='{{ representantelegal }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDepartamento">Departamento</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set departamento = "" %}
+                        	{% if data.cliente is defined %}{% set departamento = data.cliente.CLI_DEPARTAMENTO %}
+                        	{% elseif data.formEditarCliente is defined %}{% set departamento = data.formEditarCliente.departamento %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpDepartamento" name="departamento" required value='{{ departamento }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpProvincia">Provincia</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set provincia = "" %}
+                        	{% if data.cliente is defined %}{% set provincia = data.cliente.CLI_PROVINCIA %}
+                        	{% elseif data.formEditarCliente is defined %}{% set provincia = data.formEditarCliente.provincia %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpProvincia" name="provincia" required value='{{ provincia }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDistrito">Distrito</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set distrito = "" %}
+                        	{% if data.cliente is defined %}{% set distrito = data.cliente.CLI_DISTRITO %}
+                        	{% elseif data.formEditarCliente is defined %}{% set distrito = data.formEditarCliente.distrito %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpDistrito" name="distrito" required value='{{ distrito }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDireccion">Dirección</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set direccion = "" %}
+                        	{% if data.cliente is defined %}{% set direccion = data.cliente.CLI_DIRECCION %}
+                        	{% elseif data.formEditarCliente is defined %}{% set direccion = data.formEditarCliente.direccion %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpDireccion" name="direccion" required value='{{ direccion }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpTelefono">Telefono</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set telefono = "" %}
+                        	{% if data.cliente is defined %}{% set telefono = data.cliente.CLI_TELEFONO %}
+                        	{% elseif data.formEditarCliente is defined %}{% set telefono = data.formEditarCliente.telefono %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpTelefono" name="telefono" value='{{ telefono }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpEmail">Email</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            {% set email = "" %}
+                        	{% if data.cliente is defined %}{% set email = data.cliente.CLI_EMAIL %}
+                        	{% elseif data.formEditarCliente is defined %}{% set email = data.formEditarCliente.email %}{% endif %}
+                        	<input type="text" class="f_minwidth250" id="inpEmail" name="email" value='{{ email }}'>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cambios</button>
+        			<a href="{{ PUBLIC_PATH }}/cliente/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo cliente #}
+  
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formEditarCliente').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbTipo");
+	</script>
+{% endblock %}

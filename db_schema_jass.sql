@@ -1,0 +1,1475 @@
+#
+#   CREAR BASE DE DATOS jass
+#
+
+CREATE DATABASE jass CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+USE jass;
+
+# ---------------------- CREACION DE TABLAS ------------------------
+CREATE TABLE `USUARIO` (
+  `USU_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `USU_NOMBRES` varchar(50) NOT NULL,
+  `USU_APELLIDOS` varchar(50) NOT NULL,
+  `USU_USUARIO` varchar(50) NOT NULL,
+  `USU_EMAIL` varchar(50) NOT NULL,
+  `USU_PASSWORD` varchar(260) NOT NULL,
+  `USU_ESTADO` bit NOT NULL,
+  `USU_INTENTOS_FALLIDOS` int(11) NOT NULL DEFAULT 0,
+  `USU_REQUEST_TOKEN` int(11) NOT NULL DEFAULT 0,
+  `USU_TOKEN_RECOVERY` varchar(256) DEFAULT NULL,
+  `USU_TOKEN_FECHA` datetime DEFAULT NULL,
+  `USU_CREATED` datetime NOT NULL,
+  `USU_UPDATED` datetime NOT NULL,
+  `TPU_CODIGO` int(11) NOT NULL,
+  `USU_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (USU_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `TIPO_USUARIO` (
+  `TPU_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `TPU_NOMBRE` varchar(50) NOT NULL,
+  `TPU_CREATED` datetime NOT NULL,
+  `TPU_UPDATED` datetime NOT NULL,
+  `TPU_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (TPU_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `TIPO_USUARIO_CAJA` (
+  `TUC_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `TUC_CREATED` datetime NOT NULL,
+  `TUC_UPDATED` datetime NOT NULL,
+  `TUC_DELETED` datetime DEFAULT NULL,
+  `TPU_CODIGO` int(11) NOT NULL,
+  `CAJ_CODIGO` int(11) NOT NULL,
+  PRIMARY KEY (TUC_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `CLIENTE` (
+  `CLI_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `CLI_DOCUMENTO` varchar(13) NOT NULL,
+  `CLI_NOMBRES` varchar(260) NOT NULL,
+  `CLI_DIRECCION` varchar(260) NOT NULL,
+  `CLI_FECHA_NAC` date NULL,
+  `CLI_DISTRITO` varchar(70) NOT NULL,
+  `CLI_PROVINCIA` varchar(70) NOT NULL,
+  `CLI_DEPARTAMENTO` varchar(70) NOT NULL,
+  `CLI_EMAIL` varchar(100) NULL,
+  `CLI_TELEFONO` varchar(20) NULL,
+  `CLI_TIPO` int(1) NOT NULL,
+  `CLI_REPRES_LEGAL` varchar(200) NULL,
+  `CLI_CREATED` datetime NOT NULL,
+  `CLI_UPDATED` datetime NOT NULL,
+  `CLI_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (CLI_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `PREDIO` (
+  `PRE_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `PRE_DIRECCION` varchar(260) NOT NULL,
+  `PRE_HABITADA` varchar(50) NULL,
+  `PRE_MAT_CONSTRUCCION` varchar(10) NULL,
+  `PRE_PISOS` int(1) NULL,
+  `PRE_FAMILIAS` int(10) NULL,
+  `PRE_HABITANTES` int(10) NULL,
+  `PRE_POZO_TABULAR` varchar(5) NULL,
+  `PRE_PISCINA` varchar(5) NULL,
+  `PRE_CREATED` datetime NOT NULL,
+  `PRE_UPDATED` datetime NOT NULL,
+  `CLI_CODIGO` int(11) NOT NULL,
+  `CAL_CODIGO` int(11) NOT NULL,
+  `PRE_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (PRE_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `SECTOR` (
+  `STR_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `STR_NOMBRE` varchar(20) NOT NULL,
+  `STR_CREATED` datetime NOT NULL,
+  `STR_UPDATED` datetime NOT NULL,
+  `STR_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (STR_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `CALLE` (
+  `CAL_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `CAL_NOMBRE` varchar(260) NOT NULL,
+  `CAL_CREATED` datetime NOT NULL,
+  `CAL_UPDATED` datetime NOT NULL,
+  `CAL_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (CAL_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `SECTOR_CALLE` (
+  `STC_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `STR_CODIGO` int(11) NOT NULL,
+  `CAL_CODIGO` int(11) NOT NULL,
+  `STC_CREATED` datetime NOT NULL,
+  `STC_UPDATED` datetime NOT NULL,
+  `STC_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (STC_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `TIPO_PREDIO` (
+  `TIP_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `TIP_NOMBRE` varchar(100) NOT NULL,
+  `TIP_CREATED` datetime NOT NULL,
+  `TIP_UPDATED` datetime NOT NULL,
+  `TIP_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (TIP_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `TIPO_USO_PREDIO` (
+  `TUP_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `TUP_NOMBRE` varchar(100) NOT NULL,
+  `TUP_TARIFA_AGUA` double(7,2) NOT NULL,
+  `TUP_TARIFA_DESAGUE` double(7,2) NOT NULL,
+  `TUP_TARIFA_AMBOS` double(7,2) NOT NULL,
+  `TUP_TARIFA_MANTENIMIENTO` double(7,2) NULL,
+  `TUP_CREATED` datetime NOT NULL,
+  `TUP_UPDATED` datetime NOT NULL,
+  `TIP_CODIGO` int(11) NOT NULL,
+  `TUP_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (TUP_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `CONTRATO` (
+  `CTO_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `CTO_FECHA_TRAMITE` date NOT NULL,
+  `CTO_FECHA_INICIO` date DEFAULT NULL,
+  `CTO_FECHA_ANULACION` date default NULL,
+  `CTO_FECHA_SUSPENCION` date default NULL,
+  `CTO_FECHA_RECONECCION` date default NULL,
+  `CTO_FECHA_INICIO_MANTENIMIENTO` date default NULL,
+  `CTO_FECHA_FIN_MANTENIMIENTO` date default NULL,
+  `CTO_OBSERVACION` varchar(300) DEFAULT '',
+  `CTO_ESTADO` int(1) NOT NULL,
+  `CTO_AGU_CAR_CNX` varchar(50) NULL,
+  `CTO_AGU_DTO_CNX` varchar(10) NULL,    
+  `CTO_AGU_DTO_RED` int(1) NULL,
+  `CTO_AGU_FEC_INS` date NULL,
+  `CTO_AGU_MAT_CNX` varchar(10) NULL, 
+  `CTO_AGU_MAT_ABA` varchar(10) NULL,
+  `CTO_AGU_UBI_CAJ` varchar(20) NULL,
+  `CTO_AGU_MAT_CAJ` varchar(20) NULL,
+  `CTO_AGU_EST_CAJ` varchar(20) NULL,
+  `CTO_AGU_MAT_TAP` varchar(20) NULL,
+  `CTO_AGU_EST_TAP` varchar(20) NULL,
+  `CTO_ALC_CAR_CNX` varchar(50) NULL,
+  `CTO_ALC_TIP_CNX` varchar(50) NULL,
+  `CTO_ALC_FEC_INS` date NULL,
+  `CTO_ALC_MAT_CNX` varchar(10) NULL,
+  `CTO_ALC_DTO_RED` int(1) NULL,
+  `CTO_ALC_DTO_CNX` int(1) NULL,
+  `CTO_ALC_UBI_CAJ` varchar(20) NULL,
+  `CTO_ALC_MAT_CAJ` varchar(20) NULL,
+  `CTO_ALC_EST_CAJ` varchar(20) NULL,
+  `CTO_ALC_DIM_CAJ` varchar(20) NULL,
+  `CTO_ALC_MAT_TAP` varchar(20) NULL,
+  `CTO_ALC_EST_TAP` varchar(20) NULL,
+  `CTO_ALC_MED_TAP` varchar(20) NULL,
+  `CTO_CREATED` datetime NOT NULL,
+  `CTO_UPDATED` datetime NOT NULL,
+  `PRE_CODIGO` int(11) NOT NULL,
+  `TUP_CODIGO` int(11) NOT NULL,
+  PRIMARY KEY (CTO_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `RECIBO` (
+  `RBO_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `RBO_PERIODO` varchar(100) NOT NULL,
+  `RBO_FEC_PERIODO` date NOT NULL,
+  `RBO_ULT_DIA_PAGO` date NOT NULL,
+  `RBO_FECHA_CORTE` date NULL,
+  `RBO_MNTO_CONSUMO` double(5,2) NOT NULL,
+  `RBO_MNTO_SERV_ADI` double(5,2) NULL,
+  `RBO_MNTO_FIN_CUOTA` double(5,2) NOT NULL DEFAULT 0,
+  `RBO_IGV` INT(2) NOT NULL,
+  `RBO_MNTO_TOTAL` double(5,2) NULL,
+  `RBO_ESTADO` int(1) NOT NULL,
+  `RBO_CREATED` datetime NOT NULL,
+  `RBO_UPDATED` datetime NOT NULL,
+  `FCU_CODIGO` int(11) NULL,
+  `CTO_CODIGO` int(11) NOT NULL,
+  `FTO_CODIGO` int(11) NULL,
+  `IGR_CODIGO` int(11) NULL,
+  `RBO_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (RBO_CODIGO),
+  UNIQUE cu_ingreso(IGR_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+-- SAR_ESTADO: (1)PENDIENTE ; (2)AGREGADO
+CREATE TABLE `SERVICIO_ADICIONAL_RBO` (
+  `SAR_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `SAR_DESCRIPCION` varchar(256) NOT NULL,
+  `SAR_COSTO` double(5,2) NOT NULL,
+  `SAR_ESTADO` int(1) NOT NULL,
+  `SAR_CODIGO_RBO` int(11) NULL,
+  `SAR_CREATED` datetime NOT NULL,
+  `SAR_UPDATED` datetime NOT NULL,
+  `CTO_CODIGO` int(11) NOT NULL,
+  `SAR_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (SAR_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `FINANCIAMIENTO` (
+  `FTO_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `FTO_DEUDA` double(5,2) NOT NULL,
+  `FTO_CUOTA_INICIAL` double(5,2) NOT NULL,
+  `FTO_MONTO_CUOTA` double(5,2) NOT NULL,
+  `FTO_NUM_CUOTAS` int(3) NOT NULL,
+  `FTO_OBSERVACION` varchar(256) NOT NULL DEFAULT '',
+  `FTO_ESTADO` int(1) NOT NULL,
+  `CTO_CODIGO` int(11) DEFAULT NULL,
+  `FTO_CREATED` datetime NOT NULL,
+  `FTO_UPDATED` datetime NOT NULL,
+  PRIMARY KEY (FTO_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `FINANC_CUOTA` (
+  `FCU_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `FCU_NUM_CUOTA` int(3) NOT NULL,
+  `FCU_MONTO_CUOTA` double(5,2) NOT NULL,
+  `FCU_ESTADO` int(1) NOT NULL,
+  `FCU_FECHA_DE_CRONOGRAMA` date NOT NULL,
+  `FCU_CREATED` datetime NOT NULL,
+  `FCU_UPDATED` datetime NOT NULL,
+  `FTO_CODIGO` int(11) NOT NULL,
+  PRIMARY KEY (FCU_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `SERVICIO` (
+  `SRV_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `SRV_NOMBRE` varchar(100) NOT NULL,
+  `SRV_CREATED` datetime NOT NULL,
+  `SRV_UPDATED` datetime NOT NULL,
+  `SRV_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (SRV_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `SERVICIO_CONTRATO` (
+  `SRC_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `SRC_CREATED` datetime NOT NULL,
+  `SRC_UPDATED` datetime NOT NULL,
+  `SRV_CODIGO` int(11) NOT NULL,
+  `CTO_CODIGO` int(11) NOT NULL,
+  `SRC_DELETED` datetime DEFAULT NULL,
+  PRIMARY KEY (SRC_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `PROYECTO` (
+  `PTO_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `PTO_NOMBRE` varchar(150) NOT NULL,
+  `PTO_MNTO_CTO` double(5,2) NOT NULL,
+  `PTO_NUM_CUOTAS` int(3) NOT NULL,
+  `PTO_MNTO_TOTAL` double(8,2) NOT NULL,
+  `PTO_DESCRIPCION` varchar(255) NOT NULL DEFAULT '',
+  `PTO_ESTADO` int(1) NOT NULL,
+  `PTO_CREATED` datetime NOT NULL,
+  `PTO_UPDATED` datetime NOT NULL,
+  PRIMARY KEY (PTO_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `CUOTA_EXTRAORDINARIA` (
+  `CUE_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `CUE_NUM_CUOTA` int(3) NOT NULL,
+  `CUE_MNTO_CUOTA` double(5,2) NOT NULL,
+  `CUE_ESTADO` int(1) NOT NULL,
+  `CUE_CREATED` datetime NOT NULL,
+  `CUE_UPDATED` datetime NOT NULL,
+  `PTO_CODIGO` int(11) NOT NULL,
+  `CTO_CODIGO` int(11) NOT NULL,
+  `IGR_CODIGO` int(11) NULL,
+  PRIMARY KEY (CUE_CODIGO),
+  UNIQUE cu_ingreso(IGR_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `INGRESO` (
+  `IGR_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `IGR_CANTIDAD` double(8,2) NOT NULL,
+  `IGR_IGV` double(5,2) NOT NULL,
+  `IGR_MNTO_RECIBIDO` double(8,2) NULL,
+  `IGR_TIPO_COMPROBANTE` int(1) NOT NULL,
+  `IGR_COD_COMPROBANTE` varchar(16) DEFAULT NULL,
+  `IGR_DESCRIPCION` varchar(250) NOT NULL,
+  `IGR_TIPO` varchar(20) NOT NULL,
+  `IGR_ESTADO` int(1) NOT NULL,
+  `IGR_CREATED` datetime NOT NULL,
+  `IGR_UPDATED` datetime NOT NULL,
+  `USU_CODIGO` int(11) NOT NULL,
+  `CAJ_CODIGO` int(11) NOT NULL,
+  PRIMARY KEY (IGR_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE `CAJA` (
+  `CAJ_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `CAJ_NOMBRE` varchar(50) NOT NULL,
+  `CAJ_SALDO` double(5,2) NOT NULL,
+  `CAJ_CREATED` datetime NOT NULL,
+  `CAJ_UPDATED` datetime NOT NULL,
+  PRIMARY KEY (CAJ_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `EGRESO` (
+  `EGR_CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `EGR_CANTIDAD` double(5,2) NOT NULL,
+  `EGR_TIPO_COMPROBANTE` int(1) NOT NULL,
+  `EGR_COD_COMPROBANTE` varchar(16) DEFAULT '',
+  `EGR_TIPO` varchar(7) NOT NULL,
+  `EGR_DESCRIPCION` varchar(250) NOT NULL,
+  `EGR_ESTADO` int(1) NOT NULL,
+  `EGR_CREATED` datetime NOT NULL,
+  `EGR_UPDATED` datetime NOT NULL,
+  `USU_CODIGO` int(11) NOT NULL,
+  `CAJ_CODIGO` int(11) NOT NULL,
+  PRIMARY KEY (EGR_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+CREATE TABLE `IGV` (
+  `IGV_CODIGO` int(1) NOT NULL AUTO_INCREMENT,
+  `IGV_PORCENTAJE` int(2) NOT NULL,
+  `IGV_CREATED` datetime NOT NULL,
+  `IGV_UPDATED` datetime NOT NULL,
+  PRIMARY KEY (IGV_CODIGO)
+) ENGINE=InnoDB DEFAULT CHARSET= utf8 COLLATE=utf8_spanish_ci;
+
+
+# ----------------- RELACIONES ENTRE TABLAS ------------------------------
+# 
+# UN TIPO DE USUARIO PUEDE PERTENECERLE A VARIOS USUARIOS
+
+ALTER TABLE USUARIO
+ADD FOREIGN KEY TPU_USU (TPU_CODIGO) REFERENCES TIPO_USUARIO (TPU_CODIGO);
+
+# TIPO DE USO DE PREDIO
+
+ALTER TABLE TIPO_USO_PREDIO
+ADD FOREIGN KEY TUP_TIP (TIP_CODIGO) REFERENCES TIPO_PREDIO(TIP_CODIGO);
+
+
+# UN CLIENTE PUEDE TENER MUCHOS PREDIOS
+
+ALTER TABLE PREDIO
+ADD FOREIGN KEY CLI_PRE (CLI_CODIGO) REFERENCES CLIENTE (CLI_CODIGO);
+
+
+# UNA CALLE CONTIENE MUCHOS PREDIOS
+
+ALTER TABLE PREDIO
+ADD FOREIGN KEY CAL_PRE (CAL_CODIGO) REFERENCES CALLE (CAL_CODIGO);
+
+
+# UN SECTOR PUEDE CONTENER MUCHAS CALLES Y UNA CALLE PUEDE PERTENECER A MAS DE UN SECTOR
+
+ALTER TABLE SECTOR_CALLE
+ADD FOREIGN KEY STC_STR (STR_CODIGO) REFERENCES SECTOR (STR_CODIGO),
+ADD FOREIGN KEY STC_CAL (CAL_CODIGO) REFERENCES CALLE (CAL_CODIGO);
+
+
+# UNA RECIBO PUEDE TENER MUCHOS SERVICIOS ADICIONALES
+
+ALTER TABLE SERVICIO_ADICIONAL_RBO
+ADD FOREIGN KEY SAR_CTO (CTO_CODIGO) REFERENCES CONTRATO(CTO_CODIGO);
+
+
+# RECIBO SE RELACIONA: CONTRATO, FINANCIAMIENTO
+
+ALTER TABLE RECIBO
+ADD FOREIGN KEY RBO_CTO (CTO_CODIGO) REFERENCES CONTRATO(CTO_CODIGO),
+ADD FOREIGN KEY RBO_FTO (FTO_CODIGO) REFERENCES FINANCIAMIENTO(FTO_CODIGO),
+ADD FOREIGN KEY RBO_IGR (IGR_CODIGO) REFERENCES INGRESO(IGR_CODIGO);
+
+# FINANCIAMIENTO CUOTA SE RELACIONA: FINANCIAMIENTO
+
+ALTER TABLE FINANC_CUOTA
+ADD FOREIGN KEY FCU_FTO (FTO_CODIGO) REFERENCES FINANCIAMIENTO(FTO_CODIGO);
+
+# SERVICIO CONTRATO SE RELACIONA: SERVICIO, CONTRATO
+#
+
+ALTER TABLE SERVICIO_CONTRATO
+ADD FOREIGN KEY SRC_SRV (SRV_CODIGO) REFERENCES SERVICIO(SRV_CODIGO),
+ADD FOREIGN KEY SRC_CTO (CTO_CODIGO) REFERENCES CONTRATO(CTO_CODIGO);
+
+# CUOTA EXTRAORDINARIA SE RELACIONA: PROYECTO, PREDIO, INGRESO
+#
+
+ALTER TABLE CUOTA_EXTRAORDINARIA
+ADD FOREIGN KEY PTO_CUE (PTO_CODIGO) REFERENCES PROYECTO(PTO_CODIGO),
+ADD FOREIGN KEY CUE_CTO (CTO_CODIGO) REFERENCES CONTRATO(CTO_CODIGO),
+ADD FOREIGN KEY PGO_IGR (IGR_CODIGO) REFERENCES INGRESO(IGR_CODIGO);
+
+# INGRESO SE RELACIONA: RECIBO, USUARIO
+#
+
+ALTER TABLE INGRESO
+ADD FOREIGN KEY IGR_CAJ (CAJ_CODIGO) REFERENCES CAJA(CAJ_CODIGO);
+
+# EGRESO SE RELACIONA: USUARIO
+#
+
+ALTER TABLE EGRESO
+ADD FOREIGN KEY EGR_CAJ (CAJ_CODIGO) REFERENCES CAJA(CAJ_CODIGO);
+
+# CONTRATO SE RELACIONA: PREDIO, TIPO USU DEL PREDIO
+#
+
+ALTER TABLE CONTRATO
+ADD FOREIGN KEY CTO_PRE (PRE_CODIGO) REFERENCES PREDIO(PRE_CODIGO),
+ADD FOREIGN KEY CTO_TUP (TUP_CODIGO) REFERENCES TIPO_USO_PREDIO(TUP_CODIGO);
+
+
+# USUARIO_CAJA SE RELACIONA: TIPO_USUARIO, CAJA
+#
+
+ALTER TABLE TIPO_USUARIO_CAJA
+ADD FOREIGN KEY TUC_TPU (TPU_CODIGO) REFERENCES TIPO_USUARIO(TPU_CODIGO),
+ADD FOREIGN KEY TUC_CAJ (CAJ_CODIGO) REFERENCES CAJA(CAJ_CODIGO);
+
+
+
+# ---------------------------- SP: OBTIENE LOS INGRESOS DIARIOS PARA EL REPORTE------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_ingresos $$
+CREATE PROCEDURE sp_get_ingresos
+(
+    IN _fechaSel date
+)BEGIN
+
+    SELECT I.IGR_CREATED AS FECHA, 
+            C.CLI_NOMBRES AS NOMBRES, 
+            I.IGR_COD_COMPROBANTE AS RBO_NUMERO,
+            I.IGR_DESCRIPCION AS DETALLE, 
+            I.IGR_IGV AS IGV, 
+            I.IGR_CANTIDAD AS TOTAL,
+            IF(I.IGR_ESTADO = 1,'','ANULADO') AS ESTADO, 
+            I.CAJ_CODIGO AS CAJA
+    FROM INGRESO AS I
+    INNER JOIN RECIBO AS R ON R.IGR_CODIGO =  I.IGR_CODIGO
+    INNER JOIN CONTRATO AS CT ON R.CTO_CODIGO =  CT.CTO_CODIGO
+    INNER JOIN PREDIO AS P ON CT.PRE_CODIGO =  P.PRE_CODIGO
+    INNER JOIN CLIENTE AS C ON P.CLI_CODIGO =  C.CLI_CODIGO
+    WHERE (I.CAJ_CODIGO = 1 OR I.CAJ_CODIGO = 2)
+    AND DATE(I.IGR_CREATED) = _fechaSel
+
+    UNION 
+
+    SELECT I.IGR_CREATED AS FECHA, 
+            C.CLI_NOMBRES AS NOMBRES,
+            I.IGR_COD_COMPROBANTE AS RBO_NUMERO,
+            I.IGR_DESCRIPCION AS DETALLE, 
+            I.IGR_IGV AS IGV, 
+            I.IGR_CANTIDAD AS TOTAL,
+            IF(I.IGR_ESTADO = 1,'','ANULADO') AS ESTADO, 
+            I.CAJ_CODIGO AS CAJA
+    FROM INGRESO AS I
+    INNER JOIN CUOTA_EXTRAORDINARIA AS CE ON CE.IGR_CODIGO =  I.IGR_CODIGO
+    INNER JOIN PROYECTO AS PT ON CE.PTO_CODIGO =  PT.PTO_CODIGO
+    INNER JOIN CONTRATO AS CT ON CE.CTO_CODIGO =  CT.CTO_CODIGO
+    INNER JOIN PREDIO AS P ON CT.PRE_CODIGO =  P.PRE_CODIGO
+    INNER JOIN CLIENTE AS C ON P.CLI_CODIGO =  C.CLI_CODIGO
+    WHERE (I.CAJ_CODIGO = 1 OR I.CAJ_CODIGO = 2)
+    AND DATE(I.IGR_CREATED) = _fechaSel
+
+    UNION
+
+    SELECT IGR_CREATED AS FECHA, 
+            CONCAT(' ') AS NOMBRES,
+            IGR_COD_COMPROBANTE AS RBO_NUMERO,
+            IGR_DESCRIPCION AS DETALLE,
+            IGR_IGV AS IGV,
+            IGR_CANTIDAD AS TOTAL,
+            IF(IGR_ESTADO = 1,'','ANULADO') AS ESTADO, 
+            CAJ_CODIGO AS CAJA
+    FROM INGRESO 
+    WHERE (IGR_TIPO = 'OTRO' OR  IGR_TIPO = 'TRANSF')
+    AND (CAJ_CODIGO = 1 OR CAJ_CODIGO = 2)
+    AND DATE(IGR_CREATED) = _fechaSel
+    
+    ORDER BY FECHA;
+
+END $$
+DELIMITER ;
+
+
+# ---------------------------- SP: OBTIENE EGRESOS DIARIOS PARA REPORTE ------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_egresos $$
+CREATE PROCEDURE sp_get_egresos
+(
+    IN _fechaSel date
+)BEGIN
+    SELECT E.EGR_CREATED AS FECHA, 
+            E.EGR_DESCRIPCION AS DETALLE, 
+            E.EGR_COD_COMPROBANTE AS RBO_NUMERO,
+            E.EGR_TIPO_COMPROBANTE AS TIPO_COMP, 
+            E.EGR_CANTIDAD AS TOTAL,
+            IF(E.EGR_ESTADO = 1,'','ANULADO') AS ESTADO,
+            (SELECT CAJ_NOMBRE FROM CAJA WHERE CAJ_CODIGO = E.CAJ_CODIGO ) AS CAJA
+    FROM EGRESO AS E
+    WHERE DATE(E.EGR_CREATED) = _fechaSel
+    ORDER BY FECHA;
+END $$
+DELIMITER ;
+
+
+# ---------------------------- SP: INSERTAR USUARIOS ------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_agregar_Usuario $$
+ CREATE PROCEDURE sp_agregar_Usuario
+ (
+ 	IN _Nombres VARCHAR(50),
+ 	IN _Apellidos VARCHAR(50),
+ 	IN _Usuario VARCHAR(50),
+ 	IN _Email VARCHAR(50),
+ 	IN _Password VARCHAR(260),
+ 	IN _TipoUsu int(11)
+ )
+ BEGIN
+    START TRANSACTION;
+ 	INSERT INTO USUARIO(USU_NOMBRES,
+                        USU_APELLIDOS,
+                        USU_USUARIO,
+                        USU_EMAIL,
+                        USU_PASSWORD,
+                        USU_ESTADO,
+                        USU_CREATED,
+                        USU_UPDATED,
+                        TPU_CODIGO) VALUES
+ 	(_Nombres, _Apellidos, _Usuario, _Email, _Password, 1,CURDATE(),CURDATE(), _TipoUsu);
+    COMMIT;
+ END $$
+ DELIMITER ;
+
+# CALL agregar_Usuario('JUAN CARLOS','PERES TELLO','JUAN PERES','juanperes5@gmail.com','juanito',3);
+
+
+
+# ----------------------------  FC: TOMA EL IMPORTE MENSUAL DEL CONTRATO (ACTIVO / MANTENIMIENTO) ------------------------------
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS fc_get_importe_contrato $$
+CREATE FUNCTION fc_get_importe_contrato(_codigo int(7)) 
+RETURNS double(10,2)
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE codServicio INT UNSIGNED;
+    DECLARE v_agua double(10,2) DEFAULT 0;
+    DECLARE v_desague double(10,2) DEFAULT 0;
+    DECLARE v_ambos double(10,2) DEFAULT 0;
+    DECLARE v_mantenimiento double(10,2) DEFAULT 0;
+    DECLARE costoServicio double(10,2) DEFAULT 0;
+    DECLARE _i INT UNSIGNED;
+    DECLARE estadoContrato INT UNSIGNED;
+
+    DECLARE datos CURSOR FOR
+    SELECT SRV_CODIGO, TU.TUP_TARIFA_AGUA, TU.TUP_TARIFA_DESAGUE, TU.TUP_TARIFA_AMBOS, TU.TUP_TARIFA_MANTENIMIENTO
+        FROM SERVICIO_CONTRATO AS SC 
+        INNER JOIN CONTRATO AS C ON SC.CTO_CODIGO = C.CTO_CODIGO
+        INNER JOIN TIPO_USO_PREDIO AS TU ON C.TUP_CODIGO = TU.TUP_CODIGO
+        WHERE C.CTO_CODIGO = _codigo;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- ESTADO DE CONTRATO: PARA DETERMINAR SI TOMAMOS LA TARIFA DE MANTENIMIENTO
+    SET estadoContrato = (SELECT CTO_ESTADO FROM CONTRATO WHERE CTO_CODIGO = _codigo);
+
+    OPEN datos;
+    SET _i = 0;
+    loop_datos: LOOP
+        FETCH datos INTO codServicio, v_agua, v_desague, v_ambos, v_mantenimiento;
+        IF done THEN  
+            LEAVE loop_datos; 
+        END IF;
+
+        SET _i = _i + 1;
+        IF (_i = 1) THEN
+            IF (codServicio = 1) THEN
+                SET costoServicio = v_agua;
+            ELSEIF (codServicio = 2) THEN
+                SET costoServicio = v_desague;
+            END IF;
+        ELSEIF (_i = 2) THEN
+            SET costoServicio = v_ambos;
+        END IF;
+
+        IF (estadoContrato = 4) THEN
+            SET costoServicio = v_mantenimiento;
+        END IF;
+    END LOOP;
+    CLOSE datos;
+    RETURN costoServicio;
+END $$
+DELIMITER ;
+# SELECT fc_get_importe_contrato(8);
+
+# ----------------------------  FC: TOMAR SERVICIO ADICIONAL RECIBO DEL MES POR CONTRATO ------------------------------
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS fc_get_serv_adicional_rbo $$
+CREATE FUNCTION fc_get_serv_adicional_rbo(_cod INT(11), _codRbo INT(11))
+RETURNS double(10,2)
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_cod INT;
+    DECLARE v_monto double(10,2) DEFAULT 0;
+    DECLARE v_suma double(10,2) DEFAULT 0;
+
+    DECLARE montos CURSOR FOR
+    SELECT SA.SAR_CODIGO, SA.SAR_COSTO 
+        FROM SERVICIO_ADICIONAL_RBO AS SA
+        INNER JOIN CONTRATO AS C ON SA.CTO_CODIGO = C.CTO_CODIGO
+        WHERE C.CTO_CODIGO = _cod AND SA.SAR_ESTADO = 1;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN montos;
+    loop_montos: LOOP
+        FETCH montos INTO v_cod, v_monto;
+        IF done THEN  
+            LEAVE loop_montos; 
+        END IF;
+
+        SET v_suma = v_suma + v_monto;
+        UPDATE SERVICIO_ADICIONAL_RBO SET SAR_CODIGO_RBO = _codRbo, SAR_ESTADO = 2 WHERE SAR_CODIGO = v_cod;
+    END LOOP;
+
+    CLOSE montos;
+  return v_suma;
+END $$
+DELIMITER ;
+
+# ----------------------------  FC: OBTIENE MONTO DE CUOTA FINANCIADA DEL MES X CONTRATO ------------------------------
+DELIMITER $$
+DROP FUNCTION IF EXISTS fc_get_monto_financia $$
+CREATE FUNCTION fc_get_monto_financia(_codCto INT(11), _codRbo INT(11))
+RETURNS double(10,2)
+BEGIN
+    DECLARE v_monto double(10,2);
+    
+    SET v_monto = 0;
+    SELECT FC.FCU_MONTO_CUOTA 
+    INTO v_monto
+    FROM FINANC_CUOTA AS FC
+    INNER JOIN FINANCIAMIENTO AS F ON FC.FTO_CODIGO = F.FTO_CODIGO
+    WHERE FC.FCU_ESTADO = 1
+    AND F.CTO_CODIGO = _codCto
+    ORDER BY FC.FCU_CODIGO ASC LIMIT 1;
+
+  return v_monto;
+  
+END $$
+DELIMITER ;
+
+# ----------------------------   FC: OBTIENE EL CODIGO DE LA CUOTA FINANCIADA DEL MES X CONTRATO -------------------------------------------------------
+DELIMITER $$
+DROP FUNCTION IF EXISTS fc_get_codigo_cuota_financia $$
+CREATE FUNCTION fc_get_codigo_cuota_financia(_codCto INT(11), _codRbo INT(11))
+RETURNS double(10,2)
+BEGIN
+    DECLARE v_codigoCuota INT DEFAULT null;
+
+    SELECT FC.FCU_CODIGO
+    INTO v_codigoCuota
+    FROM FINANC_CUOTA AS FC
+    INNER JOIN FINANCIAMIENTO AS F ON FC.FTO_CODIGO = F.FTO_CODIGO
+    WHERE FC.FCU_ESTADO = 1
+    AND F.CTO_CODIGO = _codCto
+    ORDER BY FC.FCU_CODIGO ASC LIMIT 1;
+
+  return v_codigoCuota;
+  
+END $$
+DELIMITER ;
+
+# ----------------------------  FC: RETORNA UNA CADENA - FORMATO FECHA ------------------------------
+DELIMITER $$
+DROP FUNCTION IF EXISTS fc_formato_mes $$
+CREATE FUNCTION fc_formato_mes(_fecha date)
+RETURNS varchar(20)
+BEGIN
+    DECLARE _mes INT;
+    DECLARE _year INT;
+    DECLARE _nombre VARCHAR(20);
+    DECLARE formato VARCHAR(20);
+
+    SET _mes = MONTH(_fecha);
+    SET _year = YEAR(_fecha);
+
+    CASE _mes
+        WHEN 1 THEN SET _nombre = 'ENERO';
+        WHEN 2  THEN SET _nombre = 'FEBRERO';
+        WHEN 3  THEN SET _nombre = 'MARZO';
+        WHEN 4  THEN SET _nombre = 'ABRIL';
+        WHEN 5  THEN SET _nombre = 'MAYO';
+        WHEN 6  THEN SET _nombre = 'JUNIO';
+        WHEN 7  THEN SET _nombre = 'JULIO';
+        WHEN 8  THEN SET _nombre = 'AGOSTO';
+        WHEN 9  THEN SET _nombre = 'SEPTIEMBRE';
+        WHEN 10  THEN SET _nombre = 'OCTUBRE';
+        WHEN 11  THEN SET _nombre = 'NOVIEMBRE';
+        WHEN 12  THEN SET _nombre = 'DICIEMBRE';
+        ELSE SET _nombre = 'ERROR';
+    END CASE;
+
+    SET formato = CONCAT(_nombre, ' - ' , _year); 
+    return formato;
+END $$
+DELIMITER ;
+
+# ----------------------------  SP: CALCULA MONTO TOTAL DE RECIBOS MENSUALES ------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_calcula_montos_rbos $$
+CREATE PROCEDURE sp_calcula_montos_rbos
+(
+    IN _fecha date
+)
+BEGIN
+    DECLARE total double(10,2) DEFAULT 0;
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE codigo double(10,2) DEFAULT 0;
+    DECLARE monto1 double(10,2) DEFAULT 0;
+    DECLARE monto2 double(10,2) DEFAULT 0;
+    DECLARE monto3 double(10,2) DEFAULT 0;
+    DECLARE igv double(10,2) DEFAULT 0;
+    DECLARE v_igv INT DEFAULT 0;
+
+    DECLARE registros CURSOR FOR
+        SELECT RBO_CODIGO, RBO_MNTO_CONSUMO, RBO_MNTO_SERV_ADI, RBO_MNTO_FIN_CUOTA 
+        FROM RECIBO 
+        WHERE RBO_FEC_PERIODO = _fecha;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    SET v_igv = (SELECT IGV_PORCENTAJE FROM IGV);
+
+    OPEN registros;
+    loop_registros: LOOP
+        -- Fetch lo utilizamos para leer y almacenar cada uno de los registros
+        FETCH registros INTO codigo, monto1, monto2, monto3;
+        -- If que permite salir del ciclo
+        IF done THEN 
+            LEAVE loop_registros; 
+        END IF;
+        -- CALCULO EL IGV
+        SET igv = ((monto1 * v_igv) / 100);
+
+        SET total = ((monto1 + monto2 + monto3) + igv);
+
+        UPDATE RECIBO SET RBO_MNTO_TOTAL = total, RBO_IGV = v_igv WHERE RBO_CODIGO = codigo AND RBO_FEC_PERIODO = _fecha;
+
+        SET total = 0;
+    END LOOP;
+
+    CLOSE registros;
+END $$
+DELIMITER ;
+
+
+# ---------------------------- SP: PROCEDIMIENTO GENERAR RECIBOS MENSUAL ------------------------------
+ DELIMITER $$
+ DROP PROCEDURE IF EXISTS sp_generar_recibos_mensual $$
+ CREATE PROCEDURE sp_generar_recibos_mensual
+ (
+    IN _fecFacturacion date, 
+    OUT code_rpta INT
+ ) 
+  sp_label: BEGIN
+    -- Declaro variables 
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cod_cont INT;
+    DECLARE cod_rbo INT;
+    DECLARE v_periodos INT DEFAULT 0;
+    DECLARE v_rbo_pendientes INT DEFAULT 0;
+    DECLARE m_importe double(10,2) DEFAULT 0;
+    DECLARE m_serv_adi double(10,2) DEFAULT 0;
+    DECLARE m_finac_cuota double(10,2) DEFAULT 0;
+
+    DECLARE v_fecUltPago DATE;
+    DECLARE v_fecCorte DATE;
+    DECLARE v_new_periodo varchar(20);
+
+    DECLARE v_codigoCuota INT;
+    DECLARE v_monto double(10,2);
+
+
+    DECLARE igv INT DEFAULT 0;
+
+
+    -- Declaro CURSOR para leer tabla obtenida de la consulta
+    DECLARE contratos CURSOR FOR
+        SELECT CTO_CODIGO
+        FROM CONTRATO 
+        WHERE CTO_ESTADO = 1 OR CTO_ESTADO = 4
+        ORDER BY CTO_CODIGO;
+
+    -- Manejador para excepciones que pueda ocurra durante el proceso
+    -- 
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+      BEGIN 
+        SET code_rpta = 500;
+        ROLLBACK;
+    END;
+
+    -- Manejador de eventos para saber cuando tiene que detenerse
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    -- DECLARE CONTINUE HANDLER FOR 2014 SET done2 = TRUE;
+    
+    -- Abrir CURSOR
+    OPEN contratos;
+    
+    SET v_new_periodo = (SELECT fc_formato_mes( _fecFacturacion));
+    SET v_fecUltPago = DATE_ADD(CURDATE(), INTERVAL 10 DAY);
+    SET v_fecCorte = DATE_ADD(v_fecUltPago, INTERVAL 1 DAY);
+    SET v_periodos = (SELECT COUNT(*) FROM RECIBO WHERE RBO_PERIODO = v_new_periodo);
+    SET igv = (SELECT IGV_PORCENTAJE FROM IGV);
+
+    IF (v_periodos > 0) THEN
+        SET code_rpta = 400;
+    ELSE
+        START TRANSACTION;
+        loop_arreglo: LOOP
+            -- Fetch lo utilizamos para leer y almacenar cada uno de los registros
+            FETCH contratos INTO cod_cont;
+            -- If que permite salir del ciclo
+            IF done THEN 
+                LEAVE loop_arreglo; 
+            END IF;
+
+            SET v_rbo_pendientes = (SELECT COUNT(RBO_ESTADO) FROM RECIBO WHERE RBO_ESTADO = 1 AND CTO_CODIGO = cod_cont);
+
+
+            SET cod_rbo = (SELECT RBO_CODIGO FROM RECIBO ORDER BY RBO_CODIGO DESC LIMIT 1);
+
+            -- SI EL VALOR ES NULL TOMA 0
+            SET cod_rbo = IFNULL(cod_rbo, 0);
+
+            SET cod_rbo = cod_rbo + 1;
+            -- registro datos en la tabla recibo
+            INSERT INTO RECIBO(RBO_PERIODO,
+                                RBO_FEC_PERIODO,
+                                RBO_ULT_DIA_PAGO, 
+                                RBO_FECHA_CORTE, 
+                                RBO_MNTO_CONSUMO,
+                                RBO_MNTO_SERV_ADI,
+                                RBO_IGV,
+                                RBO_ESTADO, 
+                                RBO_CREATED, 
+                                RBO_UPDATED, 
+                                CTO_CODIGO) VALUES
+                        ( v_new_periodo, _fecFacturacion, v_fecUltPago, 
+                        IF(v_rbo_pendientes > 0, v_fecCorte, NULL), 
+                        (SELECT fc_get_importe_contrato(cod_cont)),
+                        (SELECT fc_get_serv_adicional_rbo(cod_cont, cod_rbo)),
+                        igv, 1, CURDATE(),  CURDATE(), cod_cont);
+
+            
+            -- ACTUALIZANDO LA TABLA RECIBO Y FINANCIAMIENTO MNTO_FIC
+            SET v_codigoCuota = (SELECT fc_get_codigo_cuota_financia(cod_cont, cod_rbo));
+            SET v_monto = (SELECT fc_get_monto_financia(cod_cont, cod_rbo));
+
+
+            IF ( v_codigoCuota <> NULL ) THEN
+                UPDATE FINANC_CUOTA SET FCU_ESTADO = 2 WHERE FCU_CODIGO = v_codigoCuota;
+                UPDATE RECIBO SET FCU_CODIGO = v_codigoCuota, RBO_MNTO_FIN_CUOTA = v_monto WHERE RBO_CODIGO = cod_rbo;
+            END IF;
+  
+        END LOOP;
+        COMMIT;
+
+        CALL sp_calcula_montos_rbos(_fecFacturacion);
+        SET code_rpta =  200;
+    
+    END IF;
+     
+    -- CIERRO CURSOR
+    CLOSE contratos;
+ END $$
+ DELIMITER ;
+
+
+# ---------------------------- SP: MOSTRAR DATOS DEL RECIBO X SU CODIGO ------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_datos_rbo $$
+CREATE PROCEDURE sp_get_datos_rbo
+(
+    IN _codigo INT
+)
+BEGIN 
+    SELECT R.RBO_CODIGO AS CODIGO, R.RBO_PERIODO AS PERIODO, 
+              DATE_FORMAT(R.RBO_CREATED, '%d/%m/%Y') AS 'FEC_EMISION', 
+              DATE_FORMAT(R.RBO_ULT_DIA_PAGO, '%d/%m/%Y') AS 'ULT_DIA_PAGO',
+              DATE_FORMAT(R.RBO_FECHA_CORTE, '%d/%m/%Y') AS 'FECHA_CORTE',
+              R.RBO_MNTO_TOTAL AS 'MONTO_TOTAL',
+              R.CTO_CODIGO AS CONTRATO,
+              CT.CLI_NOMBRES AS CLIENTE,
+              P.PRE_DIRECCION AS DIRECCION,
+              R.RBO_IGV AS IGV,
+              R.RBO_MNTO_CONSUMO AS MNTO_CONSUMO
+    FROM RECIBO AS R
+    INNER JOIN CONTRATO AS C ON R.CTO_CODIGO =  C.CTO_CODIGO
+    INNER JOIN PREDIO AS P ON C.PRE_CODIGO = P.PRE_CODIGO
+    INNER JOIN CLIENTE AS CT ON P.CLI_CODIGO = CT.CLI_CODIGO
+    WHERE R.RBO_CODIGO = _codigo;
+    
+END $$
+DELIMITER ;
+# call sp_get_datos_rbo(9);
+
+# -------------- SP: MOSTRAR OTROS PAGOS EN RECIBO GENERADO ------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_otros_rbo $$
+CREATE PROCEDURE sp_get_otros_rbo
+(
+    IN _cod INT
+)
+BEGIN 
+        DECLARE cod_cont INT;
+        SET cod_cont = (SELECT CTO_CODIGO FROM RECIBO WHERE RBO_CODIGO = _cod);
+
+        SELECT CONCAT('PROYECTO ', PT.PTO_NOMBRE, ' : CUOTA NRO. ', CE.CUE_NUM_CUOTA, ' S/. ', CE.CUE_MNTO_CUOTA ) AS OTROS
+        FROM CONTRATO AS C
+        INNER JOIN CUOTA_EXTRAORDINARIA AS CE ON CE.CTO_CODIGO =  C.CTO_CODIGO
+        INNER JOIN PROYECTO AS PT ON CE.PTO_CODIGO =  PT.PTO_CODIGO
+        WHERE C.CTO_CODIGO = cod_cont AND CE.CUE_ESTADO = 1
+        LIMIT 1;
+END $$
+DELIMITER ;
+# call sp_get_otros_rbo(3);
+
+# -------------- FC: OBTENER EL CODIGO DEL CLIENTE POR EL RECIBO ------------------------------
+DELIMITER $$
+DROP FUNCTION IF EXISTS fc_get_cod_cliente $$
+CREATE FUNCTION fc_get_cod_cliente 
+(_cod INT) RETURNS INT(11)
+BEGIN
+    DECLARE codigo INT DEFAULT 0;
+    SET codigo = (SELECT CTO_CODIGO FROM RECIBO WHERE RBO_CODIGO = _cod);
+    RETURN codigo;
+END $$
+DELIMITER ;
+
+# -------------- SP: MOSTRAR DETALLES EN RECIBO ------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_detalles_rbo $$
+CREATE PROCEDURE sp_get_detalles_rbo
+(
+    IN _cod INT
+)
+BEGIN 
+        -- SENTENCIA PARA RECORRER SUS SERVICIO CONTRATADO
+        SELECT IF(C.CTO_ESTADO = 4, 'SERVICIO EN MANTENIMIENTO', IF(COUNT(S.SRV_CODIGO) = 2,'AGUA POTABLE Y ALCANTARILLADO', S.SRV_NOMBRE)) AS DESCRIPCION,
+			    IF(C.CTO_ESTADO = 4, TU.TUP_TARIFA_MANTENIMIENTO, IF(COUNT(S.SRV_CODIGO) = 2,TU.TUP_TARIFA_AMBOS, IF(S.SRV_CODIGO = 1, TU.TUP_TARIFA_AGUA, TU.TUP_TARIFA_DESAGUE))) AS MONTO,
+                CONCAT('0') AS AGREGAR_MONTO
+        FROM SERVICIO_CONTRATO AS SC 
+        INNER JOIN SERVICIO AS S ON SC.SRV_CODIGO = S.SRV_CODIGO
+        INNER JOIN CONTRATO AS C ON SC.CTO_CODIGO = C.CTO_CODIGO
+        INNER JOIN TIPO_USO_PREDIO AS TU ON C.TUP_CODIGO = TU.TUP_CODIGO
+        WHERE C.CTO_CODIGO = fc_get_cod_cliente(_cod)
+
+        UNION
+        -- SENTENCIA PARA RECORRER SUS SERVICIOS ADICIONALES
+        SELECT SAR_DESCRIPCION AS DESCRIPCION, SAR_COSTO  AS MONTO, CONCAT('0') AS AGREGAR_MONTO
+        FROM SERVICIO_ADICIONAL_RBO 
+        WHERE SAR_CODIGO_RBO = _cod AND SAR_ESTADO = 2
+
+        UNION
+        -- SENTENCIA PARA MOSTRAR CUOTAS REFINANCIADAS EN RECIBO
+        SELECT CONCAT('CUOTA FINANCIADA Nro. ', FCU_CODIGO ) AS DESCRIPCION, RBO_MNTO_FIN_CUOTA AS MONTO,
+        CONCAT('0') AS AGREGAR_MONTO 
+        FROM RECIBO 
+        WHERE RBO_CODIGO = _cod AND FCU_CODIGO <> NULL
+
+        UNION
+        -- SENTENCIA PARA RECORRER SUS RECIBOS PENDIENTES
+        SELECT CONCAT('RECIBO PENDIENTE DE PAGO MES ', RBO_PERIODO,' REF. ', RBO_CODIGO ) AS DESCRIPCION, RBO_MNTO_TOTAL AS MONTO,
+        CONCAT('1') AS AGREGAR_MONTO 
+        FROM RECIBO 
+        WHERE CTO_CODIGO = fc_get_cod_cliente(_cod) AND RBO_ESTADO = 3
+        AND RBO_CODIGO <> _cod;
+
+END $$
+DELIMITER ;
+# call sp_get_detalles_rbo(5);
+
+# ----------------------- SP: MOSTRAR RECIBOS POR CONTRATO ------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_rbos_contrato $$
+CREATE PROCEDURE sp_get_rbos_contrato
+(
+    IN _cod INT
+)
+BEGIN 
+
+    SELECT DATE_FORMAT(R.RBO_FEC_PERIODO, '%Y-%m')  AS PERIODO, R.RBO_CODIGO AS REF, DATE_FORMAT(R.RBO_CREATED, '%Y-%m-%d') AS FECHA_EMISION, 
+            R.RBO_MNTO_TOTAL AS IMPORTE_MES, R.RBO_ULT_DIA_PAGO AS FECHA_VENCE, 
+            IF(R.IGR_CODIGO = NULL,'1900-01-01','1900-01-01') AS FECHA_PAGO, IF(R.RBO_ESTADO = 1,'PENDIENTE', IF(R.RBO_ESTADO = 3,'VENCIDO','FINANCIADO')) AS ESTADO
+            FROM RECIBO AS R WHERE R.CTO_CODIGO = _cod AND R.RBO_ESTADO = 1 OR R.RBO_ESTADO = 3
+                
+            UNION ALL
+
+    SELECT DATE_FORMAT(R.RBO_FEC_PERIODO, '%Y-%m') AS PERIODO, R.RBO_CODIGO AS REF, DATE_FORMAT(R.RBO_CREATED, '%Y-%m-%d')  AS FECHA_EMISION, 
+            R.RBO_MNTO_TOTAL AS IMPORTE_MES, R.RBO_ULT_DIA_PAGO AS FECHA_VENCE, DATE_FORMAT(I.IGR_CREATED, '%Y-%m-%d')  AS FECHA_PAGO, 
+            IF(R.RBO_ESTADO = 2,'PAGADO','PAGADO' ) AS ESTADO
+            FROM RECIBO AS R 
+            INNER JOIN INGRESO AS I ON R.IGR_CODIGO = I.IGR_CODIGO
+            WHERE R.CTO_CODIGO = _cod
+    
+     ORDER BY PERIODO DESC LIMIT 12;
+END $$
+DELIMITER ;
+
+# ----------------------- SP: DATOS PARA OBTENER TICKET DE INGRESO ------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_datos_ticket $$
+CREATE PROCEDURE sp_get_datos_ticket
+(
+    IN _cod INT,
+    IN _tipo VARCHAR(5)
+)
+BEGIN
+        IF (_tipo = 'RBO') THEN
+            SELECT I.IGR_COD_COMPROBANTE AS CODIGO, 
+            I.IGR_CANTIDAD AS CANTIDAD,
+            I.IGR_IGV AS IGV, 
+            I.IGR_MNTO_RECIBIDO AS MNTO_RECIBIDO,
+            IF(I.IGR_TIPO_COMPROBANTE = 1,'NORMAL', IF(I.IGR_TIPO_COMPROBANTE = 2,'BOLETA','FACTURA'))AS TIPO_PAGO,
+            I.IGR_CREATED AS FEC_EMISION,
+            R.RBO_PERIODO AS REF,
+            CT.CTO_CODIGO AS COD_CLIENTE,
+            C.CLI_NOMBRES AS NOMBRES,
+            P.PRE_DIRECCION AS DIRECCION,
+            IF(CT.CTO_ESTADO = 4, 'SERVICIO EN MANTENIMIENTO', IF(COUNT(S.SRV_CODIGO) = 2,'AGUA POTABLE Y ALCANTARILLADO', S.SRV_NOMBRE)) AS SERVICIO,
+            (SELECT CONCAT(USU_CODIGO,' - ',USU_USUARIO) FROM USUARIO WHERE USU_CODIGO = I.USU_CODIGO) AS CAJERO
+            FROM INGRESO AS I
+            INNER JOIN RECIBO AS R ON R.IGR_CODIGO =  I.IGR_CODIGO
+            INNER JOIN CONTRATO AS CT ON R.CTO_CODIGO =  CT.CTO_CODIGO
+            INNER JOIN PREDIO AS P ON CT.PRE_CODIGO =  P.PRE_CODIGO
+            INNER JOIN CLIENTE AS C ON P.CLI_CODIGO =  C.CLI_CODIGO
+            INNER JOIN SERVICIO_CONTRATO AS SC ON SC.CTO_CODIGO =  CT.CTO_CODIGO
+            INNER JOIN SERVICIO AS S ON SC.SRV_CODIGO =  S.SRV_CODIGO
+            WHERE I.IGR_CODIGO = _cod;
+
+        ELSEIF (_tipo = 'CUE') THEN
+            SELECT I.IGR_COD_COMPROBANTE AS CODIGO, I.IGR_CANTIDAD AS CANTIDAD,
+            I.IGR_CREATED AS FEC_EMISION,
+            I.IGR_MNTO_RECIBIDO AS MNTO_RECIBIDO,
+            IF(I.IGR_TIPO_COMPROBANTE = 1,'NORMAL',IF(I.IGR_TIPO_COMPROBANTE = 2,'BOLETA','FACTURA')) AS TIPO_PAGO,
+            CE.CUE_NUM_CUOTA AS REF,
+            CT.CTO_CODIGO AS COD_CONTRATO,
+            C.CLI_NOMBRES AS NOMBRES,
+            P.PTO_NOMBRE AS PROYECTO,
+            (SELECT CONCAT(USU_CODIGO,' - ',USU_USUARIO) FROM USUARIO WHERE USU_CODIGO = I.USU_CODIGO) AS CAJERO
+            FROM INGRESO AS I
+            INNER JOIN CUOTA_EXTRAORDINARIA AS CE ON CE.IGR_CODIGO =  I.IGR_CODIGO
+            INNER JOIN PROYECTO AS P ON CE.PTO_CODIGO =  P.PTO_CODIGO
+            INNER JOIN CONTRATO AS CT ON CE.CTO_CODIGO =  CT.CTO_CODIGO
+            INNER JOIN PREDIO AS PR ON CT.PRE_CODIGO =  PR.PRE_CODIGO
+            INNER JOIN CLIENTE AS C ON PR.CLI_CODIGO =  C.CLI_CODIGO
+            WHERE I.IGR_CODIGO = _cod;
+
+        ELSE
+            SELECT I.IGR_COD_COMPROBANTE AS CODIGO, I.IGR_CANTIDAD AS CANTIDAD,
+            I.IGR_MNTO_RECIBIDO AS MNTO_RECIBIDO,
+            I.IGR_DESCRIPCION AS CONCEPTO,
+            IF(I.IGR_TIPO_COMPROBANTE = 1,'NORMAL',IF(I.IGR_TIPO_COMPROBANTE = 2,'BOLETA','FACTURA')) AS TIPO_PAGO,
+            I.IGR_CREATED AS FEC_EMISION,
+            (SELECT CONCAT(USU_CODIGO,' - ',USU_USUARIO) FROM USUARIO WHERE USU_CODIGO = I.USU_CODIGO) AS CAJERO
+            FROM INGRESO AS I
+            WHERE I.IGR_CODIGO = _cod;
+        END IF;
+    
+END $$
+DELIMITER ;
+
+---------------- SP: OBTENGO DE DATOS POR CODIGO DEL TICKET EGRESO
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_ticket_egreso $$
+CREATE PROCEDURE sp_get_ticket_egreso
+(
+    IN _cod INT
+)
+BEGIN
+    SELECT  E.EGR_CODIGO AS CODIGO,
+            E.EGR_CANTIDAD AS CANTIDAD, 
+            E.EGR_COD_COMPROBANTE AS COMPROBANTE,
+            E.EGR_DESCRIPCION AS CONCEPTO,
+            IF(E.EGR_TIPO_COMPROBANTE = 1,'TICKET',IF(E.EGR_TIPO_COMPROBANTE = 2,'BOLETA','FACTURA')) AS TIPO_EMISION,
+            E.EGR_CREATED AS FEC_EMISION,
+            (SELECT CONCAT(USU_NOMBRES,' ',USU_APELLIDOS) FROM USUARIO WHERE USU_CODIGO = E.USU_CODIGO) AS CAJERO
+            FROM EGRESO AS E
+            WHERE E.EGR_CODIGO = _cod;
+END $$
+DELIMITER ;
+
+------------------- SP: CREA CUOTAS PARA FINANCIAMIENTO DEL RECIBO
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_set_financiar_cuotas $$
+CREATE PROCEDURE sp_set_financiar_cuotas
+(
+    IN _codFinanciado INT, 
+    OUT _msj INT(3)
+)BEGIN
+    
+    DECLARE num_cuota INT DEFAULT 0;
+    DECLARE monto_mes double(10,2);
+
+    DECLARE fecha_inicial DATE;
+    DECLARE fechas DATE; 
+    DECLARE contador INT;
+
+    -- SET deuda = (SELECT FTO_DEUDA FROM FINANCIAMIENTO  WHERE FTO_CODIGO = _codFinanciado);
+    SET num_cuota = (SELECT FTO_NUM_CUOTAS FROM FINANCIAMIENTO  WHERE FTO_CODIGO = _codFinanciado);
+    -- SET cuota_inicial = (SELECT FTO_CUOTA_INICIAL FROM FINANCIAMIENTO  WHERE FTO_CODIGO = _codFinanciado);
+    SET monto_mes = (SELECT FTO_MONTO_CUOTA FROM FINANCIAMIENTO  WHERE FTO_CODIGO = _codFinanciado);
+    SET fecha_inicial = (SELECT DATE_FORMAT(FTO_CREATED,'%Y-%m-%d') AS FECHA FROM FINANCIAMIENTO  WHERE FTO_CODIGO = _codFinanciado);
+
+    IF num_cuota < 1 THEN
+        SET _msj = 400;
+    ELSE
+        SET contador = 1;
+        SET fechas = fecha_inicial;
+        START TRANSACTION;
+        WHILE contador <= num_cuota DO
+            SET fechas = DATE_ADD(fechas, INTERVAL 1 MONTH);
+            
+            INSERT INTO FINANC_CUOTA (FCU_NUM_CUOTA, FCU_MONTO_CUOTA, FCU_ESTADO, 
+                                        FCU_FECHA_DE_CRONOGRAMA, FTO_CODIGO,
+                                        FCU_CREATED, FCU_UPDATED) VALUES
+                                        (contador, monto_mes, 1, fechas, _codFinanciado,
+                                        fechas, fechas);
+
+            SET contador = contador + 1;
+        END WHILE;
+        COMMIT;
+        SET _msj = 200;
+    END IF;
+  
+END $$
+DELIMITER ;
+
+-------------------------- SP: PARA MOSTRAR IMPRIMIR FINANCIAMIENTO POR CODIGO
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_cuotas_finan $$
+CREATE PROCEDURE sp_get_cuotas_finan
+(
+    IN _codFinanciamiento INT
+)BEGIN
+    
+    SELECT FCU_NUM_CUOTA AS CUOTA, FCU_FECHA_DE_CRONOGRAMA AS CRONOGRAMA,
+    FCU_MONTO_CUOTA AS MONTO,
+    (SELECT RBO_MNTO_CONSUMO FROM RECIBO WHERE FTO_CODIGO = _codFinanciamiento LIMIT 1) AS CUOTA_MES
+    FROM FINANC_CUOTA 
+    WHERE FTO_CODIGO = _codFinanciamiento
+    AND FCU_ESTADO = 1;
+
+END $$
+DELIMITER ;
+# ----------------------------  SP: OBTIENE RECIBOS REFINANCIADOS POR CODIGO  ------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_rbos_finan $$
+CREATE PROCEDURE sp_get_rbos_finan
+(
+    IN _codFinanciamiento INT
+)BEGIN
+    
+    SELECT RBO_PERIODO AS RBO_MES, 
+    RBO_MNTO_CONSUMO AS TARIFA
+    FROM RECIBO 
+    WHERE FTO_CODIGO = _codFinanciamiento;
+
+END $$
+DELIMITER ;
+
+
+# ----------------------------  SP: ACTUALIZA EL ESTADO DEL RECIBO A VENCIDO DE FORMA MENSUAL ------------------------------
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_actualiza_rbos_vencidos $$
+CREATE PROCEDURE sp_actualiza_rbos_vencidos
+(OUT rpta INT) 
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE codigo INT;
+
+    DECLARE recibos CURSOR FOR
+        SELECT RBO_CODIGO
+        FROM RECIBO 
+        WHERE RBO_ESTADO = 1 AND
+        CURDATE() > RBO_ULT_DIA_PAGO;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN recibos;
+    loop_recibos: LOOP
+        -- Fetch lo utilizamos para leer y almacenar cada uno de los recibos
+        FETCH recibos INTO codigo;
+        -- If que permite salir del ciclo
+        IF done THEN 
+            LEAVE loop_recibos; 
+        END IF;
+
+        UPDATE RECIBO SET RBO_ESTADO = 3 WHERE RBO_CODIGO = codigo;
+    END LOOP;
+
+    SET rpta = 200;
+    CLOSE recibos;
+
+END $$
+DELIMITER ;
+
+# ------------------ SP: CREA CUOTAS PARA CADA CONTRATO ACTIVO / MANTENIMIENTO DE UN PROYECTO NUEVO
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_set_proyecto_cuotas $$
+CREATE PROCEDURE sp_set_proyecto_cuotas
+(
+    IN _codProyecto INT, 
+    OUT _msj INT(3)
+)BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE num_cuota INT DEFAULT 0;
+    DECLARE monto_cuota double(10,2);
+    DECLARE montos double(10,2); 
+    DECLARE contador INT;
+    DECLARE cod_cto INT;
+    
+    DECLARE contratos CURSOR FOR 
+        SELECT CTO_CODIGO FROM CONTRATO 
+        WHERE CTO_ESTADO = 1 OR CTO_ESTADO = 4;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    SET monto_cuota = (SELECT PTO_MNTO_CTO FROM PROYECTO WHERE PTO_CODIGO = _codProyecto);
+    SET num_cuota = (SELECT PTO_NUM_CUOTAS FROM PROYECTO WHERE PTO_CODIGO = _codProyecto);
+    
+    SET montos = (monto_cuota / num_cuota);
+
+    IF num_cuota < 1 THEN
+        SET _msj = 500;
+    ELSE
+        OPEN contratos;
+        START TRANSACTION;
+
+        loop_contratos: LOOP
+            -- Fetch lo utilizamos para leer y almacenar cada uno de los recibos
+            FETCH contratos INTO cod_cto;
+            -- If que permite salir del ciclo
+            IF done THEN 
+                LEAVE loop_contratos; 
+            END IF;
+
+            SET contador = 1;
+            WHILE contador <= num_cuota DO
+                INSERT INTO CUOTA_EXTRAORDINARIA (CUE_NUM_CUOTA, CUE_MNTO_CUOTA, CUE_ESTADO, 
+                                        PTO_CODIGO,
+                                        CTO_CODIGO,
+                                        CUE_CREATED,
+                                        CUE_UPDATED) VALUES
+                                        (contador, montos, 1, 
+                                        _codProyecto, cod_cto,
+                                        CURDATE(),
+                                        CURDATE());
+
+                SET contador = contador + 1;
+            END WHILE;
+        END LOOP;
+
+        COMMIT;
+        CLOSE contratos;
+        SET _msj = 200;
+    END IF;
+  
+END $$
+DELIMITER ;
+
+
+# ------------------ SP: MUESTRO DATOS DEL CLIENTE FINANCIADO
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_datos_usuario_financiado $$
+CREATE PROCEDURE sp_datos_usuario_financiado
+(IN _codigo INT) 
+BEGIN
+    DECLARE cod_contrato INT;
+
+    SET cod_contrato = (SELECT CTO_CODIGO FROM FINANCIAMIENTO WHERE FTO_CODIGO = _codigo);
+
+    SELECT C.CLI_NOMBRES AS USUARIO, C.CLI_DOCUMENTO AS DOCUMENTO,
+        P.PRE_DIRECCION AS DIRECCION, 
+        (SELECT fc_get_importe_contrato(cod_contrato)) AS IMPORTE_CONSUMO,
+        (SELECT FTO_DEUDA AS DEUDA FROM FINANCIAMIENTO WHERE FTO_CODIGO = _codigo) AS DEUDA
+        FROM CONTRATO AS CT
+        INNER JOIN PREDIO AS P ON CT.PRE_CODIGO = P.PRE_CODIGO
+        INNER JOIN CLIENTE AS C ON P.CLI_CODIGO = C.CLI_CODIGO
+        WHERE CT.CTO_CODIGO = cod_contrato;
+END $$
+DELIMITER ;
+
+
+# ------------------ SP: MUESTRO DATOS PARA EL DOCUMENTO DE FINANCIAMIENTO
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_datos_financiamiento $$
+CREATE PROCEDURE sp_datos_financiamiento
+(IN _codigo INT)
+BEGIN
+    SELECT DATE_FORMAT(FTO_CREATED,'%Y-%m-%d') AS FECHA,
+            F.FTO_CUOTA_INICIAL AS INICIAL,
+            F.FTO_NUM_CUOTAS AS CUOTA,
+            F.FTO_MONTO_CUOTA AS MONTO_CUOTA 
+            FROM FINANCIAMIENTO AS F
+            WHERE F.FTO_CODIGO = _codigo;
+END $$
+DELIMITER ;
+
+
+# ------------------ SP: OBTENGO DATOS PARA MOSTRAR EN EL REPORTE SEMANAL 
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_montos_arqueo_semanal $$
+CREATE PROCEDURE sp_montos_arqueo_semanal
+(
+    IN _fechaInicio date,
+    IN _fechaFin date
+)BEGIN
+
+    DECLARE saldoAct double;
+    DECLARE ingresosHastaFA double;
+    DECLARE egresosHastaFA double;
+
+    DECLARE saldoIni double;
+    DECLARE ingresosRangoFecha double;
+    DECLARE egresosRangoFecha double;
+    DECLARE saldoNetoRangoFecha double;
+    
+    SET saldoAct = (SELECT SUM(CAJ_SALDO) FROM CAJA);
+    SET ingresosHastaFA = (SELECT SUM(IGR_CANTIDAD) AS TOTAL
+                            FROM INGRESO 
+                            WHERE IGR_ESTADO = 1 
+                            AND DATE(IGR_CREATED) BETWEEN _fechaInicio AND CURDATE());
+
+    SET egresosHastaFA = (SELECT SUM(EGR_CANTIDAD) AS TOTAL
+                            FROM EGRESO 
+                            WHERE EGR_ESTADO = 1 
+                            AND DATE(EGR_CREATED) BETWEEN _fechaInicio AND CURDATE());
+
+    SET saldoIni = (saldoAct - ingresosHastaFA + egresosHastaFA);
+
+    SET ingresosRangoFecha = (SELECT SUM(IGR_CANTIDAD) AS TOTAL
+                            FROM INGRESO 
+                            WHERE IGR_ESTADO = 1 
+                            AND DATE(IGR_CREATED) BETWEEN _fechaInicio AND _fechaFin);
+
+    SET egresosRangoFecha = (SELECT SUM(EGR_CANTIDAD) AS TOTAL
+                            FROM EGRESO 
+                            WHERE EGR_ESTADO = 1 
+                            AND DATE(EGR_CREATED) BETWEEN _fechaInicio AND _fechaFin);
+
+    SET saldoNetoRangoFecha =  (ingresosRangoFecha - egresosRangoFecha);  
+
+    SELECT  saldoIni AS 'SALDO_INICIAL',  ingresosRangoFecha AS 'INGRESOS', egresosRangoFecha AS 'EGRESOS';
+
+END $$
+DELIMITER ;
+
+# ------------------------------------  SP: REGISTROS PARA REPORTE SEMANAL
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_registros_reporte_semanal $$
+CREATE PROCEDURE sp_registros_reporte_semanal
+(
+    IN _fechaInicio date,
+    IN _fechaFin date
+)BEGIN
+    -- INGRESOS
+    SELECT DATE_FORMAT(DATE(IGR_CREATED),'%d-%m-%Y') AS DIA, 
+            SUM(IGR_CANTIDAD) AS TOTAL,
+            'I' AS TIPO
+    FROM INGRESO 
+    WHERE IGR_ESTADO = 1 
+    AND DATE(IGR_CREATED) BETWEEN _fechaInicio AND _fechaFin
+    GROUP BY IGR_CREATED
+
+    UNION
+
+    -- EGRESOS
+    SELECT DATE_FORMAT(DATE(EGR_CREATED),'%d-%m-%Y') AS DIA , 
+            SUM(EGR_CANTIDAD) AS TOTAL,
+            'E' AS TIPO
+    FROM EGRESO 
+    WHERE EGR_ESTADO = 1 
+    AND DATE(EGR_CREATED) BETWEEN _fechaInicio AND _fechaFin 
+    GROUP BY EGR_CREATED;
+
+END $$
+DELIMITER ;
+
+# ------------------------------------  SP: REGISTROS PARA REPORTE MENSUAL
+/* DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_registros_reporte_mensual $$
+CREATE PROCEDURE sp_registros_reporte_mensual
+(
+    IN _fechaInicio date,
+    IN _fechaFin date
+)BEGIN
+    SELECT DATE_FORMAT(DATE(IGR_CREATED),'%d-%m-%Y') AS DIA, 
+            SUM(IGR_CANTIDAD) AS INGRESOS,
+            (SELECT SUM(EGR_CANTIDAD) FROM EGRESO 
+                WHERE EGR_ESTADO = 1 
+                AND DATE(EGR_CREATED) BETWEEN _fechaInicio AND _fechaFin
+                AND EGR_TIPO = 'OTRO' 
+                GROUP BY EGR_CREATED) AS EGRESOS
+    FROM INGRESO 
+    WHERE IGR_ESTADO = 1 
+    AND DATE(IGR_CREATED) BETWEEN _fechaInicio AND _fechaFin
+    AND IGR_TIPO IN ('RBO','CUE','OTRO') 
+    GROUP BY IGR_CREATED
+
+     -- EJEMPLOS PARA PRACTICAR   
+        DECLARE varMonto DECIMAL(14,2);
+        
+        CREATE TEMPORARY TABLE IF NOT EXISTS tmp_registros_ingresos_montos (mydate DATE , monto DECIMAL(14,2));
+        
+        WHILE _fechaInicio <= _fechaFin DO
+            SELECT COALESCE(SUM(IGR_CANTIDAD), 0) INTO varMonto FROM INGRESO WHERE IGR_CREATED = _fechaInicio;
+            
+            INSERT INTO tmp_registros_ingresos_montos SELECT _fechaInicio , varMonto ;
+            SET _fechaInicio = DATE_ADD(_fechaInicio, INTERVAL 1 DAY);
+        END WHILE;
+        
+        SELECT * FROM tmp_registros_ingresos_montos;
+        
+        DROP TEMPORARY TABLE IF EXISTS tmp_registros_ingresos_montos;
+   
+
+END $$
+DELIMITER ;*/
+
+
+
+-- Documentación de STORE-PROCEDURES JASS v1.0.1:
+
+-- CALL sp_generar_recibos_mensual('2021-07-05', @rpta)  
+-- SELECT @rpta AS RESPUESTA                            : GENERA RECIBOS MASIVOS MENSUALES POR CONTRATO ACTIVOS
+-- CALL sp_get_datos_rbo($cod_rob)     : OBTENGO LOS DATOS REFERENCIAL AL RECIBO RELACIONADO CON SU CONTRATO
+-- CALL sp_get_detalles_rbo($cod_rob)  : OBTENGO DETALLES COMO: SERVICIO CONTRATADO Y SERVICIOS ADIONALES PERTENECIENTES AL RECIBO
+-- CALL sp_get_otros_rbo($cod_rob)     : OBTENGO OTROS MONTOS COMO: RENCIBOS PENDIENTES DE PAGO, CUOTAS DE PROYECTOS
+-- CALL sp_get_rbos_contrato($cod_contrato) : MUESTRA UNA TABLA CON TODOS LOS RECIBOS FACTURADOS EN LOS ULTIMO 12 MESES,
+--                                            MOSTRANDO EL ESTADO DEL MISMO(Pendiente,Pagado, Vencido y Financiado).
+-- CALL sp_get_datos_ticket($cod_ticket,'TIPO')    : OBTENGO TODOS LOS DATOS DEL TICKET Y EL CLIENTE QUIEN PAGO, PARA LUEGO MOSTRARLO EN EL COMPROBANTE
+-- SELECT *FROM  
+
+-- CALL sp_set_financiar_cuotas($codigo, @_msj);
+-- SELECT @_msj as MANSAJE;
+
+-- FUNCION fc_actualiza_rbos_vencidos           : ACTUALIZA COMO VENCIDOS A TODOS LOS RECIBOS 
+--                                                    QUE CONTENGAN UNA FECHA DE CORTE
+
+-- CALL sp_set_proyecto_cuotas(2, @msj);
+-- SELECT @msj as MENSAJE;

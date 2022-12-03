@@ -1,0 +1,306 @@
+{% set menuLItem = 'proyecto' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class=""> 
+                	<i class="fas fa-project-diagram mr-3"></i>Detalle de proyecto 
+            	</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			{# Contenedor de alertas #}
+            {% set classAlert = "" %}
+            {% if estadoDetalle is empty %}
+            	{% set classAlert = "d-none" %}
+            {% elseif codigo >= 200 and codigo <300 %}
+                {% set classAlert = "alert-success" %}
+            {% elseif codigo >= 400 %}
+                {% set classAlert = "alert-danger" %}
+            {% endif %}
+  			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+             	<ul class="mb-0" id="f_alertsUl">
+             		{% if estadoDetalle is not empty %}
+                      {% for msj in estadoDetalle %}
+                        <li>{{ msj }}</li>
+                      {% endfor %}
+                    {% endif %}
+             	</ul>
+             	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+             		<span aria-hidden="true">&times;</span>
+             	</button>
+            </div>{# /Contenedor de alertas #}
+  		</div>
+  	</div>
+  	
+  
+  	<div class="row">
+  		<div class="col-12 d-flex justify-content-between f_arearef">
+  			<div>
+  				<div class="d-inline-block mr-2 mr-md-4">
+          			<div class="f_imageref"><span class="fas fa-project-diagram" style=" color: #a69944"></span></div>
+  				</div>
+  				<div class="d-inline-block align-top">
+  					<span class="font-weight-bold f_inforef">
+  					    {% if data.proyecto is defined %}{{ data.proyecto.PTO_CODIGO }}{% endif %}
+  					</span><br/>
+  				</div>
+  			</div>
+  			<div class="d-none d-sm-block">
+  				<span><a href="{{ PUBLIC_PATH }}/proyecto/lista" class="f_link font-weight-bold">Volver a Lista</a></span>
+  			</div>
+  		</div>
+  		<div class="col-12 table-responsive">
+  			<table class="table f_table f_tableforfield">
+              <tbody>
+              	<tr>
+                  <td>Ref.</td>
+                  <td>{% if data.proyecto is defined %}{{ data.proyecto.PTO_CODIGO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Nombre</td>
+                  <td>{% if data.proyecto is defined %}{{ data.proyecto.PTO_NOMBRE }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Monto total</td>
+                  <td class="text-bold">{% if data.proyecto is defined %}{{ "S/. " ~ data.proyecto.PTO_MNTO_TOTAL|number_format(2, '.', ',') }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Estado</td>
+                  <td>
+                  	{% if  data.proyecto is defined %}
+                  		{% if data.proyecto.PTO_ESTADO == 1 %}
+                        	<span class="badge badge-warning">{{ 'Sin Confirmar' }}</span>
+                        {% elseif  data.proyecto.PTO_ESTADO == 2 %}
+                        	<span class="badge badge-success">{{ 'Confirmado' }}</span>
+                    	{% elseif  data.proyecto.PTO_ESTADO == 3 %}
+                        	<span class="badge badge-danger">{{ 'Anulado' }}</span>
+                        {% endif %}
+                  	{% endif %}
+                  </td>
+                </tr>	
+                <tr>
+                  <td>Descripción</td>
+                  <td>{% if data.proyecto is defined %}{{ data.proyecto.PTO_DESCRIPCION }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Monto por Contrato</td>
+                  <td>{% if data.proyecto is defined %}{{ "S/. " ~ data.proyecto.PTO_MNTO_CTO|number_format(2, '.', ',') }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Nro. Cuotas por contrato</td>
+                  <td>{% if data.proyecto is defined %}{{ data.proyecto.PTO_NUM_CUOTAS }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha de creación</td>
+                  <td>{% if data.proyecto is defined %}{{ data.proyecto.PTO_CREATED }}{% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+  		</div>
+  	</div><!-- /.card-body -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardfooter f_cardfooteractions text-right">
+  				{% set styleBtnAnular, titleBtnAnular = "f_buttonactiondelete", "" %}
+				{% if data.proyecto is defined and data.proyecto.PTO_ESTADO == 3 %}
+				    {% set styleBtnAnular = "f_buttonactionrefused" %}
+					{% set titleBtnAnular = "Desactivado porque el proyecto ya fue anulado" %}
+				{% elseif data.proyecto is defined and data.proyecto.PTO_ESTADO == 2 %}
+					{% set styleBtnAnular = "f_buttonactionrefused" %}
+					{% set titleBtnAnular = "Desactivado porque el proyecto ya fue confirmado" %}
+			    {% endif %}
+			    
+			    {% if data.proyecto is defined and data.proyecto.PTO_ESTADO == 1 %}
+				    <button type="button" class="f_button f_buttonaction" data-toggle="modal" data-target="#modalConfirmarProyecto">
+				    	Confirmar</button>
+			    {% endif %}
+			    
+  				<button type="button" class="f_button {{ styleBtnAnular }} classfortooltip" data-toggle="modal" 
+  						data-target="#modalAnularProyecto" title="{{ titleBtnAnular }}">
+  					Anular proyecto</button>
+  			</div>
+  			
+  		</div>
+  	</div><!-- /.card-footer -->
+  
+</div><!-- /.card -->
+
+
+{# Recursos vinculados #}
+{% if data.proyecto is defined and data.proyecto.PTO_ESTADO == 2 %}
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <div class="f_card">
+        
+          	<div class="row">
+          		<div class="col-12">
+          			<div class="f_cardheader">
+          				<div class="">Cuotas Vinculados</div>
+          			</div>
+          		</div>
+          	</div><!-- /.card-header -->
+          	
+          	<div class="row">
+              	<div class="col-12 table-responsive">
+              		<form method="get" action="{{ PUBLIC_PATH }}/cuotaextraordinaria/lista/filtro" id="formFilterListCuotasExtra">
+              			<table class="table f_table f_tableliste">
+              			  <thead>
+              			  	<tr class="liste_title">
+              			  		<td class="liste_title" colspan="2">Filtro</td>
+              			  	</tr>
+              			  </thead>
+                          <tbody>
+                          	<tr class="d-none">
+                              	<td>Proyecto Ref.</td>
+                                <td>
+                                    <input type="hidden" name="filterProyecto" value='{{ data.proyecto.PTO_CODIGO }}'></td>
+                                </td>
+                            </tr>
+                            <tr>
+                              	<td>Cliente</td>
+                                <td>
+                                    <input class="f_inputflat f_maxwidth150imp" type="text" name="filterCliente" placeholder="DNI O RUC"
+                              				value='{% if data.formFilterListCuotaExtra.filterCliente is defined %}{{ data.formFilterListCuotaExtra.filterCliente }}{% endif %}'></td>
+                                </td>
+                            </tr>
+                            <tr>
+                              	<td>Contrato Ref.</td>
+                                <td>
+                                    <input class="f_inputflat f_maxwidth150imp" type="text" name="filterContrato" 
+                              				value='{% if data.formFilterListCuotaExtra.filterCodigo is defined %}{{ data.formFilterListCuotaExtra.filterCodigo }}{% endif %}'></td>
+                                </td>
+                            </tr>
+                            <tr>
+                              	<td>Estado</td>
+                                <td>
+                                    <select class="f_inputflat" name="filterEstado" id="cmbFilterEstado">
+                                        <option value="-1" class="f_opacitymedium"></option>
+                                        <option value="1" 
+                                            {% if data.formFilterListCuotasExtra.filterEstado is defined and data.formFilterListCuotasExtra.filterEstado ==  "1" %}
+                                					{{ 'selected' }}
+                        					{% endif %}>
+                        					PENDIENTE
+                    					</option>
+                                        <option value="2"
+                                            {% if data.formFilterListCuotasExtra.filterEstado is defined and data.formFilterListCuotasExtra.filterEstado ==  "2" %}
+                                					{{ 'selected' }}
+                        					{% endif %}>
+                        					PAGADO
+                    					</option>
+                                  	</select>
+                                </td>
+                            </tr>
+                            <tr>
+                            	<td colspan="2" class="text-center">
+                            		<button type="submit" class="f_button f_buttonaction mt-2" style="padding:5px 15px">Buscar</button>
+                            	</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </form>
+            	</div>
+          	</div><!-- /.card-body -->
+          	
+          	<div class="row">
+          		<div class="col-12 f_cardfooter text-right"></div>
+          	</div><!-- /.card-footer -->
+        
+        </div><!-- /.card -->
+    </div>
+
+</div>
+{% endif %}{# /Recursos vinculados #}
+
+
+
+{# Modal confirmar proyecto #}
+{% if data.proyecto is defined and data.proyecto.PTO_ESTADO == 1 %}
+    <div class="modal fade f_modal" id="modalConfirmarProyecto" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">Confirmar Proyecto</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    	<span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                	<i class="fas fa-info-circle text-secondary mr-1"></i>
+                	<span>¿Está seguro de querer confirmar este proyecto?</span><br>
+                	<span>Si el proyecto se confirma ya no podrá anularlo.</span>
+                	<form class="d-none" id="formConfirmarProyecto" action="{{ PUBLIC_PATH }}/proyecto/confirmar" method="post">
+                		<input type="hidden" name="codigo" 
+                				value="{% if data.proyecto is defined %}{{ data.proyecto.PTO_CODIGO }}{% endif %}">
+                	</form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="f_btnactionmodal" id="btnConfirmarProyecto">Si</button>
+                    <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{# /Modal confirmar proyecto #}
+
+
+{# Modal anular proyecto #}
+{% if data.proyecto is defined and data.proyecto.PTO_ESTADO == 1 %}
+    <div class="modal fade f_modal" id="modalAnularProyecto" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">Anular Proyecto</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    	<span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                	<i class="fas fa-info-circle text-secondary mr-1"></i><span>¿Está seguro de querer anular este proyecto?</span>
+                	<form class="d-none" id="formAnularProyecto" action="{{ PUBLIC_PATH }}/proyecto/annular" method="post">
+                		<input type="hidden" name="codigo" 
+                				value="{% if data.proyecto is defined %}{{ data.proyecto.PTO_CODIGO }}{% endif %}">
+                	</form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="f_btnactionmodal" id="btnAnularProyecto">Si</button>
+                    <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{# /Modal anular proyecto #}
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#btnConfirmarProyecto').click(function(event){
+			$('#formConfirmarProyecto').submit();
+			return false;
+		});
+		
+		$('#btnAnularProyecto').click(function(event){
+			$('#formAnularProyecto').submit();
+			return false;
+		});
+		
+		f_select2("#cmbFilterEstado");
+	</script>
+	
+{% endblock %}

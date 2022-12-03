@@ -1,0 +1,190 @@
+{% set menuLItem = 'usuario' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class=""> 
+                	<i class="fas fa-user-shield mr-3"></i>Detalle de usuario 
+            	</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			{# Contenedor de alertas #}
+            {% set classAlert = "" %}
+            {% if estadoDetalle is empty %}
+            	{% set classAlert = "d-none" %}
+            {% elseif codigo >= 200 and codigo <300 %}
+                {% set classAlert = "alert-success" %}
+            {% elseif codigo >= 400 %}
+                {% set classAlert = "alert-danger" %}
+            {% endif %}
+  			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+             	<ul class="mb-0" id="f_alertsUl">
+             		{% if estadoDetalle is not empty %}
+                      {% for msj in estadoDetalle %}
+                        <li>{{ msj }}</li>
+                      {% endfor %}
+                    {% endif %}
+             	</ul>
+             	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+             		<span aria-hidden="true">&times;</span>
+             	</button>
+            </div>{# /Contenedor de alertas #}
+  		</div>
+  	</div>
+  	
+  
+  	<div class="row">
+  		<div class="col-12 d-flex justify-content-between f_arearef">
+  			<div>
+  				<div class="d-inline-block mr-2 mr-md-4">
+  				    {% set photoref = PUBLIC_PATH ~ "/img/user_default.svg" %}
+          			{% if data.photoref is defined and data.photoref is not empty %}
+          			    {% set photoref = data.photoref %}{% endif %}
+      			    <div class="f_imageref"><img  src="{{ photoref }}"></div>
+  				</div>
+  				<div class="d-inline-block align-top">
+  					<span class="font-weight-bold f_inforef">
+  					    {% if data.usuario is defined %}{{ data.usuario.USU_CODIGO }}{% endif %}
+  					</span><br/>
+  					<span class="font-weight-bold f_inforef">
+  					    {% if data.usuario is defined %}{{ data.usuario.USU_USUARIO }}{% endif %}
+				    </span><br/>
+  					<span><i class="fas fa-at mr-1"></i>{% if data.usuario is defined %}{{ data.usuario.USU_EMAIL }}{% endif %}</span>
+  				</div>
+  			</div>
+  			<div class="d-none d-sm-block">
+  				<span><a href="{{ PUBLIC_PATH }}/usuario/lista" class="f_link font-weight-bold">Volver a Lista</a></span>
+  			</div>
+  		</div>
+  		<div class="col-12 col-lg-6 table-responsive">
+  			<table class="table f_table f_tableforfield">
+              <tbody>
+              	<tr>
+                  <td>Inicio de sesión / Id.</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_CODIGO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Inicio de sesión / Usuario</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_USUARIO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Tipo</td>
+                  <td>{% if data.usuarioTipo is defined %}{{ data.usuarioTipo.TPU_NOMBRE }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Estado</td>
+                  <td>
+                  	{% if  data.usuario is defined %}
+                  		{% if data.usuario.USU_ESTADO == 0 %}
+                        	<span class="badge badge-danger">{{ 'Suspendido' }}</span>
+                        {% elseif  data.usuario.USU_ESTADO == 1 %}
+                        	<span class="badge badge-success">{{ 'Activo' }}</span>
+                        {% endif %}
+                  	{% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Fecha de creación</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_CREATED }}{% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+  		</div>
+  		<div class="col-12 col-lg-6  mt-3 mt-lg-0 table-responsive">
+  			<table class="table f_table f_tableforfield">
+              <tbody>
+              	<tr>
+                  <td>Nombre</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_NOMBRES }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Apellidos</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_APELLIDOS }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Correo</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_EMAIL }}{% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+  		</div>
+  	</div><!-- /.card-body -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardfooter f_cardfooteractions text-right">
+  				{% if data.usuario is defined and data.usuario.USU_INTENTOS_FALLIDOS >= 3 %}
+      				{% set titleBtnDesbloquear = "Desbloquear usuario por limite de intentos fallidos" %}
+      				<button type="button" class="f_button f_buttonaction classfortooltip" data-toggle="modal" data-target="#modalDesbloquearUsuario"
+      						title="{{ titleBtnDesbloquear }}">Desbloquear</button>
+				{% endif %}
+  				<a href="{{ PUBLIC_PATH }}/usuario/editar/{% if data.usuario is defined %}{{ data.usuario.USU_CODIGO }}{% endif %}" 
+  					class="f_linkbtn f_linkbtnaction">Modificar</a>
+				{% set titleBtnEliminar = "Los usuarios no pueden ser eliminados.
+  											 Para quitar acceso al sistema puede suspender al usuario" %}
+  				<button type="button" class="f_button f_buttonactionrefused classfortooltip" data-toggle="modal" data-target="#modalEliminarUsuario"
+  						title="{{ titleBtnEliminar }}">Eliminar</button>
+  			</div>
+  			
+  		</div>
+  	</div><!-- /.card-footer -->
+  
+</div><!-- /.card -->
+
+
+
+{# Modal desbloquear usuario #}
+{% if data.usuario is defined and data.usuario.USU_INTENTOS_FALLIDOS >= 3 %}
+<div class="modal fade f_modal" id="modalDesbloquearUsuario" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Desbloquear Usuario</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i>
+            	<span>
+                	Este usuario fue bloqueado por superar el limite de intentos fallidos al intentar acceder al sistema
+                	¿Está seguro de querer desbloquear al usuario?</span>
+            	<form class="d-none" id="formDesbloquearUsuario" action="{{ PUBLIC_PATH }}/usuario/unlock/intentosfallidos" method="post">
+            		<input type="hidden" name="codigo" value="{% if data.usuario is defined %}{{ data.usuario.USU_CODIGO }}{% endif %}">
+            	</form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnDesbloquearUsuario">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{# /Modal desbloquear usuario #}
+
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#btnDesbloquearUsuario').click(function(event){
+			$('#formDesbloquearUsuario').submit();
+			return false;
+		});
+	</script>
+	
+{% endblock %}

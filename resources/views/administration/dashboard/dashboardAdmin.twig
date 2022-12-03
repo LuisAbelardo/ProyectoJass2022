@@ -1,0 +1,30 @@
+{% set menuLItem = 'home' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+	<div class="row">
+		{% if data.cajas is defined %}
+        	{% for caja in data.cajas %}
+        		<div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box p-0">
+                        <span class="info-box-icon bg-info" style="background-color:#ececec !important">
+                        	<i class="fas fa-archive" style="color:#000 !important; font-size:1.5rem"></i>
+                    	</span>
+                        
+                        <div class="info-box-content">
+                            <span class="info-box-text">SALDO {{ caja.CAJ_NOMBRE }}</span>
+                            <span class="info-box-number">{{ "S/. " ~ caja.CAJ_SALDO|number_format(2, '.', ',') }}</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                	<!-- /.info-box -->
+                </div>
+        	{% endfor %}
+        {% endif %}
+	</div>
+</div><!-- /.card -->
+    
+{% endblock %}

@@ -1,0 +1,9 @@
+.env
+node_modules
+vendor
+SQL/db_data_dawerbunker.sql
+
+
+.buildpath
+.project
+.settings/

@@ -1,0 +1,764 @@
+{% set menuLItem = 'contrato' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class=""> 
+                	<i class="fas fa-file-contract mr-3"></i>Detalle de contrato
+            	</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			{# Contenedor de alertas #}
+            {% set classAlert = "" %}
+            {% if estadoDetalle is empty %}
+            	{% set classAlert = "d-none" %}
+            {% elseif codigo >= 200 and codigo <300 %}
+                {% set classAlert = "alert-success" %}
+            {% elseif codigo >= 400 %}
+                {% set classAlert = "alert-danger" %}
+            {% endif %}
+  			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+             	<ul class="mb-0" id="f_alertsUl">
+             		{% if estadoDetalle is not empty %}
+                      {% for msj in estadoDetalle %}
+                        <li>{{ msj }}</li>
+                      {% endfor %}
+                    {% endif %}
+             	</ul>
+             	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+             		<span aria-hidden="true">&times;</span>
+             	</button>
+            </div>{# /Contenedor de alertas #}
+  		</div>
+  	</div>
+  	
+  
+  	<div class="row">
+  		<div class="col-12 d-flex justify-content-between f_arearef">
+  			<div>
+  				<div class="d-inline-block mr-2 mr-md-4">
+          			<div class="f_imageref"><span class="fas fa-file-contract" style=" color: #a69944"></span></div>
+  				</div>
+  				<div class="d-inline-block align-top">
+  					<span class="font-weight-bold f_inforef">
+  					    {% if data.contrato is defined %}{{ data.contrato.CTO_CODIGO }}{% endif %}
+  					</span><br/>
+  				</div>
+  			</div>
+  			<div class="d-none d-sm-block">
+  				<span><a href="{{ PUBLIC_PATH }}/contrato/lista" class="f_link font-weight-bold">Volver a Lista</a></span>
+  			</div>
+  		</div>
+  		<div class="col-12 col-lg-6 table-responsive">
+  			<table class="table f_table f_tableforfield">
+              <tbody>
+              	<tr>
+                  <td>Ref.</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_CODIGO }}{% endif %}</td>
+                </tr>
+                </tr>
+                <tr>
+                  <td>Estado</td>
+                  <td>
+                  	{% if  data.contrato is defined %}
+                  		{% if data.contrato.CTO_ESTADO == 0 %}
+                        	<span class="badge badge-warning">{{ 'Tramite' }}</span>
+                        {% elseif  data.contrato.CTO_ESTADO == 1 %}
+                        	<span class="badge badge-success">{{ 'Activo' }}</span>
+                        {% elseif  data.contrato.CTO_ESTADO == 2 %}
+                        	<span class="badge badge-danger">{{ 'Anulado' }}</span>
+                        {% elseif  data.contrato.CTO_ESTADO == 3 %}
+                        	<span class="badge badge-secondary">{{ 'Cortado' }}</span>
+                        {% elseif  data.contrato.CTO_ESTADO == 4 %}
+                        <span class="badge badge-info">{{ 'Mantenimiento' }}</span>
+                        {% elseif  data.contrato.CTO_ESTADO == 5 %}
+                        <span class="badge badge-dark">{{ 'Pasivo' }}</span>
+                        {% endif %}
+                  	{% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Fecha de Tramite</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_FECHA_TRAMITE }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha de Inicio</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_FECHA_INICIO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha de Anulación</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_FECHA_ANULACION }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha de Corte</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_FECHA_SUSPENCION }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha de Reconección</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_FECHA_RECONECCION }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha Inicio Mantenimiento</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_FECHA_INICIO_MANTENIMIENTO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha Fin Mantenimiento</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_FECHA_FIN_MANTENIMIENTO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Servicios</td>
+                  <td>
+                  	{% if data.servicios is defined  %}
+                  		{% set cantServicios = 0 %}
+                  	    {% for servicio in data.servicios %}
+                  	    	{% set cantServicios = cantServicios + 1 %}
+                  	    	{% if cantServicios > 1 %}{{ ' Y ' ~ servicio.SRV_NOMBRE }}{% else %}{{ servicio.SRV_NOMBRE }}{% endif %}
+                  	    {% endfor %}
+                  	{% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Costo Fijo</td>
+                  <td>
+                  {#
+                  {% set costoFijo = 0 %}
+                  {% set tieneAgua = false %}
+                  {% set tieneDesague = false %}
+                  
+                  {% if data.servicios is defined  %}
+                    {% set cantServicios = 0 %}
+                      {% for servicio in data.servicios %}
+                        {% if servicio.SRV_CODIGO == 1 %}{% set tieneAgua = true %}
+                        {% elseif servicio.SRV_CODIGO == 2 %}{% set tieneDesague = true %}{% endif %}
+                      {% endfor %}
+                  {% endif %}
+                  
+                  {% if data.tipoUsoPredio is defined %}
+                    {% if tieneAgua and tieneDesague %}
+                      {% if data.tipoPredio.TIP_CODIGO == 1 %}
+                        {% set costoFijo = data.tipoUsoPredio.TUP_TARIFA_AMBOS %}
+                      {% else %}
+                        {% set costoFijo = data.tipoUsoPredio.TUP_TARIFA_AGUA + data.tipoUsoPredio.TUP_TARIFA_DESAGUE %}
+                      {% endif %}
+                    {% elseif tieneAgua %}
+                      {% set costoFijo = data.tipoUsoPredio.TUP_TARIFA_AGUA %}
+                    {% elseif tieneDesague %}
+                      {% set costoFijo = data.tipoUsoPredio.TUP_TARIFA_DESAGUE %}
+                    {% endif %}
+                  {% endif %} #}
+
+                  {% set costoFijo = 0 %}
+                  {% set tieneAgua = false %}
+                  {% set tieneDesague = false %}
+                  
+                  {% if data.servicios is defined  %}
+                    {% set cantServicios = 0 %}
+                      {% for servicio in data.servicios %}
+                        {% if servicio.SRV_CODIGO == 1 %}{% set tieneAgua = true %}
+                        {% elseif servicio.SRV_CODIGO == 2 %}{% set tieneDesague = true %}{% endif %}
+                      {% endfor %}
+                  {% endif %}
+
+                  {# Agregado para mostrar el costo de Mantenimiento solo para contrato de Tipo Uso:(1)SOCIAL #}
+                  {% if data.contrato is defined and data.contrato.CTO_ESTADO == 4 %}
+                    {% set costoFijo = data.tipoUsoPredio.TUP_TARIFA_MANTENIMIENTO %}
+                  {% else %}
+                    {% if data.tipoUsoPredio is defined %}
+                      {% if tieneAgua and tieneDesague %}
+                        {% set costoFijo = data.tipoUsoPredio.TUP_TARIFA_AMBOS %}
+                      {% elseif tieneAgua %}
+                        {% set costoFijo = data.tipoUsoPredio.TUP_TARIFA_AGUA %}
+                      {% elseif tieneDesague %}
+                        {% set costoFijo = data.tipoUsoPredio.TUP_TARIFA_DESAGUE %}
+                      {% endif %}
+                    {% endif %} 
+                  {% endif %}
+                  {{ costoFijo|number_format(2, '.', ',') }}
+                  
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tipo de uso de predio</td>
+                  <td>{% if data.tipoUsoPredio is defined %}{{ data.tipoUsoPredio.TUP_NOMBRE }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Observación</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_OBSERVACION }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha de Creación</td>
+                  <td>{% if data.contrato is defined %}{{ data.contrato.CTO_CREATED }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Detalles de servicio</td>
+                  <td>
+                  	<button type="button" class="f_btngenerico" style="padding:4px 8px; font-size:.8rem" 
+                    		data-toggle="modal" data-target="#modalMasDetalleServicio" id="btnMasDetalleServicios">
+        				Más detalles
+    				</button>
+                  </td>
+                </tr>
+                
+              </tbody>
+            </table>
+            
+            {# Modal mas detalles de servicios #}
+            <div class="modal fade f_modal" id="modalMasDetalleServicio" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="modal-title">Detalle de servicios</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            	<span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                        
+                        	{# Contenedor mas detalles de servicios #}
+                        	<div id="divNuevoContratoMasDetalles">
+                        	
+                        		{% if tieneAgua %}
+                        		{# Contenedor mas detalles de agua #}
+                        		<div id="divNuevoContratoMasDetallesAgua">
+                            		<h5 style="color:#23878c" class="mb-4">Servicio de Agua</h5>
+                            		<div class="col-12 table-responsive">
+                              			<table class="table f_table f_tableforfield">
+                                          <tbody>
+                                            <tr>
+                                              <td>Fecha de instalación</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_FEC_INS }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Caracteristica de conexion</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_CAR_CNX }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Diametro de conexion</td>
+                                              <td>{% if data.contrato is defined and data.contrato.CTO_AGU_DTO_CNX is not null %}
+                                                      {{ data.contrato.CTO_AGU_DTO_CNX }}"{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Diametro de red</td>
+                                              <td>{% if data.contrato is defined and data.contrato.CTO_AGU_DTO_RED is not null %}
+                                                      {{ data.contrato.CTO_AGU_DTO_RED }}"{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Material de conexion</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_MAT_CNX }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Material de abrazadera</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_MAT_ABA }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Ubicación de caja</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_UBI_CAJ }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Material de caja</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_MAT_CAJ }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Estado de caja</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_EST_CAJ }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Material de tapa</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_MAT_TAP }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Estado de tapa</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_AGU_EST_TAP }}{% endif %}</td>
+                                            </tr>
+                                          </tbody>
+                                        </table>
+                                    </div>
+                                </div>{# /Contenedor mas detalles de agua #}
+                                {% endif %}
+                                
+                                
+                                {% if tieneDesague %}
+                                {# Contenedor mas detalles de alcantarillado #}
+                                <div id="divNuevoContratoMasDetallesAlc">
+                                    <h5 style="color:#23878c" class="my-4">Servicio de Alcantarillado</h5>
+                            		<div class="col-12 table-responsive">
+                              			<table class="table f_table f_tableforfield">
+                                          <tbody>
+                                            <tr>
+                                              <td>Fecha de conexion</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_FEC_INS }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Caracteristica de conexion</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_CAR_CNX }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Tipo de conexion</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_TIP_CNX }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Diametro de conexion</td>
+                                              <td>{% if data.contrato is defined and data.contrato.CTO_ALC_DTO_CNX is not null %}
+                                                      {{ data.contrato.CTO_ALC_DTO_CNX }}"{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Diametro de red</td>
+                                              <td>{% if data.contrato is defined and data.contrato.CTO_ALC_DTO_RED is not null %}
+                                                      {{ data.contrato.CTO_ALC_DTO_RED }}"{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Material de conexion</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_MAT_CNX }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Ubicación de caja</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_UBI_CAJ }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Material de caja</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_MAT_CAJ }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Estado de caja</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_EST_CAJ }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Dimención de caja</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_DIM_CAJ }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Material de tapa</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_MAT_TAP }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Estado de tapa</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_EST_TAP }}{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>Medidas de tapa</td>
+                                              <td>{% if data.contrato is defined %}{{ data.contrato.CTO_ALC_MED_TAP }}{% endif %}</td>
+                                            </tr>
+                                          </tbody>
+                                        </table>
+                                    </div>
+                                </div>{# /Contenedor mas detalles de alcantarillado #}
+                                {% endif %}
+                                
+                        	</div>{# /Contenedor mas detalles de servicios #}
+                        </div>
+                    </div>
+                </div>
+            </div>{# /Modal mas detalles de servicio #}
+  		</div>
+  		
+  		<div class="col-12 col-lg-6 mt-3 mt-lg-0 table-responsive">
+    		<table class="table f_table f_tableforfield">
+              <tbody>
+              	<tr>
+                  <td>Predio/Ref.</td>
+                  <td>{% if data.predio is defined %}{{ data.predio.PRE_CODIGO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Predio/Calle</td>
+                  <td>{% if data.calle is defined %}{{ data.calle.CAL_NOMBRE }}{% endif %}</td>
+                </tr>
+              	<tr>
+                  <td>Predio/Dirección</td>
+                  <td>{% if data.predio is defined %}{{ data.predio.PRE_DIRECCION }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Cliente/Ref.</td>
+                  <td>{% if data.cliente is defined %}{{ data.cliente.CLI_CODIGO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Cliente/Documento.</td>
+                  <td>{% if data.cliente is defined %}{{ data.cliente.CLI_DOCUMENTO }}{% endif %}</td>
+                </tr>
+              	<tr>
+                  <td>Cliente/Nombre</td>
+                  <td>{% if data.cliente is defined %}{{ data.cliente.CLI_NOMBRES }}{% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+    	</div>
+  	</div><!-- /.card-body -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardfooter f_cardfooteractions text-right">
+  				{% set styleBtnAnular, titleBtnModificar, titleBtnAnular = "f_buttonactiondelete", "", "" %}
+				{% if data.contrato is defined and data.contrato.CTO_ESTADO == 2 %}
+				    {% set styleBtnAnular = "f_buttonactionrefused" %}
+				    {% set titleBtnModificar = "Desactivado porque el contrato no se puede modificar,
+			    								ya que fue anulado" %}
+					{% set titleBtnAnular = "Desactivado porque el contrato ya fue anulado" %}
+			    {% endif %}
+			    
+			    {% if data.contrato is defined and data.contrato.CTO_ESTADO == 2 %}
+			    	<a href="#" class="f_linkbtn f_linkbtnactionrefused classfortooltip" title="{{ titleBtnModificar }}">Modificar</a>
+			    {% else %}
+
+			    	<a href="{{ PUBLIC_PATH }}/contrato/editar/{% if data.contrato is defined %}{{ data.contrato.CTO_CODIGO }}{% endif %}" 
+  						class="f_linkbtn f_linkbtnaction classfortooltip" title="{{ titleBtnModificar }}">Modificar</a>
+			    {% endif %}
+
+          {% if data.contrato is defined and data.contrato.CTO_ESTADO == 1 and data.tipoPredio.TIP_CODIGO == 1 %}
+            <button type="button" class="f_button {{ styleBtnAnular }} classfortooltip" data-toggle="modal" 
+  						data-target="#modalMantenimientoContrato" title="">
+  					Mantenimiento</button>
+          {% endif %}
+
+          {% if data.contrato is defined and data.contrato.CTO_ESTADO == 4 %}
+            <button type="button" class="f_button {{ styleBtnAnular }} classfortooltip" data-toggle="modal" 
+  						data-target="#modalFinMantenimientoContrato" title="">
+  					Activar</button>
+          {% endif %}
+          
+          {% if data.contrato is defined and data.contrato.CTO_ESTADO == 1 %}
+            <button type="button" class="f_button {{ styleBtnAnular }} classfortooltip" data-toggle="modal" 
+  						data-target="#modalSuspenderContrato" title="">
+  					Corte</button>
+          {% endif %}
+
+          
+          {% if data.contrato is defined and data.contrato.CTO_ESTADO == 3 %}
+            <button type="button" class="f_button {{ styleBtnAnular }} classfortooltip" data-toggle="modal" 
+  						data-target="#modalReconectarContrato" title="">
+  					Reconectar</button>
+          {% endif %}
+
+          
+  				<button type="button" class="f_button {{ styleBtnAnular }} classfortooltip" data-toggle="modal" 
+  						data-target="#modalAnularContrato" title="{{ titleBtnAnular }}">
+  					Anular contrato</button>
+  			</div>
+  			
+  		</div>
+  	</div><!-- /.card-footer -->
+  
+</div><!-- /.card -->
+
+
+{# Elementos vinculados al contrato #}
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <div class="f_card">
+        
+          	<div class="row">
+          		<div class="col-12">
+          			<div class="f_cardheader">
+          				<div class="">Financiamientos (Activos)</div>
+          			</div>
+          		</div>
+          	</div><!-- /.card-header -->
+          	
+          	<div class="row">
+              	<div class="col-12 table-responsive">
+          			<table class="table f_table f_tableliste">
+          			  <thead>
+          			  	<tr class="liste_title">
+          			  		<td class="liste_title">Ref.</td>
+          			  		<td class="liste_title">Monto</td>
+          			  		<td class="liste_title">Fecha</td>
+          			  	</tr>
+          			  </thead>
+                      <tbody>
+                      	{% if data.financiamientos is defined and data.financiamientos is not empty %}
+                                  	
+                      		{% for financiamiento in data.financiamientos %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/financiamiento/detalle/{{ financiamiento.FTO_CODIGO }}" class="f_link">
+                                  		<span class="align-middtle">{{ financiamiento.FTO_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax150">{{ financiamiento.FTO_DEUDA|number_format(2, '.', ',') }}</td>
+                                  <td class="f_overflowmax150">{{ financiamiento.FTO_CREATED is empty ? "" : financiamiento.FTO_CREATED|date("d/m/Y") }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..2 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      </tbody>
+                    </table>
+            	</div>
+          	</div><!-- /.card-body -->
+          	
+          	<div class="row">
+          		<div class="col-12 f_cardfooter text-right"></div>
+          	</div><!-- /.card-footer -->
+        
+        </div><!-- /.card -->
+    </div>
+
+	<div class="col-12 col-lg-6 mt-3 mt-lg-0">
+		<div class="f_card">
+        
+          	<div class="row">
+          		<div class="col-12">
+          			<div class="f_cardheader">
+          				<div class="">Proyectos (Activos)</div>
+          			</div>
+          		</div>
+          	</div><!-- /.card-header -->
+          	
+          	<div class="row">
+              	<div class="col-12 table-responsive">
+          			<table class="table f_table f_tableliste">
+          			  <thead>
+          			  	<tr class="liste_title">
+          			  		<td class="liste_title" colspan="2">Proyectos</td>
+          			  	</tr>
+          			  </thead>
+                      <tbody>
+                      	{% if data.proyectos is defined and data.proyectos is not empty %}
+                                  	
+                      		{% for proyecto in data.proyectos %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/proyecto/detalle/{{ proyecto.PTO_CODIGO }}" class="f_link">
+                                  		<span class="align-middtle">{{ proyecto.PTO_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax150">{{ proyecto.PTO_NOMBRE }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..2 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      </tbody>
+                    </table>
+            	</div>
+          	</div><!-- /.card-body -->
+          	
+          	<div class="row">
+          		<div class="col-12 f_cardfooter text-right"></div>
+          	</div><!-- /.card-footer -->
+        
+        </div><!-- /.card -->
+	</div>
+
+</div>{# /Elementos vinculados al contrato #}
+
+
+
+{# Modal anular contrato #}
+{% if data.contrato is defined and data.contrato.CTO_ESTADO != 2 %}
+<div class="modal fade f_modal" id="modalAnularContrato" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Anular un contrato</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i>
+            	<span>¿Está seguro de querer anular este contrato?</span><br/>
+            	<span>
+            		Si anula el contrato los financiamientos y cuotas extraordinarias pendientes de pago
+            		dejarán de tenerse en cuenta para futuras facturaciones.
+            	</span>
+            	<form class="d-none" id="formAnularContrato" action="{{ PUBLIC_PATH }}/contrato/annular" method="post">
+            		<input type="hidden" name="codigo" value="{% if data.contrato is defined %}{{ data.contrato.CTO_CODIGO }}{% endif %}">
+            	</form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnAnularContrato">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{# /Modal anular contrato #}
+
+
+
+
+{# Modal Corte de contrato #}
+{% if data.contrato is defined and data.contrato.CTO_ESTADO != 2 %}
+<div class="modal fade f_modal" id="modalSuspenderContrato" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Corte de contrato</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i>
+            	<span>¿Está seguro de querer cortar este contrato?</span><br/>
+            	<span>
+            		Si corta este contrato dejará de emitirse los recibos para futuras facturaciones mensuales.
+            	</span>
+              <form class="d-none" id="formSuspenderContrato" action="{{ PUBLIC_PATH }}/contrato/suspend" method="post">
+            	  <input type="hidden" name="codigo" value="{% if data.contrato is defined %}{{ data.contrato.CTO_CODIGO }}{% endif %}">
+              </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnSuspenderContrato">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{# /Modal Corte de contrato #}
+
+
+
+{# Modal Reconectar contrato #}
+{% if data.contrato is defined and data.contrato.CTO_ESTADO == 3 %}
+<div class="modal fade f_modal" id="modalReconectarContrato" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Reconectar un contrato</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i>
+            	<span>¿Está seguro de querer reconectar este contrato?</span><br/>
+            	<span>
+            		Al reconectar este contrato continuará con el servicio y se emitirá los recibos en las siguientes facturaciones mensuales.
+            	</span>
+              <form class="d-none" id="formReconectarContrato" action="{{ PUBLIC_PATH }}/contrato/reconnect" method="post">
+            	  <input type="hidden" name="codigo" value="{% if data.contrato is defined %}{{ data.contrato.CTO_CODIGO }}{% endif %}">
+              </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnReconectarContrato">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{# /Modal Reconectar contrato #}
+
+
+
+{# Modal Mantenimiento contrato #}
+{% if data.contrato is defined and data.contrato.CTO_ESTADO != 2 %}
+<div class="modal fade f_modal" id="modalMantenimientoContrato" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Mantenimiento un contrato</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i>
+            	<span>¿Está seguro de querer cambiar en mantenimiento este contrato?</span><br/>
+            	<span>
+            		Si cambia el estado en mantenimiento de este contrato solo se cobrará el costo de mantenimiento en los recibos para futuras facturaciones mensuales.
+            	</span>
+              <form class="d-none" id="formMantenimientoContrato" action="{{ PUBLIC_PATH }}/contrato/maintenance" method="post">
+            	  <input type="hidden" name="codigo" value="{% if data.contrato is defined %}{{ data.contrato.CTO_CODIGO }}{% endif %}">
+              </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnMantenimientoContrato">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{# /Modal mantenimiento contrato #}
+
+{# Modal fin Mantenimiento Contrato #}
+{% if data.contrato is defined and data.contrato.CTO_ESTADO == 4 %}
+<div class="modal fade f_modal" id="modalFinMantenimientoContrato" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Contrato en Mantenimiento</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i>
+            	<span>¿Está seguro de querer activar este contrato?</span><br/>
+            	<span>
+            		Al activar este contrato continuará con el servicio normal y se emitirá los recibos en las siguientes facturaciones mensuales.
+            	</span>
+              <form class="d-none" id="formFinMantenimientoContrato" action="{{ PUBLIC_PATH }}/contrato/endMaintenance" method="post">
+            	  <input type="hidden" name="codigo" value="{% if data.contrato is defined %}{{ data.contrato.CTO_CODIGO }}{% endif %}">
+              </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnFinMantenimientoContrato">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{# /Modal Fin Mantenimiento Contrato #}
+
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#btnAnularContrato').click(function(event){
+			$('#formAnularContrato').submit();
+			return false;
+		});
+
+
+    $('#btnSuspenderContrato').click(function(event){
+			$('#formSuspenderContrato').submit();
+			return false;
+		});
+
+    $('#btnReconectarContrato').click(function(event){
+			$('#formReconectarContrato').submit();
+			return false;
+		});
+
+    $('#btnMantenimientoContrato').click(function(event){
+			$('#formMantenimientoContrato').submit();
+			return false;
+		});
+
+    $('#btnFinMantenimientoContrato').click(function(event){
+			$('#formFinMantenimientoContrato').submit();
+			return false;
+		});
+
+	</script>
+	
+{% endblock %}

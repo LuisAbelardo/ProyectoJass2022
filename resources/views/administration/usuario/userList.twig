@@ -1,0 +1,245 @@
+{% set menuLItem, menuLLink = 'usuario', 'lista' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+	{# Formulario para busqueda por tabla #}
+  	<form method="get" action="{{ PUBLIC_PATH }}/usuario/lista/filtro" id="formFilterListUsers">
+  	
+  		<div class="row">
+  			<div class="col-12">
+  				<div class="f_cardheader">
+                    <div> 
+                    	<i class="fas fa-user-shield mr-3"></i>Listado de usuarios 
+                    	<span>({{ data.pagination.paginaCantidadRegistros }})</span>
+                	</div>
+                  </div>
+  			</div>
+  		</div><!-- /.card-header -->
+  		
+  		<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  		
+  		<div class="row">
+  			<div class="col-12">
+  			
+  				{# Paginador #}
+  				<div class="d-flex justify-content-end align-items-center pb-2">
+  					<div>
+                    	<ul class="pagination f_pagination-basic pagination-sm m-0">
+                            <li class="page-item {% if data.pagination.paginaAnterior == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link"
+                            		id="paginaAnterior" 
+                            		data-page="{{ data.pagination.paginaAnterior }}" 
+                            		href="#" ><i class="fas fa-chevron-left"></i></a>
+                        	</li>
+                            <li class="page-item">
+                            	<span class="page-link info">
+                                	<input type="text" id="filterPaginaActual" name="filterPaginaActual" class="f_inputflat" required size="10"
+                            				value="{{ data.pagination.paginaActual }}">
+                        			de {{ data.pagination.paginaCantidad }}
+                            	</span>
+                            </li>
+                            <li class="page-item {% if data.pagination.paginaSiguiente == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link" id="paginaSiguiente"
+                            		data-page="{{ data.pagination.paginaSiguiente }}"
+                            		href="#"><i class="fas fa-chevron-right"></i></a>
+                        	</li>
+                        </ul>
+                    </div>
+                    <div class="px-2">
+                    	<button type="submit" class="f_btnflat" name="btnBuscarFiltros">
+                    		<span class="fas fa-search"></span>
+                		</button>
+                		<a href="{{ PUBLIC_PATH }}/usuario/lista" class="f_link">
+                			<i class="fas fa-times"></i>
+            			</a>
+                    </div>
+  				</div>{# /Paginador #}
+  				
+  				
+      			<div class="table-responsive">
+                    <table class="table f_table f_tableliste f_listwidthfilterbefore">
+                      <thead>
+                      	<tr class="liste_title_filter">
+                          <td class="liste_title f_minwidth125">
+                          	<i class="fas fa-filter mr-1"></i>
+    						<input class="f_inputflat f_maxwidth80imp" type="text" name="filterCodigo"  disabled
+                          		value='{% if data.formFilterListUsers.filterCodigo is defined %}{{ data.formFilterListUsers.filterCodigo }}{% endif %}'></td>
+                    	  <td class="liste_title">
+                    	  	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterUsuario" disabled
+                    	  		value="{% if data.formFilterListUsers.filterUsuario is defined %}{{ data.formFilterListUsers.filterUsuario }}{% endif %}"></td>
+                          <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterNombres"
+                          		value="{% if data.formFilterListUsers.filterNombres is defined %}{{ data.formFilterListUsers.filterNombres }}{% endif %}"></td>
+                          <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterApellidos"
+                          		value="{% if data.formFilterListUsers.filterApellidos is defined %}{{ data.formFilterListUsers.filterApellidos }}{% endif %}"></td>
+                          <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterEmail" disabled
+                          		value="{% if data.formFilterListUsers.filterEmail is defined %}{{ data.formFilterListUsers.filterEmail }}{% endif %}"></td>
+                          <td class="liste_title">
+                          	<select class="f_inputflat" name="filterTipo" id="cmbFilterTipo">
+                                <option value="-1" class="f_opacitymedium"></option>
+                                {% if data.usuarioTipos is defined %}
+                                    {% set selectedFilterTipo = false %}
+                            		{% for tipoUsuario in data.usuarioTipos %}
+                                    	<option value="{{ tipoUsuario.TPU_CODIGO }}"
+                                				{% if not selectedFilterTipo 
+                                				        and data.formFilterListUsers is defined 
+                        					            and data.formFilterListUsers.filterTipo ==  tipoUsuario.TPU_CODIGO %}
+                    					            {{ 'selected' }}{% set selectedFilterTipo = true %}{% endif %}>
+                            				{{ tipoUsuario.TPU_NOMBRE }}
+                        				</option>
+                                    {% endfor %}
+                            	{% endif %}
+                              </select>
+                          </td>
+                          <td class="liste_title">
+                          	<select class="f_inputflat" name="filterEstado" id="cmbFilterEstado">
+                                <option value="-1" class="f_opacitymedium"></option>
+                                <option value="0" 
+                                    {% if data.formFilterListUsers.filterEstado is defined and data.formFilterListUsers.filterEstado ==  "0" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Suspendido
+            					</option>
+                                <option value="1"
+                                    {% if data.formFilterListUsers.filterEstado is defined and data.formFilterListUsers.filterEstado ==  "1" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Activo
+            					</option>
+                              </select>
+                          </td>
+                        </tr>
+                        <tr class="liste_title">
+                          <th class="wrapcolumntitle liste_title">Ref.</th>
+                          <th class="wrapcolumntitle liste_title">Usuario</th>
+                          <th class="wrapcolumntitle liste_title">Nombres</th>
+                          <th class="wrapcolumntitle liste_title">Apellidos</th>
+                          <th class="wrapcolumntitle liste_title">Email</th>
+                          <th class="wrapcolumntitle liste_title">Tipo</th>
+                          <th class="wrapcolumntitle liste_title">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      
+                      	{% if data.users is not empty %}
+                      	
+                      		{% for user in data.users %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/usuario/detalle/{{ user.USU_CODIGO }}" class="f_link">
+                                  		<span>
+                                  			{% set userAvatar = PUBLIC_PATH ~ "/img/user_default_table.png" %}
+                                  			{% if user.USU_FOTO is defined and user.USU_FOTO is not empty %}
+                                  			    {% set userAvatar = user.USU_FOTO %}{% endif %}
+                                  			<img class="f_imageavatartable align-middle mr-1" alt=""
+                                  					src="{{ userAvatar }}">
+                              			</span>
+                                  		<span class="align-middtle">{{ user.USU_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax150">{{ user.USU_USUARIO }}</td>
+                                  <td class="f_overflowmax250">{{ user.USU_NOMBRES}}</td>
+                                  <td class="f_overflowmax250">{{ user.USU_APELLIDOS }}</td>
+                                  <td class="f_overflowmax150">{{ user.USU_EMAIL }}</td>
+                                  <td class="f_overflowmax150">
+    								{% if data.usuarioTipos is defined %}
+    									{% set selectedUsuarioTipo = false %}
+    									{% for usuarioTipo in data.usuarioTipos if not selectedUsuarioTipo %}
+    										{% if usuarioTipo.TPU_CODIGO == user.TPU_CODIGO %}
+    											{{ usuarioTipo.TPU_NOMBRE }}{% set selectedUsuarioTipo = true %}
+    										{% endif %}
+    									{% endfor %}
+    								{% endif %}
+                                  </td>
+                                  <td class="f_overflowmax150">
+                                      {% if user.USU_ESTADO == 0 %}
+                                      	<span class="badge badge-danger">{{ 'Suspendido' }}</span>
+                                      {% elseif  user.USU_ESTADO == 1 %}
+                                      	<span class="badge badge-success">{{ 'Activo' }}</span>
+                                      {% endif %}
+                                  </td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..3 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      
+                      	
+                      </tbody>
+                    </table>
+                </div>
+  			</div>
+  			
+  		</div><!-- /.card-body -->
+  		
+  		<div class="row">
+      		<div class="col-12 f_cardfooter text-right"></div>
+      	</div><!-- /.card-footer -->
+  		
+    </form>{# /Formulario para busqueda por tabla #}
+    
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#paginaAnterior').click(function(event){
+			if($('#paginaAnterior').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) - 1);
+				$('#formFilterListUsers').submit();
+			}
+			return false;
+		});
+		
+		$('#paginaSiguiente').click(function(event){
+			if($('#paginaSiguiente').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) + 1);
+				$('#formFilterListUsers').submit();
+			}
+			return false;
+		});
+        
+        f_select2("#cmbFilterEstado");
+        f_select2("#cmbFilterTipo");
+	</script>
+	
+{% endblock %}

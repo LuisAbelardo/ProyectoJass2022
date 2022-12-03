@@ -1,0 +1,167 @@
+{% set menuLItem, menuLLink = 'cliente', 'nuevo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevo cliente #}
+	<form class="f_inputflat" id="formNuevoCliente" method="post" action="{{ PUBLIC_PATH }}/cliente/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-user mr-3"></i>Nuevo cliente
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_tabs">
+          			<div class="f_tabunactive">
+          				<a href="{{ PUBLIC_PATH }}/cliente/nuevo/natural" class="f_link">Natural</a>
+          			</div>
+          			<div class="f_tabactive">
+          				<a href="#" class="f_link">Juridico</a>
+          			</div>
+              	</div>
+      		</div>
+      	</div><!-- /.tabs de contenido -->
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+                    
+                    <div class="form-group row d-none">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTipo">Tipo</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="hidden" class="f_minwidth300" id="inpTipo" name="tipo" value='2'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDocumento">RUC</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpDocumento" name="documento" maxlength="11" required
+                        			value='{% if data.formNuevoCliente.documento is defined %}{{ data.formNuevoCliente.documento }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNombres">Razón Social</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpNombres" name="nombres" required
+                        			value='{% if data.formNuevoCliente.nombres is defined %}{{ data.formNuevoCliente.nombres }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpRepresentanteLegal">Repr. Legal</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpRepresentanteLegal" name="representantelegal" required
+                        			value='{% if data.formNuevoCliente.representantelegal is defined %}{{ data.formNuevoCliente.representantelegal }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDepartamento">Departamento</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpDepartamento" name="departamento" required
+                        			value='{% if data.formNuevoCliente.departamento is defined %}{{ data.formNuevoCliente.departamento }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpProvincia">Provincia</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpProvincia" name="provincia" required
+                        			value='{% if data.formNuevoCliente.provincia is defined %}{{ data.formNuevoCliente.provincia }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDistrito">Distrito</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpDistrito" name="distrito" required
+                        			value='{% if data.formNuevoCliente.distrito is defined %}{{ data.formNuevoCliente.distrito }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDireccion">Dirección</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpDireccion" name="direccion" required
+                        			value='{% if data.formNuevoCliente.direccion is defined %}{{ data.formNuevoCliente.direccion }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpTelefono">Telefono</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth250" id="inpTelefono" name="telefono"
+                        			value='{% if data.formNuevoCliente.telefono is defined %}{{ data.formNuevoCliente.telefono }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpEmail">Email</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth250" id="inpEmail" name="email"
+                        			value='{% if data.formNuevoCliente.email is defined %}{{ data.formNuevoCliente.email }}{% endif %}'>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cliente</button>
+        			<a href="{{ PUBLIC_PATH }}/cliente/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo cliente #}
+  
+</div><!-- /.card -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoCliente').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbTipo");
+	</script>
+{% endblock %}

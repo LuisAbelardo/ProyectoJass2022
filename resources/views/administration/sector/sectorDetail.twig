@@ -1,0 +1,220 @@
+{% set menuLItem = 'sector' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class=""> 
+                	<i class="fas fa-puzzle-piece mr-3"></i>Sectores
+            	</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			{# Contenedor de alertas #}
+            {% set classAlert = "" %}
+            {% if estadoDetalle is empty %}
+            	{% set classAlert = "d-none" %}
+            {% elseif codigo >= 200 and codigo <300 %}
+                {% set classAlert = "alert-success" %}
+            {% elseif codigo >= 400 %}
+                {% set classAlert = "alert-danger" %}
+            {% endif %}
+  			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+             	<ul class="mb-0" id="f_alertsUl">
+             		{% if estadoDetalle is not empty %}
+                      {% for msj in estadoDetalle %}
+                        <li>{{ msj }}</li>
+                      {% endfor %}
+                    {% endif %}
+             	</ul>
+             	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+             		<span aria-hidden="true">&times;</span>
+             	</button>
+            </div>{# /Contenedor de alertas #}
+  		</div>
+  	</div>
+  	
+  	<div class="row">
+  		<div class="col-12">
+      		<div class="f_tabs">
+      			<div class="f_tabunactive">
+      				<a href="{{ PUBLIC_PATH }}/sector/lista" class="f_link">Lista</a>
+      			</div>
+      			<div class="f_tabunactive">
+      				<a href="{{ PUBLIC_PATH }}/sector/nuevo" class="f_link">Nuevo</a>
+      			</div>
+      			<div class="f_tabactive">
+      				<a href="#" class="f_link">Detalle</a>
+      			</div>
+          	</div>
+  		</div>
+  	</div><!-- /.tabs de contenido -->
+  	
+  	<div class="f_divwithbartop">
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="d-flex justify-content-between f_arearef">
+          			<div>
+          				<div class="d-inline-block mr-2 mr-md-4">
+                  			<div class="f_imageref"><span class="fas fa-puzzle-piece" style=" color: #a69944"></span></div>
+          				</div>
+          				<div class="d-inline-block align-top">
+          					<span class="font-weight-bold f_inforef">
+          					    {% if data.sector is defined %}{{ data.sector.STR_CODIGO }}{% endif %}
+          					</span><br/>
+          					<span class="font-weight-bold f_inforef">
+          					    {% if data.sector is defined %}{{ data.sector.STR_NOMBRE }}{% endif %}
+        				    </span><br/>
+          				</div>
+          			</div>
+        		</div>
+      		</div>
+          		
+      		<div class="col-12 table-responsive">
+      			<table class="table f_table f_tableforfield">
+                  <tbody>
+                  	<tr>
+                      <td>Ref.</td>
+                      <td>{% if data.sector is defined %}{{ data.sector.STR_CODIGO }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                      <td>Nombre</td>
+                      <td>{% if data.sector is defined %}{{ data.sector.STR_NOMBRE }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                    <tr>
+                      <td>Fecha de creación</td>
+                      <td>{% if data.sector is defined %}{{ data.sector.STR_CREATED }}{% endif %}</td>
+                    </tr>
+                  </tbody>
+                </table>
+      		</div>
+      	</div>
+  	</div><!-- /.card-body -->
+  	
+  	<div class="row">
+  		<div class="col-12 text-right">
+  			<div class="f_cardfooter f_cardfooteractions">
+  				<a href="{{ PUBLIC_PATH }}/sector/editar/{% if data.sector is defined %}{{ data.sector.STR_CODIGO }}{% endif %}" 
+  					class="f_linkbtn f_linkbtnaction">Modificar</a>
+				{% set styleBtnEliminar, titleBtnEliminar = "f_buttonactiondelete", "" %}
+				{% if data.calles is defined and data.calles is not empty %}
+				    {% set styleBtnEliminar = "f_buttonactionrefused" %}
+				    {% set titleBtnEliminar = "Desactivado porque el sector no se puede borrar.
+				    							Se han creado calles asociados a este sector" %}
+			    {% endif %}
+  				<button type="button" class="f_button {{ styleBtnEliminar }} classfortooltip" data-toggle="modal" data-target="#modalEliminarSector"
+  						title="{{ titleBtnEliminar }}">
+  					Eliminar</button>
+  			</div>
+  			
+  		</div>
+  	</div><!-- /.card-footer -->
+
+</div><!-- /.card -->
+
+
+
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class="">Calles Vinculadas</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	
+  	<div class="row">
+      	<div class="col-12 col-lg-6 table-responsive">
+          		
+  			<table class="table f_table f_tableliste">
+  			  <thead>
+  			  	<tr class="liste_title">
+  			  		<td class="liste_title" colspan="2">Calles</td>
+  			  	</tr>
+  			  </thead>
+              <tbody>
+              	{% if data.calles is defined and data.calles is not empty %}
+                          	
+              		{% for calle in data.calles %}
+                        <tr class="f_oddeven">
+                          <td>
+                              <a href="{{ PUBLIC_PATH }}/calle/detalle/{{ calle.CAL_CODIGO }}" class="f_link">
+                          		<span class="align-middtle">{{ calle.CAL_CODIGO }}</span>
+                              </a>
+                          </td>
+                          <td class="f_overflowmax150">{{ calle.CAL_NOMBRE }}</td>
+                        </tr>
+                    {% endfor %}
+                
+              	{% else %}
+              		{% for i in 0..2 %}
+                  		<tr>
+							<td>&nbsp;</td><td></td>
+                        </tr>
+                    {% endfor %}
+              	{% endif %}
+              </tbody>
+            </table>
+      		
+    	</div>
+  	</div><!-- /.card-body -->
+  	
+  	<div class="row">
+  		<div class="col-12 f_cardfooter text-right"></div>
+  	</div><!-- /.card-footer -->
+
+</div><!-- /.card -->
+
+
+{# Modal Eliminar Sector #}
+{% if data.calles is defined and data.calles is empty %}
+<div class="modal fade f_modal" id="modalEliminarSector" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Eliminar una Sector</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i><span>¿Está seguro de querer eliminar este sector?</span>
+            	<form class="d-none" id="formEliminarSector" action="{{ PUBLIC_PATH }}/sector/delete" method="post">
+            		<input type="hidden" name="codigo" value="{% if data.sector is defined %}{{ data.sector.STR_CODIGO }}{% endif %}">
+            	</form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnEliminarSector">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{# /Modal Eliminar Sector #}
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#btnEliminarSector').click(function(event){
+			$('#formEliminarSector').submit();
+			return false;
+		});
+	</script>
+	
+{% endblock %}

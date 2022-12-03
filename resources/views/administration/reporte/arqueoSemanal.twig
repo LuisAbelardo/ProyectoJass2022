@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=1.0, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>{{ SITE_NAME }}</title>
+    <link rel="stylesheet" href="{{ PUBLIC_PATH }}/css/report_style.css">
+<body>
+    <header class="clearfix">
+        <div id="logo">
+            <img src="{{ PUBLIC_PATH }}/img/logo.png" style="width:50px">
+        </div>
+        
+        <div class="titulo_reporte">
+            <span>ACTA DE ARQUEO DE CAJA<span><br>
+            <small style="font-size: 0.7em">Semana: {{ data.fechaInicio|date("d/m/Y") }} - {{ data.fechaFin|date("d/m/Y") }}</small>
+        </div>
+        
+        <div id="company" class="clearfix">
+            <div>MZ. D1 LT. 62 - CHOSICA DEL NORTE</div>
+            <div>TELF. 074 - 431993</div>
+            <div>R.U.C. 20479771856</div>
+            <div><a href="mailto:jasschosica@gmail.com">jasschosica@gmail.com</a></div>
+        </div>
+        <div id="project" >
+            <div><span>USUARIO :</span> {{ data.usuario }}</div>
+            <div><span>FECHA :</span> {{ "now"|date("d/m/Y h:i:s a") }}</div>
+        </div>
+    </header>
+    <main>
+    
+    {# Obteniendo montos generales para el arqueo #}
+	{% set montosArqueo = data.montosArqueo[0] %}
+
+      <table>
+          <caption class="text_left_l">1.- SALDO ANTERIOR</caption>
+          <thead>
+              <tr>
+                <th class="service" colspan="5">SALDO AL DIA : {{ data.fechaInicio|date_modify("-1 day")|date("d/m/Y") }}</th>
+                <th class="total_l" colspan="" style="">{{ montosArqueo.SALDO_INICIAL|number_format(2, '.', ',') }}</th>
+              </tr>
+          </thead>
+      </table>
+       
+      <table>
+        <caption class="text_left_l">2.- INGRESOS</caption>
+        <thead>
+          <tr>
+            <th class="service" colspan="5"></th>
+            <th class="total_l" colspan="">{{ montosArqueo.INGRESOS|number_format(2, '.', ',') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            {% for ingreso in data.registrosArqueo %}
+            {% if ingreso.TIPO == 'I' %}
+            	<tr>
+                    <td colspan=""></td>
+                    <td class="" colspan="">{{ ingreso.DIA }}</td>
+                    <td colspan=""></td>
+                    <td colspan="">{{ ingreso.TOTAL|number_format(2, '.', ',') }}</td>
+                </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+      </table>
+      
+      
+      
+      <table>
+          <caption class="text_left_l">3.- TOTAL INGRESOS</caption>
+          <thead>
+              <tr>
+                <th class="service" colspan="5">INGRESOS AL DIA : {{ data.fechaFin|date("d/m/Y") }}</th>
+                <th class="total_l" colspan="" style="">{{ (montosArqueo.SALDO_INICIAL + montosArqueo.INGRESOS)|number_format(2, '.', ',') }}</th>
+              </tr>
+          </thead>
+      </table>
+      
+      
+      
+      <table>
+          <caption class="text_left_l">4.- EGRESOS</caption>
+          <thead>
+            <tr>
+              <th class="service" colspan="5"></th>
+              <th class="total_l" colspan="">{{ montosArqueo.EGRESOS|number_format(2, '.', ',') }}</th>
+            </tr>
+          </thead>
+          <tbody>  
+            {% for egreso in data.registrosArqueo %}
+                {% if egreso.TIPO == 'E' %}
+                	<tr>
+                        <td colspan=""></td>
+                        <td class="" colspan="">{{ egreso.DIA }}</td>
+                        <td colspan=""></td>
+                        <td colspan="">{{ egreso.TOTAL|number_format(2, '.', ',') }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+          </tbody>
+      </table>
+      <table>
+          <caption class="text_left_l">5.- SALDO DE LA SEMANA</caption>
+          <thead>
+              <tr>
+                <th class="service" colspan="5">SALDO AL DIA : {{ data.fechaFin|date("d/m/Y") }}</th>
+                <th class="total_l" colspan="">{{ (montosArqueo.SALDO_INICIAL + montosArqueo.INGRESOS - montosArqueo.EGRESOS)|number_format(2, '.', ',') }}</th>
+              </tr>
+          </thead>
+          <tbody>       
+                    
+          </tbody>
+      </table>
+   
+      <div id="notices">
+        <div>OBSERVACION:</div><br><br>
+        <p class="notice"></p>
+      </div>
+      </br>
+
+      <div id="notices">
+        <div>NOTICIA:</div>
+        <div class="notice">Despues de analizar el documento(comprobantes ingresos, egresos y otros)
+          se procede a firmar la presente, en señan de conformidad:</div>
+      </div>
+    </main>
+    <footer>
+        Sistema J.A.S.S. v1.0.0.
+    </footer>
+  </body>
+</html>

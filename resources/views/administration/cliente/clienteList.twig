@@ -1,0 +1,207 @@
+{% set menuLItem, menuLLink = 'cliente', 'lista' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+	{# Formulario para busqueda por tabla #}
+  	<form method="get" action="{{ PUBLIC_PATH }}/cliente/lista/filtro" id="formFilterListClientes">
+  	
+  		<div class="row">
+  			<div class="col-12">
+  				<div class="f_cardheader">
+                    <div> 
+                    	<i class="fas fa-user mr-3"></i>Listado de clientes
+                    	<span>({{ data.pagination.paginaCantidadRegistros }})</span>
+                	</div>
+                  </div>
+  			</div>
+  		</div><!-- /.card-header -->
+  		
+  		<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  		
+  		<div class="row">
+  			<div class="col-12">
+  			
+  				{# Paginador #}
+  				<div class="d-flex justify-content-end align-items-center pb-2">
+  					<div>
+                    	<ul class="pagination f_pagination-basic pagination-sm m-0">
+                            <li class="page-item {% if data.pagination.paginaAnterior == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link"
+                            		id="paginaAnterior" 
+                            		data-page="{{ data.pagination.paginaAnterior }}" 
+                            		href="#" ><i class="fas fa-chevron-left"></i></a>
+                        	</li>
+                            <li class="page-item">
+                            	<span class="page-link info">
+                                	<input type="text" id="filterPaginaActual" name="filterPaginaActual" class="f_inputflat" required size="10"
+                            				value="{{ data.pagination.paginaActual }}">
+                        			de {{ data.pagination.paginaCantidad }}
+                            	</span>
+                            </li>
+                            <li class="page-item {% if data.pagination.paginaSiguiente == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link" id="paginaSiguiente"
+                            		data-page="{{ data.pagination.paginaSiguiente }}"
+                            		href="#"><i class="fas fa-chevron-right"></i></a>
+                        	</li>
+                        </ul>
+                    </div>
+                    <div class="px-2">
+                    	<button type="submit" class="f_btnflat" name="btnBuscarFiltros">
+                    		<span class="fas fa-search"></span>
+                		</button>
+                		<a href="{{ PUBLIC_PATH }}/cliente/lista" class="f_link">
+                			<i class="fas fa-times"></i>
+            			</a>
+                    </div>
+  				</div>{# /Paginador #}
+  				
+  				
+      			<div class="table-responsive">
+                    <table class="table f_table f_tableliste f_listwidthfilterbefore">
+                      <thead>
+                      	<tr class="liste_title_filter">
+                          <td class="liste_title f_minwidth125">
+                          	<i class="fas fa-filter mr-1"></i>
+    						<input class="f_inputflat f_maxwidth80imp" type="text" name="filterCodigo" 
+                          		value='{% if data.formFilterListClientes.filterCodigo is defined %}{{ data.formFilterListClientes.filterCodigo }}{% endif %}'></td>
+                    	  <td class="liste_title">
+                    	  	<select class="f_inputflat" name="filterTipo" id="cmbFilterTipo">
+                                <option value="-1" class="f_opacitymedium"></option>
+                                <option value="1" 
+                                    {% if data.formFilterListClientes.filterTipo is defined and data.formFilterListClientes.filterTipo ==  "1" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Natual
+            					</option>
+                                <option value="2"
+                                    {% if data.formFilterListClientes.filterTipo is defined and data.formFilterListClientes.filterTipo ==  "2" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Juridico
+            					</option>
+                              </select>
+                    	  </td>		
+                    	  <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterDocumento" maxlength="11"
+                          		value="{% if data.formFilterListClientes.filterDocumento is defined %}{{ data.formFilterListClientes.filterDocumento }}{% endif %}"></td>
+                          <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterNombres"
+                          		value="{% if data.formFilterListClientes.filterNombres is defined %}{{ data.formFilterListClientes.filterNombres }}{% endif %}"></td>
+                          <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterTelefono" disabled
+                          		value="{% if data.formFilterListClientes.filterTelefono is defined %}{{ data.formFilterListClientes.filterTelefono }}{% endif %}"></td>
+                        </tr>
+                        <tr class="liste_title">
+                          <th class="wrapcolumntitle liste_title">Ref.</th>
+                          <th class="wrapcolumntitle liste_title">Tipo</th>
+                          <th class="wrapcolumntitle liste_title">Documento</th>
+                          <th class="wrapcolumntitle liste_title">Nombre</th>
+                          <th class="wrapcolumntitle liste_title">Teléfono</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      
+                      	{% if data.clientes is not empty %}
+                      	
+                      		{% for cliente in data.clientes %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/cliente/detalle/{{ cliente.CLI_CODIGO }}" class="f_link">
+                                  		<span style=" color: #a69944">
+                                  			<i class="fas fa-user mr-1"></i>
+                              			</span>
+                                  		<span class="align-middtle">{{ cliente.CLI_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax150">
+                                  	  {% if cliente.CLI_TIPO == 1 %}
+                                      	{{ 'Natural' }}
+                                      {% elseif  cliente.CLI_TIPO == 2 %}
+                                      	{{ 'Juridico' }}
+                                      {% endif %}
+                                  </td>
+                                  <td class="f_overflowmax250">{{ cliente.CLI_DOCUMENTO}}</td>
+                                  <td class="f_overflowmax150">{{ cliente.CLI_NOMBRES }}</td>
+                                  <td class="f_overflowmax150">{{ cliente.CLI_TELEFONO }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..3 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      
+                      	
+                      </tbody>
+                    </table>
+                </div>
+  			</div>
+  			
+  		</div><!-- /.card-body -->
+  		
+  		<div class="row">
+      		<div class="col-12 f_cardfooter text-right"></div>
+      	</div><!-- /.card-footer -->
+  		
+    </form>{# /Formulario para busqueda por tabla #}
+    
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#paginaAnterior').click(function(event){
+			if($('#paginaAnterior').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) - 1);
+				$('#formFilterListClientes').submit();
+			}
+			return false;
+		});
+		
+		$('#paginaSiguiente').click(function(event){
+			if($('#paginaSiguiente').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) + 1);
+				$('#formFilterListClientes').submit();
+			}
+			return false;
+		});
+        
+        f_select2("#cmbFilterTipo");
+	</script>
+	
+{% endblock %}

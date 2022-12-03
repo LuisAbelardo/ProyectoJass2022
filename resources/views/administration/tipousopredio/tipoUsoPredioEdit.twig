@@ -1,0 +1,222 @@
+{% set menuLItem = 'tipousopredio' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Editar tipo de uso de predio #}
+	<form class="f_inputflat" id="formEditarTipoUsoPredio" method="post" action="{{ PUBLIC_PATH }}/tipousopredio/update">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-warehouse mr-3"></i>Tipos de uso de predio
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_tabs">
+          			<div class="f_tabunactive">
+          				<a href="{{ PUBLIC_PATH }}/tipousopredio/lista" class="f_link">Lista</a>
+          			</div>
+          			<div class="f_tabunactive">
+          				<a href="{{ PUBLIC_PATH }}/tipousopredio/nuevo" class="f_link">Nuevo</a>
+          			</div>
+          			<div class="f_tabactive">
+          				<a href="#" class="f_link">Editar</a>
+          			</div>
+              	</div>
+      		</div>
+      	</div><!-- /.tabs de contenido -->
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field">Ref.</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set codigo = "" %}
+                        	{% if data.tipoUsoPredio is defined %}{% set codigo = data.tipoUsoPredio.TUP_CODIGO %}{{ data.tipoUsoPredio.TUP_CODIGO }}
+                        	{% elseif data.formEditarTipoUsoPredio is defined %}
+                        	    {% set codigo = data.formEditarTipoUsoPredio.codigo %}{{ data.formEditarTipoUsoPredio.codigo }}{% endif %}
+                        	<input type="hidden" class="f_minwidth300" id="inpCodigo" name="codigo" value='{{ codigo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNombre">Nombre</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set nombre = "" %}
+                        	{% if data.tipoUsoPredio is defined %}{% set nombre = data.tipoUsoPredio.TUP_NOMBRE %}
+                        	{% elseif data.formEditarTipoUsoPredio is defined %}{% set nombre = data.formEditarTipoUsoPredio.nombre %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpNombre" name="nombre" value='{{ nombre }}' required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTarifaAgua">Tarifa Agua</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set tarifaAgua = "" %}
+                        	{% if data.tipoUsoPredio is defined %}{% set tarifaAgua = data.tipoUsoPredio.TUP_TARIFA_AGUA %}
+                        	{% elseif data.formEditarTipoUsoPredio is defined %}
+                        	    {% set tarifaAgua = data.formEditarTipoUsoPredio.tarifaAgua %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpTarifaAgua" name="tarifaAgua" value='{{ tarifaAgua }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTarifaDesague">Tarifa Desague</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set TarifaDesague = "" %}
+                        	{% if data.tipoUsoPredio is defined %}{% set TarifaDesague = data.tipoUsoPredio.TUP_TARIFA_DESAGUE %}
+                        	{% elseif data.formEditarTipoUsoPredio is defined %}
+                        	    {% set TarifaDesague = data.formEditarTipoUsoPredio.tarifaDesague %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpTarifaDesague" name="tarifaDesague" value='{{ TarifaDesague }}' required>
+                        </div>
+                    </div>
+					<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTarifaAmbos">Tarifa Ambos</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set TarifaAmbos = "" %}
+                        	{% if data.tipoUsoPredio is defined %}{% set TarifaAmbos = data.tipoUsoPredio.TUP_TARIFA_AMBOS %}
+                        	{% elseif data.formEditarTipoUsoPredio is defined %}
+                        	    {% set TarifaAmbos = data.formEditarTipoUsoPredio.tarifaAmbos %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpTarifaAmbos" name="tarifaAmbos" value='{{ TarifaAmbos }}' required>
+                        </div>
+                    </div>
+					<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpTarifaManten">Tarifa Mantenimiento</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set TarifaManten = "" %}
+                        	{% if data.tipoUsoPredio is defined %}{% set TarifaManten = data.tipoUsoPredio.TUP_TARIFA_MANTENIMIENTO %}
+                        	{% elseif data.formEditarTipoUsoPredio is defined %}
+                        	    {% set TarifaManten = data.formEditarTipoUsoPredio.tarifaManten %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpTarifaManten" name="tarifaManten" value='{{ TarifaManten }}' required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbTipoPredio">Tipo Predio</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            <select name="tipoPredio" class="f_minwidth200" id="cmbTipoPredio" required>
+                            	{% if data.tiposPredio is defined %}
+                            		{% set selectedTipoPredio = false %}
+                            		{% for tipoPredio in data.tiposPredio %}
+                                    	<option value="{{ tipoPredio.TIP_CODIGO }}"
+                                    			{% if not selectedTipoPredio %}
+                                    				{% if data.tipoUsoPredio is defined and data.tipoUsoPredio.TIP_CODIGO ==  tipoPredio.TIP_CODIGO %}
+                                    					{{ 'selected' }}{% set selectedTipoPredio = true %}
+                                					{% elseif data.formEditarTipoUsoPredio is defined 
+                                					            and data.formEditarTipoUsoPredio.tipoPredio ==  tipoPredio.TIP_CODIGO %}
+                        					            {{ 'selected' }}{% set selectedTipoPredio = true %}{% endif %}
+            					            	{% endif %}>
+                            				{{ tipoPredio.TIP_NOMBRE }}
+                        				</option>
+                                    {% endfor %}
+                            	{% endif %}
+                            </select>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cambios</button>
+        			<a href="{{ PUBLIC_PATH }}/tipousopredio/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Editar tipo uso predio #}
+  
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formEditarTipoUsoPredio').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbTipoPredio");
+
+
+		function getTarifaAmbosServicios(){
+			if($("#cmbTipoPredio").val() != 1){
+				var tarifaAgua = 0;
+				var tarifaDesague = 0;
+				if($("#inpTarifaAgua").val() != ""){tarifaAgua = parseFloat($("#inpTarifaAgua").val())}
+				if($("#inpTarifaDesague").val() != ""){tarifaDesague = parseFloat($("#inpTarifaDesague").val())}
+				$("#inpTarifaAmbos").val( tarifaAgua + tarifaDesague);
+			}
+		}
+
+		$("#inpTarifaAgua").change(function(){
+			getTarifaAmbosServicios();
+		});
+
+		$("#inpTarifaDesague").change(function(){
+			getTarifaAmbosServicios();
+		});
+
+		if($("#cmbTipoPredio").val() == 1){
+    		$("#inpTarifaAmbos").prop("disabled", false);
+			$("#inpTarifaManten").prop("disabled", false);
+    	}else{
+    		getTarifaAmbosServicios();
+    		$("#inpTarifaAmbos").prop("disabled", true);
+			$("#inpTarifaManten").prop("disabled", true);
+    	}
+        
+        $("#cmbTipoPredio").change(function(){
+        	if($("#cmbTipoPredio").val() == 1){
+        		$("#inpTarifaAmbos").prop("disabled", false);
+				$("#inpTarifaManten").prop("disabled", false);
+				$("#inpTarifaAmbos").val("");
+        	}else{
+        		getTarifaAmbosServicios();
+        		$("#inpTarifaAmbos").prop("disabled", true);
+				$("#inpTarifaManten").prop("disabled", true);
+        	}
+        });
+	</script>
+{% endblock %}

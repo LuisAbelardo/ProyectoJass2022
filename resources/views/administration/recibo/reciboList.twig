@@ -1,0 +1,459 @@
+{% set menuLItem, menuLLink = 'recibo', 'lista' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+	{# Formulario para busqueda por tabla #}
+  	<form method="get" action="{{ PUBLIC_PATH }}/recibo/lista/filtro" id="formFilterListRecibos">
+  	
+  		<div class="row">
+  			<div class="col-12">
+  				<div class="f_cardheader">
+                    <div> 
+                    	<i class="fas fa-file-invoice mr-3"></i>Listado de recibos
+                    	<span>({{ data.pagination.paginaCantidadRegistros }})</span>
+                	</div>
+                	<div class="d-none" id="divrboacciones"> 
+                    	<select class="f_inputflat f_minwidth150" name="rboAccion" id="cmbRboAccion">
+                            <option value="-1" class="f_opacitymedium">Seleccione acción</option>
+                            <option value="1" 
+                                {% if data.formFilterListRecibos.rboAccion is defined and data.formFilterListRecibos.rboAccion ==  "1" %}
+                    					{{ 'selected' }}
+            					{% endif %}>
+            					FINANCIAR
+        					</option>
+                      	</select>
+                      	<button type="button" class="f_button f_buttonaction" id="btnRboConfirmarAccion">confirmar
+                      		<span><i class="fas fa-spinner f_classforrotatespinner d-none" id="spinnerCheckRboVencidos"></i></span>
+                      	</button>
+                	</div>
+                	<div></div>
+                  </div>
+  			</div>
+  		</div><!-- /.card-header -->
+  		
+  		<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  		
+  		<div class="row">
+  			<div class="col-12">
+  			
+  				{# Paginador #}
+  				<div class="d-flex justify-content-end align-items-center pb-2">
+  					<div>
+                    	<ul class="pagination f_pagination-basic pagination-sm m-0">
+                            <li class="page-item {% if data.pagination.paginaAnterior == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link"
+                            		id="paginaAnterior" 
+                            		data-page="{{ data.pagination.paginaAnterior }}" 
+                            		href="#" ><i class="fas fa-chevron-left"></i></a>
+                        	</li>
+                            <li class="page-item">
+                            	<span class="page-link info">
+                                	<input type="text" id="filterPaginaActual" name="filterPaginaActual" class="f_inputflat" required size="10"
+                            				value="{{ data.pagination.paginaActual }}">
+                        			de {{ data.pagination.paginaCantidad }}
+                            	</span>
+                            </li>
+                            <li class="page-item {% if data.pagination.paginaSiguiente == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link" id="paginaSiguiente"
+                            		data-page="{{ data.pagination.paginaSiguiente }}"
+                            		href="#"><i class="fas fa-chevron-right"></i></a>
+                        	</li>
+                        </ul>
+                    </div>
+                    <div class="px-2">
+                    	<button type="submit" class="f_btnflat" name="btnBuscarFiltros">
+                    		<span class="fas fa-search"></span>
+                		</button>
+                		<a href="{{ PUBLIC_PATH }}/recibo/lista" class="f_link">
+                			<i class="fas fa-times"></i>
+            			</a>
+                    </div>
+  				</div>{# /Paginador #}
+  				
+  				
+      			<div class="table-responsive">
+                    <table class="table f_table f_tableliste f_listwidthfilterbefore">
+                      <thead>
+                      	<tr class="liste_title_filter">
+                      		<td colspan="11">
+                          		<i class="fas fa-user mr-1"></i>
+        						<input class="f_inputflat f_maxwidth200imp" type="text" name="filterCliente" placeholder="Buscar por DNI o RUC"
+                              		value='{% if data.formFilterListRecibos.filterCliente is defined %}{{ data.formFilterListRecibos.filterCliente }}{% endif %}'>
+                      			<button class="f_btngenerico" type="button" id="btnVerificarVencidos">Verificar Vencidos
+                      				<span><i class="fas fa-spinner f_classforrotatespinner d-none" id="spinnerVerificarVencidos"></i></span>
+                      			</button>
+                      		</td>
+                      	<tr class="liste_title_filter">
+                            <td class="liste_title f_minwidth125">
+                                <i class="fas fa-filter mr-1"></i>
+                                <input class="f_inputflat f_maxwidth80imp" type="text" name="filterCodigo" 
+                                	value='{% if data.formFilterListRecibos.filterCodigo is defined %}{{ data.formFilterListRecibos.filterCodigo }}{% endif %}'></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" name="filterContrato"
+                                	value="{% if data.formFilterListRecibos.filterContrato is defined %}{{ data.formFilterListRecibos.filterContrato }}{% endif %}"></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" name="filterPeriodo"
+                                	value="{% if data.formFilterListRecibos.filterPeriodo is defined %}{{ data.formFilterListRecibos.filterPeriodo }}{% endif %}"></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth125imp" type="date" name="filterFechaEmision"
+                                	value="{% if data.formFilterListRecibos.filterFechaEmision is defined %}{{ data.formFilterListRecibos.filterFechaEmision }}{% endif %}"></td>
+                            <td class="liste_title">
+                                <select class="f_inputflat" name="filterEstado" id="cmbFilterEstado">
+                                    <option value="-1" class="f_opacitymedium"></option>
+                                    <option value="1" 
+                                        {% if data.formFilterListRecibos.filterEstado is defined and data.formFilterListRecibos.filterEstado ==  "1" %}
+                            					{{ 'selected' }}
+                    					{% endif %}>
+                    					Pendiente
+                					</option>
+                                    <option value="2"
+                                        {% if data.formFilterListRecibos.filterEstado is defined and data.formFilterListRecibos.filterEstado ==  "2" %}
+                            					{{ 'selected' }}
+                    					{% endif %}>
+                    					Pagado
+                					</option>
+                					<option value="3"
+                                        {% if data.formFilterListRecibos.filterEstado is defined and data.formFilterListRecibos.filterEstado ==  "3" %}
+                            					{{ 'selected' }}
+                    					{% endif %}>
+                    					Vencido
+                					</option>
+                					<option value="4"
+                                        {% if data.formFilterListRecibos.filterEstado is defined and data.formFilterListRecibos.filterEstado ==  "4" %}
+                            					{{ 'selected' }}
+                    					{% endif %}>
+                    					Financiado
+                					</option>
+                              	</select>
+                          	</td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" value="" disabled></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth125imp" type="date" name="filterFechaCorte"
+                                	value="{% if data.formFilterListRecibos.filterFechaCorte is defined %}{{ data.formFilterListRecibos.filterFechaCorte }}{% endif %}"></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" value="" disabled></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" value="" disabled></td>
+                            <td class="liste_title" colspan="2">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" value="" disabled></td>
+                        </tr>
+                        <tr class="liste_title">
+                          <th class="wrapcolumntitle liste_title">Ref.</th>
+                          <th class="wrapcolumntitle liste_title">Ref. Contrato</th>
+                          <th class="wrapcolumntitle liste_title">Periodo</th>
+                          <th class="wrapcolumntitle liste_title">Fecha emisión</th>
+                          <th class="wrapcolumntitle liste_title">Estado</th>
+                          <th class="wrapcolumntitle liste_title">Ultimo día pago</th>
+                          <th class="wrapcolumntitle liste_title">Fecha corte</th>
+                          <th class="wrapcolumntitle liste_title">Monto total</th>
+                          <th class="wrapcolumntitle liste_title">Detalle</th>
+                          <th class="wrapcolumntitle liste_title" colspan="2">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      
+                      	{% if data.recibos is not empty %}
+                      	
+                      		{% for recibo in data.recibos %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="#" class="f_link">
+                                  		<span style=" color: #a69944">
+                                  			<i class="fas fa-file-invoice mr-1"></i>
+                              			</span>
+                                  		<span class="align-middtle">{{ recibo.RBO_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/contrato/detalle/{{ recibo.CTO_CODIGO }}" class="f_link">
+                                  		<span class="align-middtle">{{ recibo.CTO_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax250">{{ recibo.RBO_PERIODO }}</td>
+                                  <td class="f_overflowmax250">
+                                  	{% if recibo.RBO_CREATED is not empty %}{{ recibo.RBO_CREATED|date("d/m/Y") }}{% endif %}
+                                  </td>
+                                  <td class="f_overflowmax250">
+                                    {% if recibo.RBO_ESTADO == 1 %}
+                                    	<span class="badge badge-warning">{{ 'Pendiente' }}</span>
+                                    {% elseif  recibo.RBO_ESTADO == 2 %}
+                                    	<span class="badge badge-success">{{ 'Pagado' }}</span>
+                                    {% elseif  recibo.RBO_ESTADO == 3 %}
+                                    	<span class="badge badge-danger">{{ 'Vencido' }}</span>
+                                	{% elseif  recibo.RBO_ESTADO == 4 %}
+                                    	<span class="badge badge-info">{{ 'Financiado' }}</span>
+                                    {% endif %}
+                                  </td>
+                                  <td class="f_overflowmax250">
+                                      {% if recibo.RBO_ULT_DIA_PAGO is not empty %}{{ recibo.RBO_ULT_DIA_PAGO|date("d/m/Y") }}{% endif %}
+                                  </td>
+                                  <td class="f_overflowmax250">
+                                      {% if recibo.RBO_FECHA_CORTE is not empty %}{{ recibo.RBO_FECHA_CORTE|date("d/m/Y") }}{% endif %}
+                                  </td>
+                                  <td class="f_overflowmax250">{{ recibo.RBO_MNTO_TOTAL|number_format(2, '.', ',') }}</td>
+                                  <td>
+                                      <a class="f_link ver_recibo" href="{{ PUBLIC_PATH }}/reporte/recibo/{{ recibo.RBO_CODIGO }}">
+                                  		<span class="align-middtle">{{ 'ver detalle' }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax250">
+                                    {% if recibo.RBO_ESTADO == 1 %}
+                                    	<a class="f_link pagar_recibo" href="{{ PUBLIC_PATH }}/ingreso/recibo/nuevo/{{ recibo.RBO_CODIGO }}">
+                                      		<span class="align-middtle">{{ 'Registrar pago' }}</span>
+                                        </a>
+                                    {% endif %}
+                                  </td>
+                                  <td>
+                                    {% if recibo.RBO_ESTADO == 3 %}
+                                    	<input type="checkbox" class="classforhighlightrow chkrbovencido" name="rboVencidos[]" 
+                                				value="{{ recibo.RBO_CODIGO }}">
+                                    {% endif %}
+                                  </td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..3 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      
+                      	
+                      </tbody>
+                    </table>
+                </div>
+  			</div>
+  			
+  		</div><!-- /.card-body -->
+  		
+  		<div class="row">
+      		<div class="col-12 f_cardfooter text-right"></div>
+      	</div><!-- /.card-footer -->
+  		
+    </form>{# /Formulario para busqueda por tabla #}
+    
+</div><!-- /.card -->
+
+
+
+{# Modal detalle de recibo #}
+<div class="modal fade f_modal" id="modalMostrarRecibo" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Recibo</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<div id="contentRecibo" src="">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>{# /Modal detalle de recibo #}
+
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+    
+	<script type="text/javascript">
+		$('#paginaAnterior').click(function(event){
+			if($('#paginaAnterior').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) - 1);
+				$('#formFilterListRecibos').submit();
+			}
+			return false;
+		});
+		
+		$('#paginaSiguiente').click(function(event){
+			if($('#paginaSiguiente').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) + 1);
+				$('#formFilterListRecibos').submit();
+			}
+			return false;
+		});
+		
+		f_select2("#cmbFilterEstado");
+		f_select2("#cmbRboAccion");
+		
+		
+		$('.ver_recibo').click(function(){
+            $('#contentRecibo').empty();
+            $('#modalMostrarRecibo').modal('show');
+            $('#contentRecibo').html('<object style="width:100%;height: 600px" id="pdf" data="'+$(this).attr('href')+'" type="application/pdf"></object>');
+            return false;
+        });
+        
+        
+        $("#btnVerificarVencidos").click(function(){
+        	
+        	$("#btnVerificarVencidos").attr("disabled", true);
+    		var spinnerVerificarVencidos = $("#spinnerVerificarVencidos");
+    		spinnerVerificarVencidos.removeClass("d-none");
+    	
+    		$.ajax({
+                method: "POST",
+                url: "{{ PUBLIC_PATH }}/recibo/verificarvencidos",
+                dataType: "json",
+                data: {},
+                complete: function(){
+                	spinnerVerificarVencidos.addClass("d-none");
+                	$("#btnVerificarVencidos").attr("disabled", false);
+                },
+    			error: function(jqXHR ){console.log(jqXHR);
+    				$(document).Toasts('create', {
+                    	class: 'bg-danger',
+                        title: 'Respuesta de solicitud',
+                        position: 'topRight',
+                        autohide: true,
+						delay: 8000,
+                        body: "Ocurrio un error inesperado, vuelva a intentarlo"
+                     });
+    			},
+    			success: function(respons){
+    				$(document).Toasts('create', {
+                    	class: 'bg-success',
+                        title: 'Respuesta de solicitud',
+                        position: 'topRight',
+                        autohide: true,
+						delay: 8000,
+                        body: "Estado de recibos actualizados"
+                     });
+    			
+    				setTimeout(function(){
+    					window.location.href = "{{ PUBLIC_PATH }}/recibo/lista";
+					}, 2000);
+                     
+    			}
+            });
+        });
+        
+        
+        $(".classforhighlightrow").click(function(){
+        	if($(this).prop('checked')) {
+                $(this).parent().parent().css("background", "#edf4fb");
+            }else{
+            	$(this).parent().parent().css("background", "inherit");
+            }
+        });
+        
+        
+        $(".chkrbovencido").click(function(){
+        	var mostrarAcciones = false;
+        	$(".chkrbovencido").each(function(indice, elemento) {
+            	if($(elemento).prop('checked')){ mostrarAcciones = true; return false;}
+            });
+            if(mostrarAcciones){
+            	$("#divrboacciones").removeClass("d-none");
+            }else{
+            	$("#divrboacciones").addClass("d-none");
+            	$("#cmbRboAccion").val("-1");
+            	$('#cmbRboAccion').change();
+        	}
+        });
+        
+        
+        if($("#cmbRboAccion").val() != -1){
+    		$("#btnRboConfirmarAccion").css("opacity", "1");
+    		$("#btnRboConfirmarAccion").prop("disabled", false);
+    	}else{
+    		$("#btnRboConfirmarAccion").css("opacity", "0.5");
+    		$("#btnRboConfirmarAccion").prop("disabled", true);
+    	}
+        
+        $("#cmbRboAccion").change(function(){
+        	if($(this).val() != -1){
+        		$("#btnRboConfirmarAccion").css("opacity", 1);
+        		$("#btnRboConfirmarAccion").prop("disabled", false);
+        	}else{
+        		$("#btnRboConfirmarAccion").css("opacity", 0.5);
+        		$("#btnRboConfirmarAccion").prop("disabled", true);
+        	}
+        });
+        
+        
+        $("#btnRboConfirmarAccion").click(function(){
+        
+            $("#btnRboConfirmarAccion").attr("disabled", true);
+    		var spinnerCheckRboVencidos = $("#spinnerCheckRboVencidos");
+    		spinnerCheckRboVencidos.removeClass("d-none");
+    		var dataSend = new FormData(document.getElementById('formFilterListRecibos'));
+        	
+        	$.ajax({
+                method: "POST",
+                url: "{{ PUBLIC_PATH }}/financiamiento/checkrbovencidos",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                data: dataSend,
+                complete: function(){
+                	spinnerCheckRboVencidos.addClass("d-none");
+                	$("#btnRboConfirmarAccion").attr("disabled", false);
+                },
+    			error: function(jqXHR){
+    				var msjRta = "Ocurrio un error inesperado, vuelva a intentarlo";
+    				if(jqXHR.responseJSON != undefined){
+    					msjRta = '<ul class="pl-3">';
+    					dataDetalle = jqXHR.responseJSON.estadoDetalle;
+    					for (const property in dataDetalle) {
+                          msjRta += "<li>" + dataDetalle[property] + "</li>";
+                        }
+                        msjRta += "</ul>";
+    				}
+    			
+    				$(document).Toasts('create', {
+                    	class: 'bg-danger',
+                        title: 'Respuesta de solicitud',
+                        position: 'topRight',
+                        autohide: true,
+						delay: 8000,
+                        body: msjRta
+                     })
+    			},
+    			success: function(respons){
+    				window.location.href = "{{ PUBLIC_PATH }}/financiamiento/nuevo";
+    			}
+            });
+        	
+        });
+        
+	</script>
+	
+{% endblock %}

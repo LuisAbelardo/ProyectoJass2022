@@ -1,0 +1,298 @@
+{% set menuLItem, menuLLink = 'predio', 'nuevo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevo predio #}
+	<form class="f_inputflat" id="formNuevoPredio" method="post" action="{{ PUBLIC_PATH }}/predio/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-house-user mr-3"></i>Nuevo predio
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      			
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpCliente">Cliente (DNI / RUC)</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpCliente" name="cliente" required maxlength="11"
+                        			value='{% if data.formNuevoPredio.cliente is defined %}{{ data.formNuevoPredio.cliente }}{% endif %}'>
+                			<button type="button" class="f_btnflat" name="btnBuscarCliente" id="btnBuscarCliente">
+                				<span class="fas fa-search"></span>
+            				</button>
+                			<span><i class="fas fa-spinner f_classforrotatespinner d-none" id="spinnerBuscarCliente"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpClienteNombre">Cliente Nombre</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth300" id="inpClienteNombre" name="clienteNombre" required disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbCalle">Calle</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="calle" class="f_minwidth300" id="cmbCalle" required> 
+                            	{% set selectedCalle= false %}
+                                {% for calle in data.calles %}
+                                	<option value="{{ calle.CAL_CODIGO }}"
+                            				{% if not selectedCalle and data.formNuevoPredio is defined 
+                            				        and data.formNuevoPredio.calle ==  calle.CAL_CODIGO %}
+                            					{{ 'selected' }}{% set selectedCalle = true %}
+                                            {% endif %}>
+                        				{{ calle.CAL_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDireccion">Dirección</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth250" id="inpDireccion" name="direccion" required
+                        			value='{% if data.formNuevoPredio.direccion is defined %}{{ data.formNuevoPredio.direccion }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="cmbHabitada">Habitada</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="habitada" class="f_minwidth300" id="cmbHabitada"> 
+                        		<option value="-1"></option>
+                            	<option value="si"
+                        				{% if data.formNuevoPredio is defined 
+                        				        and data.formNuevoPredio.habitada ==  "si" %}
+                        					{{ 'selected' }}
+                                        {% endif %}>
+                                        Si
+                				</option>
+                				<option value="no"
+                        				{% if data.formNuevoPredio is defined 
+                        				        and data.formNuevoPredio.habitada ==  "no" %}
+                        					{{ 'selected' }}
+                                        {% endif %}>
+                                        No
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="cmbMaterialConst">Material de Construcción</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="materialConst" class="f_minwidth300" id="cmbMaterialConst"> 
+                            	<option value="-1"></option>
+                            	<option value="noble"
+                        				{% if data.formNuevoPredio is defined 
+                        				        and data.formNuevoPredio.materialConst ==  "noble" %}
+                        					{{ 'selected' }}
+                                        {% endif %}>
+                                        Noble
+                				</option>
+                				<option value="adobe"
+                        				{% if data.formNuevoPredio is defined 
+                        				        and data.formNuevoPredio.materialConst ==  "adobe" %}
+                        					{{ 'selected' }}
+                                        {% endif %}>
+                                        Adobe
+                				</option>
+                				<option value="madera"
+                        				{% if data.formNuevoPredio is defined 
+                        				        and data.formNuevoPredio.materialConst ==  "madera" %}
+                        					{{ 'selected' }}
+                                        {% endif %}>
+                                        Madera
+                				</option>
+                				<option value="no aplicable"
+                        				{% if data.formNuevoPredio is defined 
+                        				        and data.formNuevoPredio.materialConst ==  "no aplicable" %}
+                        					{{ 'selected' }}
+                                        {% endif %}>
+                                        No aplicable
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpPisos">Pisos</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth250" id="inpPisos" name="pisos"
+                        			value='{% if data.formNuevoPredio.pisos is defined %}{{ data.formNuevoPredio.pisos }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpFamilias">Familias</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth250" id="inpFamilias" name="familias"
+                        			value='{% if data.formNuevoPredio.familias is defined %}{{ data.formNuevoPredio.familias }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpHabitantes">Habitantes</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth250" id="inpHabitantes" name="habitantes"
+                        			value='{% if data.formNuevoPredio.habitantes is defined %}{{ data.formNuevoPredio.habitantes }}{% endif %}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="cmbPozoTabular">Pozo Tabular</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="pozoTabular" class="f_minwidth300" id="cmbPozoTabular"> 
+                        		<option value="-1"></option>
+                            	<option value="si"
+                    				{% if data.formNuevoPredio is defined 
+                    				        and data.formNuevoPredio.pozoTabular ==  "si" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    Si
+                				</option>
+                				<option value="no"
+                    				{% if data.formNuevoPredio is defined 
+                    				        and data.formNuevoPredio.pozoTabular ==  "no" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    No
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="cmbPiscina">Piscina</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="piscina" class="f_minwidth300" id="cmbPiscina"> 
+                        		<option value="-1"></option>
+                            	<option value="si"
+                        				{% if data.formNuevoPredio is defined 
+                        				        and data.formNuevoPredio.piscina ==  "si" %}
+                        					{{ 'selected' }}
+                                        {% endif %}>
+                                        Si
+                				</option>
+                				<option value="no"
+                        				{% if data.formNuevoPredio is defined 
+                        				        and data.formNuevoPredio.piscina ==  "no" %}
+                        					{{ 'selected' }}
+                                        {% endif %}>
+                                        No
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar predio</button>
+        			<a href="{{ PUBLIC_PATH }}/predio/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo predio #}
+  
+</div><!-- /.card -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoPredio').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbCalle");
+        f_select2("#cmbHabitada");
+        f_select2("#cmbMaterialConst");
+        f_select2("#cmbPozoTabular");
+        f_select2("#cmbPiscina");
+        
+        
+        $("#btnBuscarCliente").click(function(){
+        
+			$("#inpClienteNombre").val("");
+        	
+        	$("#inpCliente").val($("#inpCliente").val().trim());
+        	var inpCliente = $("#inpCliente").val();
+        	
+        	if(inpCliente != ""){
+        	
+        		var spinnerBuscarCliente = $("#spinnerBuscarCliente");
+        		spinnerBuscarCliente.removeClass("d-none");
+        	
+        		$.ajax({
+                    method: "GET",
+                    url: "{{ PUBLIC_PATH }}/cliente/detalle/json/"+inpCliente,
+                    dataType: "json",
+                    complete: function(){
+                    	spinnerBuscarCliente.addClass("d-none");
+                    },
+        			error: function(jqXHR){
+        				var msj = "";
+        				if(jqXHR.status == 404){
+        					msj = "No se encontro el cliente solicitado";
+        					console.log(msj);
+        				}else{
+        					msj = "Ocurrio un error inesperado, vuelva a intentarlo";
+        					console.log(msj);
+        				}
+        				$(document).Toasts('create', {
+                            	class: 'bg-danger',
+                                title: 'Respuesta de busqueda',
+                                position: 'topRight',
+                                autohide: true,
+       							delay: 4000,
+                                body: msj
+                            })
+        			},
+        			success: function(respons){
+        				$("#inpClienteNombre").val(respons.data.cliente.nombre);
+        			}
+                });
+        	}
+        });
+	</script>
+{% endblock %}

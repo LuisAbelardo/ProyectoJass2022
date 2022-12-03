@@ -1,0 +1,244 @@
+{% set menuLItem, menuLLink = 'contrato', 'lista' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+	{# Formulario para busqueda por tabla #}
+  	<form method="get" action="{{ PUBLIC_PATH }}/contrato/lista/filtro" id="formFilterListContratos">
+  	
+  		<div class="row">
+  			<div class="col-12">
+  				<div class="f_cardheader">
+                    <div> 
+                    	<i class="fas fa-file-contract mr-3"></i>Listado de contratos
+                    	<span>({{ data.pagination.paginaCantidadRegistros }})</span>
+                	</div>
+                  </div>
+  			</div>
+  		</div><!-- /.card-header -->
+  		
+  		<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  		
+  		<div class="row">
+  			<div class="col-12">
+  			
+  				{# Paginador #}
+  				<div class="d-flex justify-content-end align-items-center pb-2">
+  					<div>
+                    	<ul class="pagination f_pagination-basic pagination-sm m-0">
+                            <li class="page-item {% if data.pagination.paginaAnterior == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link"
+                            		id="paginaAnterior" 
+                            		data-page="{{ data.pagination.paginaAnterior }}" 
+                            		href="#" ><i class="fas fa-chevron-left"></i></a>
+                        	</li>
+                            <li class="page-item">
+                            	<span class="page-link info">
+                                	<input type="text" id="filterPaginaActual" name="filterPaginaActual" class="f_inputflat" required size="10"
+                            				value="{{ data.pagination.paginaActual }}">
+                        			de {{ data.pagination.paginaCantidad }}
+                            	</span>
+                            </li>
+                            <li class="page-item {% if data.pagination.paginaSiguiente == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link" id="paginaSiguiente"
+                            		data-page="{{ data.pagination.paginaSiguiente }}"
+                            		href="#"><i class="fas fa-chevron-right"></i></a>
+                        	</li>
+                        </ul>
+                    </div>
+                    <div class="px-2">
+                    	<button type="submit" class="f_btnflat" name="btnBuscarFiltros">
+                    		<span class="fas fa-search"></span>
+                		</button>
+                		<a href="{{ PUBLIC_PATH }}/contrato/lista" class="f_link">
+                			<i class="fas fa-times"></i>
+            			</a>
+                    </div>
+  				</div>{# /Paginador #}
+  				
+  				
+      			<div class="table-responsive">
+                    <table class="table f_table f_tableliste f_listwidthfilterbefore">
+                      <thead>
+                      	<tr class="liste_title_filter">
+                      		<td colspan="4">
+                          		<i class="fas fa-user mr-1"></i>
+        						<input class="f_inputflat f_maxwidth200imp" type="text" name="filterCliente" placeholder="Nombres del Cliente"
+                              		value='{% if data.formFilterListContratos.filterCliente is defined %}{{ data.formFilterListContratos.filterCliente }}{% endif %}'></td></td>
+                  		</tr>
+                      	<tr class="liste_title_filter">
+                          <td class="liste_title f_minwidth125">
+                          	<i class="fas fa-filter mr-1"></i>
+    						<input class="f_inputflat f_maxwidth80imp" type="text" name="filterCodigo" 
+                          		value='{% if data.formFilterListContratos.filterCodigo is defined %}{{ data.formFilterListContratos.filterCodigo }}{% endif %}'></td>
+                    	  <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterPredio"
+                          		value="{% if data.formFilterListContratos.filterPredio is defined %}{{ data.formFilterListContratos.filterPredio }}{% endif %}"></td>
+                  		  <td class="liste_title">
+                  		  	<select class="f_inputflat" name="filterEstado" id="cmbFilterEstado">
+                                <option value="-1" class="f_opacitymedium"></option>
+                                <option value="0" 
+                                    {% if data.formFilterListContratos.filterEstado is defined and data.formFilterListContratos.filterEstado ==  "0" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Tramite
+            					</option>
+                                <option value="1"
+                                    {% if data.formFilterListContratos.filterEstado is defined and data.formFilterListContratos.filterEstado ==  "1" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Activo
+            					</option>
+            					<option value="2"
+                                    {% if data.formFilterListContratos.filterEstado is defined and data.formFilterListContratos.filterEstado ==  "2" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Anulado
+            					</option>
+								<option value="3"
+                                    {% if data.formFilterListContratos.filterEstado is defined and data.formFilterListContratos.filterEstado ==  "3" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Cortado
+            					</option>
+								<option value="4"
+                                    {% if data.formFilterListContratos.filterEstado is defined and data.formFilterListContratos.filterEstado ==  "4" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Mantenimiento
+            					</option>
+								<option value="5"
+                                    {% if data.formFilterListContratos.filterEstado is defined and data.formFilterListContratos.filterEstado ==  "5" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Pasivo
+            					</option>
+                              </select>
+                          </td>
+                          <td class="liste_title">
+                    	  	<input class="f_inputflat f_maxwidth150imp" type="date" name="filterFechaTramite"
+                    	  		value="{% if data.formFilterListContratos.filterFechaTramite is defined %}{{ data.formFilterListContratos.filterFechaTramite }}{% endif %}"></td>
+                        </tr>
+                        <tr class="liste_title">
+                          <th class="wrapcolumntitle liste_title">Ref.</th>
+                          <th class="wrapcolumntitle liste_title">Ref. Predio</th>
+                          <th class="wrapcolumntitle liste_title">Estado</th>
+                          <th class="wrapcolumntitle liste_title">Fecha Tramite</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      
+                      	{% if data.contratos is not empty %}
+                      	
+                      		{% for contrato in data.contratos %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/contrato/detalle/{{ contrato.CTO_CODIGO }}" class="f_link">
+                                  		<span style=" color: #a69944">
+                                  			<i class="fas fa-file-contract mr-1"></i>
+                              			</span>
+                                  		<span class="align-middtle">{{ contrato.CTO_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax250">
+                                    <a href="{{ PUBLIC_PATH }}/predio/detalle/{{ contrato.PRE_CODIGO }}" class="f_link">
+                                    	<span class="align-middtle">{{ contrato.PRE_CODIGO }}</span>
+                                    </a>
+                                  </td>
+                                  <td class="f_overflowmax250">
+                                    {% if contrato.CTO_ESTADO == 0 %}
+                                    	<span class="badge badge-warning">{{ 'Tramite' }}</span> 
+                                    {% elseif  contrato.CTO_ESTADO == 1 %}
+                                    	<span class="badge badge-success">{{ 'Activo' }}</span>
+                                    {% elseif  contrato.CTO_ESTADO == 2 %}
+                                    	<span class="badge badge-danger">{{ 'Anulado' }}</span>
+									{% elseif  contrato.CTO_ESTADO == 3 %}
+										<span class="badge badge-secondary">{{ 'Cortado' }}</span>
+									{% elseif  contrato.CTO_ESTADO == 4 %}
+                                    	<span class="badge badge-info">{{ 'Mantenimiento' }}</span>
+									{% elseif  contrato.CTO_ESTADO == 5 %}
+                                    	<span class="badge badge-dark">{{ 'Pasivo' }}</span>
+                                    {% endif %}
+                                  </td>
+                                  <td class="f_overflowmax150">{{ contrato.CTO_FECHA_TRAMITE }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..3 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      
+                      	
+                      </tbody>
+                    </table>
+                </div>
+  			</div>
+  			
+  		</div><!-- /.card-body -->
+  		
+  		<div class="row">
+      		<div class="col-12 f_cardfooter text-right"></div>
+      	</div><!-- /.card-footer -->
+  		
+    </form>{# /Formulario para busqueda por tabla #}
+    
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#paginaAnterior').click(function(event){
+			if($('#paginaAnterior').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) - 1);
+				$('#formFilterListContratos').submit();
+			}
+			return false;
+		});
+		
+		$('#paginaSiguiente').click(function(event){
+			if($('#paginaSiguiente').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) + 1);
+				$('#formFilterListContratos').submit();
+			}
+			return false;
+		});
+		
+		f_select2("#cmbFilterEstado");
+	</script>
+	
+{% endblock %}

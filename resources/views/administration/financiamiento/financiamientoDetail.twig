@@ -1,0 +1,348 @@
+{% set menuLItem, menuLLink = 'recibo', 'financiamientos' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class=""> 
+                	<i class="fas fa-clipboard mr-3"></i>Detalle de financiamiento 
+            	</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			{# Contenedor de alertas #}
+            {% set classAlert = "" %}
+            {% if estadoDetalle is empty %}
+            	{% set classAlert = "d-none" %}
+            {% elseif codigo >= 200 and codigo <300 %}
+                {% set classAlert = "alert-success" %}
+            {% elseif codigo >= 400 %}
+                {% set classAlert = "alert-danger" %}
+            {% endif %}
+  			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+             	<ul class="mb-0" id="f_alertsUl">
+             		{% if estadoDetalle is not empty %}
+                      {% for msj in estadoDetalle %}
+                        <li>{{ msj }}</li>
+                      {% endfor %}
+                    {% endif %}
+             	</ul>
+             	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+             		<span aria-hidden="true">&times;</span>
+             	</button>
+            </div>{# /Contenedor de alertas #}
+  		</div>
+  	</div>
+  	
+  
+  	<div class="row">
+  		<div class="col-12 d-flex justify-content-between f_arearef">
+  			<div>
+  				<div class="d-inline-block mr-2 mr-md-4">
+          			<div class="f_imageref"><span class="fas fa-clipboard" style=" color: #a69944"></span></div>
+  				</div>
+  				<div class="d-inline-block align-top">
+  					<span class="font-weight-bold f_inforef">
+  					    {% if data.financiamiento is defined %}{{ data.financiamiento.FTO_CODIGO }}{% endif %}
+  					</span><br/>
+  				</div>
+  			</div>
+  			<div class="d-none d-sm-block">
+  				<span><a href="{{ PUBLIC_PATH }}/financiamiento/lista" class="f_link font-weight-bold">Volver a Lista</a></span>
+  			</div>
+  		</div>
+  		<div class="col-12 table-responsive">
+  			<table class="table f_table f_tableforfield">
+              <tbody>
+              	<tr>
+                  <td>Ref.</td>
+                  <td>{% if data.financiamiento is defined %}{{ data.financiamiento.FTO_CODIGO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Monto Total</td>
+                  <td>{% if data.financiamiento is defined %}{{ "S/. " ~ data.financiamiento.FTO_DEUDA|number_format(2, '.', ',') }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Cuota Inicial</td>
+                  <td>{% if data.financiamiento is defined %}{{ "S/. " ~ data.financiamiento.FTO_CUOTA_INICIAL|number_format(2, '.', ',') }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Nro. Cuotas</td>
+                  <td>{% if data.financiamiento is defined %}{{ data.financiamiento.FTO_NUM_CUOTAS }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Monto por cuota</td>
+                  <td>{% if data.financiamiento is defined %}{{ "S/. " ~  data.financiamiento.FTO_MONTO_CUOTA|number_format(2, '.', ',') }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Estado</td>
+                  <td>
+                  	{% if  data.financiamiento is defined %}
+                  		{% if data.financiamiento.FTO_ESTADO == 1 %}
+                        	<span class="badge badge-warning">{{ 'Sin Confirmar' }}</span>
+                        {% elseif  data.financiamiento.FTO_ESTADO == 2 %}
+                        	<span class="badge badge-success">{{ 'Confirmado' }}</span>
+                    	{% elseif  data.financiamiento.FTO_ESTADO == 3 %}
+                        	<span class="badge badge-danger">{{ 'Anulado' }}</span>
+                        {% endif %}
+                  	{% endif %}
+                  </td>
+                </tr>	
+                <tr>
+                  <td>Contrato Ref.</td>
+                  <td>{% if data.financiamiento is defined %}{{ data.financiamiento.CTO_CODIGO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Fecha de creación</td>
+                  <td>{% if data.financiamiento is defined %}{{ data.financiamiento.FTO_CREATED }}{% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+  		</div>
+  	</div><!-- /.card-body -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardfooter f_cardfooteractions text-right">
+  				{% set financiamientoAnulado = false %}
+  				{% set styleBtnAnular, titleBtnAnular = "f_buttonactiondelete", "" %}
+				{% if data.financiamiento is defined and data.financiamiento.FTO_ESTADO == 3 %}
+				    {% set styleBtnAnular = "f_buttonactionrefused" %}
+					{% set titleBtnAnular = "Desactivado porque el financiamiento ya fue anulado" %}
+					{% set financiamientoAnulado = true %}
+				{% elseif data.financiamiento is defined and data.financiamiento.FTO_ESTADO == 2 %}
+					{% set styleBtnAnular = "f_buttonactionrefused" %}
+					{% set titleBtnAnular = "Desactivado porque el financiamiento ya fue confirmado" %}
+			    {% endif %}
+			    
+			    {% if not financiamientoAnulado and data.financiamiento is defined %}
+    			    <a href="{{ PUBLIC_PATH }}/reporte/contratofinanciamiento/{{ data.financiamiento.FTO_CODIGO }}" 
+  						class="f_linkbtn f_linkbtnaction" id="btnVer" target="_blank">Ver</a>
+			    {% endif %}
+			    
+			    {% if data.financiamiento is defined and data.financiamiento.FTO_ESTADO == 1 %}
+				    <button type="button" class="f_button f_buttonaction" data-toggle="modal" data-target="#modalConfirmarFinanciamiento">
+				    	Confirmar</button>
+			    {% endif %}
+			    
+  				<button type="button" class="f_button {{ styleBtnAnular }} classfortooltip" data-toggle="modal" 
+  						data-target="#modalAnularFinanciamiento" title="{{ titleBtnAnular }}">
+  					Anular financiamiento</button>
+  			</div>
+  			
+  		</div>
+  	</div><!-- /.card-footer -->
+  
+</div><!-- /.card -->
+
+
+{# Recursos vinculados #}
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <div class="f_card">
+        
+          	<div class="row">
+          		<div class="col-12">
+          			<div class="f_cardheader">
+          				<div class="">Cuotas Vinculados</div>
+          			</div>
+          		</div>
+          	</div><!-- /.card-header -->
+          	
+          	<div class="row">
+              	<div class="col-12 table-responsive">
+          			<table class="table f_table f_tableliste">
+          			  <thead>
+          			  	<tr class="liste_title">
+          			  		<td class="liste_title">Nro.</td>
+          			  		<td class="liste_title">Fech. Cronograma</td>
+          			  		<td class="liste_title">Fech. Pago</td>
+          			  		<td class="liste_title">Estado</td>
+          			  	</tr>
+          			  </thead>
+                      <tbody>
+                      	{% if data.cuotas is defined and data.cuotas is not empty %}
+                                  	
+                      		{% for cuota in data.cuotas %}
+                                <tr class="f_oddeven">
+                                  <td>{{ cuota.FCU_NUM_CUOTA }}</td>
+                                  <td class="f_overflowmax150">
+                                  	{{ cuota.FCU_FECHA_DE_CRONOGRAMA is empty ? "" : cuota.FCU_FECHA_DE_CRONOGRAMA|date("d/m/Y") }}
+                              	  </td>
+                              	  <td class="f_overflowmax150">
+                                  	{{ cuota.FCU_FECHA_DE_CRONOGRAMA is empty ? "" : cuota.FCU_FECHA_DE_CRONOGRAMA|date("d/m/Y") }}
+                              	  </td>
+                              	  <td>
+                              	  	{% if cuota.FCU_ESTADO == 1 %}
+                                    	<span class="badge badge-warning">{{ 'Pendiente' }}</span>
+                                    {% elseif  cuota.FCU_ESTADO == 2 %}
+                                    	<span class="badge badge-success">{{ 'Facturado' }}</span>
+                                    {% elseif  cuota.FCU_ESTADO == 3 %}
+                                    	<span class="badge badge-danger">{{ 'Pagado' }}</span>
+                                    {% endif %}
+                              	  </td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..2 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      </tbody>
+                    </table>
+            	</div>
+          	</div><!-- /.card-body -->
+          	
+          	<div class="row">
+          		<div class="col-12 f_cardfooter text-right"></div>
+          	</div><!-- /.card-footer -->
+        
+        </div><!-- /.card -->
+    </div>
+
+	<div class="col-12 col-lg-6 mt-3 mt-lg-0">
+		<div class="f_card">
+        
+          	<div class="row">
+          		<div class="col-12">
+          			<div class="f_cardheader">
+          				<div class="">Recibos Vinculados</div>
+          			</div>
+          		</div>
+          	</div><!-- /.card-header -->
+          	
+          	<div class="row">
+              	<div class="col-12 table-responsive">
+          			<table class="table f_table f_tableliste">
+          			  <thead>
+          			  	<tr class="liste_title">
+          			  		<td class="liste_title" colspan="2">Recibos</td>
+          			  	</tr>
+          			  </thead>
+                      <tbody>
+                      	{% if data.recibos is defined and data.recibos is not empty %}
+                                  	
+                      		{% for recibo in data.recibos %}
+                                <tr class="f_oddeven">
+                                  <td>{{ recibo.RBO_CODIGO }}</td>
+                                  <td class="f_overflowmax150">{{ recibo.RBO_PERIODO }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..2 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      </tbody>
+                    </table>
+            	</div>
+          	</div><!-- /.card-body -->
+          	
+          	<div class="row">
+          		<div class="col-12 f_cardfooter text-right"></div>
+          	</div><!-- /.card-footer -->
+        
+        </div><!-- /.card -->
+	</div>
+
+</div>{# /Recursos vinculados #}
+
+
+
+{# Modal confirmar financiamiento #}
+{% if data.financiamiento is defined and data.financiamiento.FTO_ESTADO == 1 %}
+    <div class="modal fade f_modal" id="modalConfirmarFinanciamiento" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">Confirmar Financiamiento</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    	<span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                	<i class="fas fa-info-circle text-secondary mr-1"></i>
+                	<span>¿Está seguro de querer confirmar este financiamiento?</span><br>
+                	<span>Si el financiamiento se confirma ya no podra anularse.</span>
+                	<form class="d-none" id="formConfirmarFinanciamiento" action="{{ PUBLIC_PATH }}/financiamiento/confirmar" method="post">
+                		<input type="hidden" name="codigo" 
+                				value="{% if data.financiamiento is defined %}{{ data.financiamiento.FTO_CODIGO }}{% endif %}">
+                	</form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="f_btnactionmodal" id="btnConfirmarFinanciamiento">Si</button>
+                    <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{# /Modal confirmar financiamiento #}
+
+
+{# Modal anular financiamiento #}
+{% if data.financiamiento is defined and data.financiamiento.FTO_ESTADO == 1 %}
+    <div class="modal fade f_modal" id="modalAnularFinanciamiento" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">Anular Financiamiento</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    	<span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                	<i class="fas fa-info-circle text-secondary mr-1"></i><span>¿Está seguro de querer anular este financiamiento?</span>
+                	<form class="d-none" id="formAnularFinanciamiento" action="{{ PUBLIC_PATH }}/financiamiento/annular" method="post">
+                		<input type="hidden" name="codigo" 
+                				value="{% if data.financiamiento is defined %}{{ data.financiamiento.FTO_CODIGO }}{% endif %}">
+                	</form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="f_btnactionmodal" id="btnAnularFinanciamiento">Si</button>
+                    <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}{# /Modal anular financiamiento #}
+
+
+    
+{% endblock %}
+
+
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#btnConfirmarFinanciamiento').click(function(event){
+			$('#formConfirmarFinanciamiento').submit();
+			return false;
+		});
+		
+		$('#btnAnularFinanciamiento').click(function(event){
+			$('#formAnularFinanciamiento').submit();
+			return false;
+		});
+		
+		
+	</script>
+	
+{% endblock %}

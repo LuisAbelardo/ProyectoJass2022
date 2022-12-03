@@ -1,0 +1,125 @@
+{% set menuLItem, menuLLink = 'proyecto', 'nuevo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevo proyecto #}
+	<form class="f_inputflat" id="formNuevoProyecto" method="post" action="{{ PUBLIC_PATH }}/proyecto/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-project-diagram mr-3"></i>Nuevo proyecto
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNombre">Nombre</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            {% set nombre = "" %}
+                        	{% if data.formNuevoProyecto is defined %}
+                        	    {% set nombre = data.formNuevoProyecto.nombre %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpNombre" name="nombre" required 
+                        			value='{{ nombre }}'>
+                        </div>
+                    </div>
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpMontoPorContrato">Monto por contrato</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            {% set montoPorContrato = "" %}
+                        	{% if data.formNuevoProyecto is defined %}
+                        	    {% set montoPorContrato = data.formNuevoProyecto.montoPorContrato %}{% endif %}
+                        	<div style="background-color:#b9ceac" class="d-inline-block">
+                        		<span class="pl-1">S/. </span>
+                        		<input type="text" class="f_minwidth100" id="inpMontoPorContrato" name="montoPorContrato" required
+                        			style="background-color:#b9ceac" value='{{ montoPorContrato }}'>
+                        	</div>
+                        </div>
+                    </div>
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpNroCuotasPorContrato">Nro. Cuotas por contrato</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            {% set nroCuotasPorContrato = "" %}
+                        	{% if data.formNuevoProyecto is defined %}
+                        	    {% set nroCuotasPorContrato = data.formNuevoProyecto.nroCuotasPorContrato %}{% endif %}
+                        	<input type="text" class="f_minwidth100" id="inpNroCuotasPorContrato" name="nroCuotasPorContrato" required 
+                        			value='{{ nroCuotasPorContrato }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="txaDescripcion">Descripción</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set descripcion = '' %}
+                        	{% if data.formNuevoProyecto.descripcion is defined %}
+                        	    {% set descripcion = data.formNuevoProyecto.descripcion %}{% endif %}
+                        	<textarea class="f_minwidth400" id="txaDescripcion" rows="2" maxlength="256" required
+                        				name="descripcion">{{ descripcion }}</textarea>
+                        </div>
+                    </div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar</button>
+        			<a href="{{ PUBLIC_PATH }}/proyecto/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo proyecto #}
+  
+</div><!-- /.card -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoProyecto').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+	</script>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% set menuLItem, menuLLink = 'proyecto', 'cuotas' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+	{# Formulario para busqueda por tabla #}
+  	<form method="get" action="{{ PUBLIC_PATH }}/cuotaextraordinaria/lista/filtro" id="formFilterListCuotasExtra">
+  	
+  		<div class="row">
+  			<div class="col-12">
+  				<div class="f_cardheader">
+                    <div> 
+                    	<i class="fas fa-project-diagram mr-3"></i>Listado de cuotas extraordinarias
+                    	<span>({{ data.pagination.paginaCantidadRegistros }})</span>
+                	</div>
+                  </div>
+  			</div>
+  		</div><!-- /.card-header -->
+  		
+  		<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  		
+  		<div class="row">
+  			<div class="col-12">
+  			
+  				{# Paginador #}
+  				<div class="d-flex justify-content-end align-items-center pb-2">
+  					<div>
+                    	<ul class="pagination f_pagination-basic pagination-sm m-0">
+                            <li class="page-item {% if data.pagination.paginaAnterior == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link"
+                            		id="paginaAnterior" 
+                            		data-page="{{ data.pagination.paginaAnterior }}" 
+                            		href="#" ><i class="fas fa-chevron-left"></i></a>
+                        	</li>
+                            <li class="page-item">
+                            	<span class="page-link info">
+                                	<input type="text" id="filterPaginaActual" name="filterPaginaActual" class="f_inputflat" required size="10"
+                            				value="{{ data.pagination.paginaActual }}">
+                        			de {{ data.pagination.paginaCantidad }}
+                            	</span>
+                            </li>
+                            <li class="page-item {% if data.pagination.paginaSiguiente == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link" id="paginaSiguiente"
+                            		data-page="{{ data.pagination.paginaSiguiente }}"
+                            		href="#"><i class="fas fa-chevron-right"></i></a>
+                        	</li>
+                        </ul>
+                    </div>
+                    <div class="px-2">
+                    	<button type="submit" class="f_btnflat" name="btnBuscarFiltros">
+                    		<span class="fas fa-search"></span>
+                		</button>
+                		<a href="{{ PUBLIC_PATH }}/cuotaextraordinaria/lista" class="f_link">
+                			<i class="fas fa-times"></i>
+            			</a>
+                    </div>
+  				</div>{# /Paginador #}
+  				
+  				
+      			<div class="table-responsive">
+                    <table class="table f_table f_tableliste f_listwidthfilterbefore">
+                      <thead>
+                      	<tr class="liste_title_filter">
+                      		<td colspan="8">
+                          		<i class="fas fa-user mr-1"></i>
+        						<input class="f_inputflat f_maxwidth200imp" type="text" name="filterCliente" placeholder="Buscar por DNI o RUC"
+                              		value='{% if data.formFilterListCuotasExtra.filterCliente is defined %}{{ data.formFilterListCuotasExtra.filterCliente }}{% endif %}'>
+                      			
+                      		</td>
+                      	<tr class="liste_title_filter">
+                            <td class="liste_title f_minwidth125">
+                                <i class="fas fa-filter mr-1"></i>
+                                <input class="f_inputflat f_maxwidth80imp" type="text" name="filterCodigo" 
+                                	value='{% if data.formFilterListCuotasExtra.filterCodigo is defined %}{{ data.formFilterListCuotasExtra.filterCodigo }}{% endif %}'></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" name="filterProyecto"
+                                	value="{% if data.formFilterListCuotasExtra.filterProyecto is defined %}{{ data.formFilterListCuotasExtra.filterProyecto }}{% endif %}"></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" name="filterContrato"
+                                	value="{% if data.formFilterListCuotasExtra.filterContrato is defined %}{{ data.formFilterListCuotasExtra.filterContrato }}{% endif %}"></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" value="" disabled></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" value="" disabled></td>
+                            <td class="liste_title">
+                                <select class="f_inputflat" name="filterEstado" id="cmbFilterEstado">
+                                    <option value="-1" class="f_opacitymedium"></option>
+                                    <option value="1" 
+                                        {% if data.formFilterListCuotasExtra.filterEstado is defined and data.formFilterListCuotasExtra.filterEstado ==  "1" %}
+                            					{{ 'selected' }}
+                    					{% endif %}>
+                    					PENDIENTE
+                					</option>
+                                    <option value="2"
+                                        {% if data.formFilterListCuotasExtra.filterEstado is defined and data.formFilterListCuotasExtra.filterEstado ==  "2" %}
+                            					{{ 'selected' }}
+                    					{% endif %}>
+                    					PAGADO
+                					</option>
+                              	</select>
+                          	</td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" value="" disabled></td>
+                            <td class="liste_title">
+                                <input class="f_inputflat f_maxwidth100imp" type="text" value="" disabled></td>
+                        </tr>
+                        <tr class="liste_title">
+                          <th class="wrapcolumntitle liste_title">Ref.</th>
+                          <th class="wrapcolumntitle liste_title">Ref. Proyecto</th>
+                          <th class="wrapcolumntitle liste_title">Ref. Contrato</th>
+                          <th class="wrapcolumntitle liste_title">Nro. Cuota</th>
+                          <th class="wrapcolumntitle liste_title">Monto Cuota</th>
+                          <th class="wrapcolumntitle liste_title">Estado</th>
+                          <th class="wrapcolumntitle liste_title">Fecha creación</th>
+                          <th class="wrapcolumntitle liste_title">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      
+                      	{% if data.cuotasExtraordinarias is not empty %}
+                      	
+                      		{% for cuota in data.cuotasExtraordinarias %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="#" class="f_link">
+                                  		<span style=" color: #a69944">
+                                  			<i class="fas fa-project-diagram mr-1"></i>
+                              			</span>
+                                  		<span class="align-middtle">{{ cuota.CUE_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/proyecto/detalle/{{ cuota.PTO_CODIGO }}" class="f_link">
+                                      	<span style=" color: #a69944">
+                                  			<i class="fas fa-project-diagram mr-1"></i>
+                              			</span>
+                                  		<span class="align-middtle">{{ cuota.PTO_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/contrato/detalle/{{ cuota.CTO_CODIGO }}" class="f_link">
+                                      	<span style=" color: #a69944">
+                                  			<i class="fas fa-file-contract mr-1"></i>
+                              			</span>
+                                  		<span class="align-middtle">{{ cuota.CTO_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax250">{{ cuota.CUE_NUM_CUOTA }}</td>
+                                  <td class="f_overflowmax250">{{ cuota.CUE_MNTO_CUOTA|number_format(2, '.', ',') }}</td>
+                                  <td class="f_overflowmax250">
+                                    {% if cuota.CUE_ESTADO == 1 %}
+                                    	<span class="badge badge-warning">{{ 'Pendiente' }}</span>
+                                    {% elseif  cuota.CUE_ESTADO == 2 %}
+                                    	<span class="badge badge-success">{{ 'Pagado' }}</span>
+                                    {% endif %}
+                                  </td>
+                                  <td class="f_overflowmax250">
+                                  	{% if cuota.CUE_CREATED is not empty %}{{ cuota.CUE_CREATED|date("d/m/Y") }}{% endif %}
+                                  </td>
+                                  <td>
+                                    {% if cuota.CUE_ESTADO == 1 %}
+                                    	<a class="f_link pagar_recibo" href="{{ PUBLIC_PATH }}/ingreso/cuotaextraordinaria/nuevo/{{ cuota.CUE_CODIGO }}">
+                                      		<span class="align-middtle">{{ 'Registrar pago' }}</span>
+                                        </a>
+                                    {% endif %}
+                                  </td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..3 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      
+                      	
+                      </tbody>
+                    </table>
+                </div>
+  			</div>
+  			
+  		</div><!-- /.card-body -->
+  		
+  		<div class="row">
+      		<div class="col-12 f_cardfooter text-right"></div>
+      	</div><!-- /.card-footer -->
+  		
+    </form>{# /Formulario para busqueda por tabla #}
+    
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+    
+	<script type="text/javascript">
+		$('#paginaAnterior').click(function(event){
+			if($('#paginaAnterior').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) - 1);
+				$('#formFilterListCuotasExtra').submit();
+			}
+			return false;
+		});
+		
+		$('#paginaSiguiente').click(function(event){
+			if($('#paginaSiguiente').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) + 1);
+				$('#formFilterListCuotasExtra').submit();
+			}
+			return false;
+		});
+		
+		f_select2("#cmbFilterEstado");
+        
+        
+	</script>
+	
+{% endblock %}

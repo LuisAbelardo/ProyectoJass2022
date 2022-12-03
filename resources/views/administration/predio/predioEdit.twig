@@ -1,0 +1,276 @@
+{% set menuLItem = 'predio' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Editar predio #}
+	<form class="f_inputflat" id="formEditarPredio" method="post" action="{{ PUBLIC_PATH }}/predio/update">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-house-user mr-3"></i>Editar predio
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field">Ref.</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set codigoPredio = "" %}
+                        	{% if data.predio is defined %}{% set codigoPredio = data.predio.PRE_CODIGO %}{{ data.predio.PRE_CODIGO }}
+                        	{% elseif data.formEditarPredio is defined %}
+                        	    {% set codigoPredio = data.formEditarPredio.codigo %}{{ data.formEditarPredio.codigo }}{% endif %}
+                        	<input type="hidden" class="f_minwidth300" id="inpCodigo" name="codigo" value='{{ codigoPredio }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpCliente">Cliente (DNI / RUC)</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            {% set clienteDocumento = "" %}
+                        	{% if data.cliente is defined %}{% set clienteDocumento = data.cliente.CLI_DOCUMENTO %}
+                        	{% elseif data.formEditarPredio is defined %}{% set clienteDocumento = data.formEditarPredio.cliente %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpCliente" name="cliente" required maxlength="11" 
+                        			value='{{ clienteDocumento }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbCalle">Calle</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="calle" class="f_minwidth300" id="cmbCalle" required> 
+                            	{% set selectedCalle = false %}
+                                {% for calle in data.calles %}
+                                	<option value="{{ calle.CAL_CODIGO }}"
+                                		{% if not selectedCalle %}
+                                		    {% if data.calle is defined and data.calle.CAL_CODIGO ==  calle.CAL_CODIGO %}
+                            					{{ 'selected' }}{% set selectedCalle = true %}
+                            				{% elseif data.formEditarPredio is defined and data.formEditarPredio.calle ==  calle.CAL_CODIGO %}
+                            					{{ 'selected' }}{% set selectedCalle= true %}{% endif %}
+                        				{% endif %}>
+                        				{{ calle.CAL_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDireccion">Dirección</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set direccion = "" %}
+                        	{% if data.predio is defined %}{% set direccion = data.predio.PRE_DIRECCION %}
+                        	{% elseif data.formEditarPredio is defined %}{% set direccion = data.formEditarPredio.direccion %}{% endif %}
+                        	<input type="text" class="f_minwidth250" id="inpDireccion" name="direccion" required value='{{ direccion }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="cmbHabitada">Habitada</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="habitada" class="f_minwidth300" id="cmbHabitada"> 
+                        		<option value="-1"></option>
+                            	<option value="si"
+                        			{% if data.predio is defined and data.predio.PRE_HABITADA ==  "si" %}
+                        					{{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.habitada == "si" %}
+                        					{{ 'selected' }}
+                    				{% endif %}>
+                                    Si
+                				</option>
+                				<option value="no"
+                    				{% if data.predio is defined and data.predio.PRE_HABITADA ==  "no" %}
+                        					{{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.habitada == "no" %}
+                        					{{ 'selected' }}
+                    				{% endif %}>
+                                    No
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="cmbMaterialConst">Material de Construcción</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="materialConst" class="f_minwidth300" id="cmbMaterialConst"> 
+                            	<option value="-1"></option>
+                            	<option value="noble"
+                            		{% if data.predio is defined and data.predio.PRE_MAT_CONSTRUCCION ==  "noble" %}
+                        				{{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.materialConst ==  "noble" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    Noble
+                				</option>
+                				<option value="adobe"
+                					{% if data.predio is defined and data.predio.PRE_MAT_CONSTRUCCION ==  "adobe" %}
+                        				{{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.materialConst ==  "adobe" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    Adobe
+                				</option>
+                				<option value="madera"
+                					{% if data.predio is defined and data.predio.PRE_MAT_CONSTRUCCION ==  "madera" %}
+                        			    {{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.materialConst ==  "madera" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    Madera
+                				</option>
+                				<option value="no-aplicable"
+                					{% if data.predio is defined and data.predio.PRE_MAT_CONSTRUCCION ==  "no-aplicable" %}
+                        				{{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.materialConst ==  "no-aplicable" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    No aplicable
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpPisos">Pisos</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set pisos = "" %}
+                        	{% if data.predio is defined %}{% set pisos = data.predio.PRE_PISOS %}
+                        	{% elseif data.formEditarPredio is defined %}{% set pisos = data.formEditarPredio.pisos %}{% endif %}
+                        	<input type="text" class="f_minwidth250" id="inpPisos" name="pisos" value='{{ pisos }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpFamilias">Familias</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set familias = "" %}
+                        	{% if data.predio is defined %}{% set familias = data.predio.PRE_FAMILIAS %}
+                        	{% elseif data.formEditarPredio is defined %}{% set familias = data.formEditarPredio.familias %}{% endif %}
+                        	<input type="text" class="f_minwidth250" id="inpFamilias" name="familias"value='{{ familias }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpHabitantes">Habitantes</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set habitantes = "" %}
+                        	{% if data.predio is defined %}{% set habitantes = data.predio.PRE_HABITANTES %}
+                        	{% elseif data.formEditarPredio is defined %}{% set habitantes = data.formEditarPredio.habitantes %}{% endif %}
+                        	<input type="text" class="f_minwidth250" id="inpHabitantes" name="habitantes" value='{{ habitantes }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="cmbPozoTabular">Pozo Tabular</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="pozoTabular" class="f_minwidth300" id="cmbPozoTabular"> 
+                        		<option value="-1"></option>
+                            	<option value="si"
+                            		{% if data.predio is defined and data.predio.PRE_POZO_TABULAR ==  "si" %}
+                        			    {{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.pozoTabular ==  "si" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    Si
+                				</option>
+                				<option value="no"
+                					{% if data.predio is defined and data.predio.PRE_POZO_TABULAR ==  "no" %}
+                        			    {{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.pozoTabular ==  "no" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    No
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="cmbPiscina">Piscina</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="piscina" class="f_minwidth300" id="cmbPiscina"> 
+                        		<option value="-1"></option>
+                            	<option value="si"
+                            		{% if data.predio is defined and data.predio.PRE_PISCINA ==  "si" %}
+                        			    {{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.piscina ==  "si" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    Si
+                				</option>
+                				<option value="no"
+                					{% if data.predio is defined and data.predio.PRE_PISCINA ==  "no" %}
+                        			    {{ 'selected' }}
+                    				{% elseif data.formEditarPredio is defined and data.formEditarPredio.piscina ==  "no" %}
+                    					{{ 'selected' }}
+                                    {% endif %}>
+                                    No
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cambios</button>
+        			<a href="{{ PUBLIC_PATH }}/predio/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Editar predio #}
+  
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formEditarPredio').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbCalle");
+        f_select2("#cmbHabitada");
+        f_select2("#cmbMaterialConst");
+        f_select2("#cmbPozoTabular");
+        f_select2("#cmbPiscina");
+	</script>
+{% endblock %}

@@ -1,0 +1,426 @@
+{# Tipo de usuario que solicita el recurso #}
+{% set typeUser = SESSION['jass_user']['rol_nombre'] %}
+
+{# Home --------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'home'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="{{ PUBLIC_PATH }}/home" class="nav-link ">
+      <i class="nav-icon fas fa-chart-line"></i>
+      <p>Inicio</p>
+    </a>
+</li>
+
+
+<li class="nav-header"><b>TESORERIA</b></li>
+
+{# Monto adicional recibo -------------------------------------------------------------------------------------------------------- #}
+
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'montoadicionalrecibo'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-file-invoice-dollar"></i>
+      <p>
+        Monto adicional recibo
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+        {% if typeUser == 'ADMINISTRADOR' or typeUser == 'TESORERO' or typeUser == 'AUXILIAR' %}
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/montoadicionalrecibo/nuevo" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'nuevo'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Nuevo</p>
+            </a>
+        </li>{% endif %}
+        
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/montoadicionalrecibo/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+    </ul>
+</li>
+
+
+
+{# Recibo -------------------------------------------------------------------------------------------------------- #}
+
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'recibo'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-file-invoice"></i>
+      <p>
+        Recibo
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/recibo/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+     	
+     	{% if typeUser == 'ADMINISTRADOR' or typeUser == 'AUXILIAR' %}
+     	<li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/recibo/generar" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'generar'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Generar recibos</p>
+            </a>
+        </li>{% endif %} 
+        
+        {% if typeUser == 'ADMINISTRADOR' or typeUser == 'AUXILIAR' %}
+     	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/recibo/impresionmasiva" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'impresionmasiva'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Impresión masiva</p>
+        	</a>
+     	</li>{% endif %} 
+   
+ 		 {% if typeUser == 'ADMINISTRADOR' or typeUser == 'AUXILIAR' %}
+		 <li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/financiamiento/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'financiamientos'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Financiamientos</p>
+        	</a>
+     	</li>{% endif %}
+    </ul>
+</li>
+
+
+
+{# Ingreso -------------------------------------------------------------------------------------------------------- #}
+
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'ingreso'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-money-bill"></i>
+      <p>
+        Ingreso
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+        {% if typeUser == 'ADMINISTRADOR' or typeUser == 'TESORERO' or typeUser == 'COBRANZAS' %}
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/ingreso/otros/nuevo" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'nuevo'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Ingreso otros</p>
+            </a>
+        </li>{% endif %}
+        
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/ingreso/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+    </ul>
+</li>
+
+
+{# Egreso -------------------------------------------------------------------------------------------------------- #}
+
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'egreso'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-money-bill"></i>
+      <p>
+        Egreso
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+        {% if typeUser == 'ADMINISTRADOR' or typeUser == 'TESORERO' or typeUser == 'AUXILIAR' %}
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/egreso/nuevo" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'nuevo'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Nuevo</p>
+            </a>
+        </li>{% endif %}
+        
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/egreso/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+    </ul>
+</li>
+
+
+
+{# Transferencia -------------------------------------------------------------------------------------------------------- #}
+{% if typeUser == 'ADMINISTRADOR' or typeUser == 'AUXILIAR' %}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'transferencia'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="{{ PUBLIC_PATH }}/transferencia/nuevo" class="nav-link ">
+      <i class="nav-icon fas fa-exchange-alt"></i>
+      <p>Transferencia</p>
+    </a>
+</li>{% endif %}
+
+
+
+{# Proyecto -------------------------------------------------------------------------------------------------------- #}
+
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'proyecto'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-project-diagram"></i>
+      <p>
+        Proyecto
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+    	{% if typeUser == 'ADMINISTRADOR' or typeUser == 'AUXILIAR' %}
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/proyecto/nuevo" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'nuevo'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Nuevo Proyecto</p>
+        	</a>
+     	</li>{% endif %}
+     	
+     	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/proyecto/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+     	
+     	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/cuotaextraordinaria/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'cuotas'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Cuotas</p>
+        	</a>
+     	</li>
+    </ul>
+</li>
+
+
+{# Igv -------------------------------------------------------------------------------------------------------- #}
+{% if typeUser == 'ADMINISTRADOR' %}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'igv'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="{{ PUBLIC_PATH }}/igv/editar" class="nav-link ">
+      <i class="nav-icon fas fa-percent"></i>
+      <p>Igv</p>
+    </a>
+</li>
+{% endif %}
+
+
+{% if typeUser == 'ADMINISTRADOR' or typeUser == 'AUXILIAR' %}{# ------------------------- #}
+
+<li class="nav-header"><b>GESTIÓN</b></li>
+
+{# Contrato -------------------------------------------------------------------------------------------------------- #}
+
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'contrato'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-file-contract"></i>
+      <p>
+        Contrato
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/contrato/nuevo" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'nuevo'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Nuevo</p>
+            </a>
+        </li>
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/contrato/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+    </ul>
+</li>
+
+
+
+{# Clientes -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'cliente'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-users"></i>
+      <p>
+        Clientes
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/cliente/nuevo/natural" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'nuevo'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Nuevo</p>
+            </a>
+        </li>
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/cliente/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+    </ul>
+</li>
+
+{# Predios -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'predio'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-house-user"></i>
+      <p>
+        Predios
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/predio/nuevo" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'nuevo'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Nuevo</p>
+            </a>
+        </li>
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/predio/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+    </ul>
+</li>
+
+{# Servicio -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'servicio'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="{{ PUBLIC_PATH }}/servicio/lista" class="nav-link">
+    	<i class="nav-icon fas fa-cube"></i>
+    	<p>Servicio</p>
+    </a>
+</li>
+
+{# Calle -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'calle'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+	<a href="{{ PUBLIC_PATH }}/calle/lista" class="nav-link ">
+      	<i class="nav-icon fas fa-road"></i>
+      	<p>Calle</p>
+	</a>
+</li>
+
+{# Sector -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'sector'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+	<a href="{{ PUBLIC_PATH }}/sector/lista" class="nav-link">
+      	<i class="nav-icon fas fa-puzzle-piece "></i>
+      	<p>Sector</p>
+	</a>
+</li>
+
+{# Tipo de predio -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'tipopredio'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+	<a href="{{ PUBLIC_PATH }}/tipopredio/lista" class="nav-link">
+      	<i class="nav-icon fas fa-home"></i>
+      	<p>Tipo Predio</p>
+	</a>
+</li>
+
+{# Tipo de uso de predio -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'tipousopredio'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+	<a href="{{ PUBLIC_PATH }}/tipousopredio/lista" class="nav-link">
+      	<i class="nav-icon fas fa-warehouse"></i>
+      	<p>Tipo Uso Predio</p>
+	</a>
+</li>
+{% endif %}{# ------------------------- #}
+
+
+
+<li class="nav-header"><b>REPORTES</b></li>
+
+{# Reportes -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'reporteconsolidado'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+	<a href="#" class="nav-link">
+      	<i class="nav-icon fas fa-file-pdf"></i>
+      	<p>Consolidado
+      		<i class="right fas fa-angle-right"></i>
+  		</p>
+	</a>
+	<ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/reporte/arqueodiario"
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'arqueodiario'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Rep. Diario</p>
+            </a>
+        </li>
+        
+        {% if typeUser == 'ADMINISTRADOR' or typeUser == 'TESORERO' %}
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/reporte/arqueosemanal" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'arqueosemanal'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Rep. Semanal</p>
+            </a>
+        </li>
+        
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/reporte/arqueomensual" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'arqueomensual'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Rep. Mensual</p>
+        	</a>
+     	</li>{% endif %}
+    </ul>
+</li>
+
+
+
+{% if typeUser == 'ADMINISTRADOR' %}{# ------------------------- #}
+
+<li class="nav-header"><b>CONFIGURACIÓN</b></li>
+
+{# Usuarios del sistema -------------------------------------------------------------------------------------------------------- #}
+<li class="nav-item {% if menuLItem is defined and menuLItem == 'usuario'%}{{'menu-is-openenig menu-open'}}{% endif %}">
+    <a href="#" class="nav-link">
+      <i class="nav-icon fas fa-user-shield"></i>
+      <p>
+        Usuarios
+        <i class="right fas fa-angle-right"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="{{ PUBLIC_PATH }}/usuario/nuevo" 
+            	class="nav-link {% if menuLLink is defined and menuLLink == 'nuevo'%}{{'active'}}{% endif %}">
+            	<i class="far fa-circle nav-icon invisible"></i>
+            	<p>Nuevo</p>
+            </a>
+        </li>
+      	<li class="nav-item">
+        	<a href="{{ PUBLIC_PATH }}/usuario/lista" 
+        		class="nav-link {% if menuLLink is defined and menuLLink == 'lista'%}{{'active'}}{% endif %}">
+          	<i class="far fa-circle nav-icon invisible"></i>
+          	<p>Lista</p>
+        	</a>
+     	</li>
+    </ul>
+</li>
+{% endif %}{# ------------------------- #}
+
+
+    
+

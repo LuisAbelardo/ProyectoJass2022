@@ -1,0 +1,150 @@
+{% set menuLItem = 'transferencia' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nueva transferenica #}
+	<form class="f_inputflat" id="formNuevaTransferencia" method="post" action="{{ PUBLIC_PATH }}/transferencia/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-exchange-alt mr-3"></i>Nueva transferencia
+                	</div>
+      			</div>
+      		</div>
+      		<div class="col-12 pb-2 text-secondary">
+      			<span>Utilice la transferencia interna para transferir de una cuenta a otra, 
+      					la aplicación escribirá dos registros: un egreso en la cuenta de origen y un ingreso en la cuenta de destino.
+      					Se utilizará la misma cantidad y fecha para esta transacción.</span>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+                    
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpMonto">Monto</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            {% set monto = "" %}
+                        	{% if data.formNuevaTransferencia is defined %}
+                        	    {% set monto = data.formNuevaTransferencia.monto %}{% endif %}
+                        	<div style="background-color:#b9ceac" class="d-inline-block">
+                        		<span class="pl-1">S/. </span>
+                        		<input type="text" class="f_minwidth100" id="inpMonto" name="monto" required 
+                        			style="background-color:#b9ceac" value='{{ monto }}'>
+                        	</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2  f_fieldrequired" for="cmbCajaEmisor">De</label>
+                        <div class="col-12 col-md-9">
+                            <select name="cajaEmisor" class="f_minwidth200" id="cmbCajaEmisor" required>
+                            	<option value="-1" class="f_opacitymedium"></option>
+                                {% set selectedCajaEmisor = false %}
+                                {% for cajaEmisor in data.cajasEmisor %}
+                                	<option value="{{ cajaEmisor.CAJ_CODIGO }}"
+                            				{% if not selectedCajaEmisor and data.formNuevaTransferencia is defined 
+                            				        and data.formNuevaTransferencia.cajaEmisor ==  cajaEmisor.CAJ_CODIGO %}
+                            					{{ 'selected' }}{% set selectedCajaEmisor = true %}
+                                            {% endif %}>
+                        				{{ cajaEmisor.CAJ_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2  f_fieldrequired" for="cmbCajaReceptor">Hacia</label>
+                        <div class="col-12 col-md-9">
+                            <select name="cajaReceptor" class="f_minwidth200" id="cmbCajaReceptor" required>
+                            	<option value="-1" class="f_opacitymedium"></option>
+                                {% set selectedCajaReceptor = false %}
+                                {% for cajaReceptor in data.cajasReceptor %}
+                                	<option value="{{ cajaReceptor.CAJ_CODIGO }}"
+                            				{% if not selectedCajaReceptor and data.formNuevaTransferencia is defined 
+                            				        and data.formNuevaTransferencia.cajaReceptor ==  cajaReceptor.CAJ_CODIGO %}
+                            					{{ 'selected' }}{% set selectedCajaReceptor = true %}
+                                            {% endif %}>
+                        				{{ cajaReceptor.CAJ_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDescripcion">Descripción</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set descripcion = '' %}
+                        	{% if data.formNuevaTransferencia.descripcion is defined %}
+                        	    {% set descripcion = data.formNuevaTransferencia.descripcion %}{% endif %}
+                        	<textarea class="f_minwidth400" id="inpDescripcion" rows="2" maxlength="256" 
+                        				name="descripcion" required>{{ descripcion }}</textarea>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Crear</button>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nueva transferencia #}
+  
+</div><!-- /.card -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevaTransferencia').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbCajaEmisor");
+        f_select2("#cmbCajaReceptor");
+        
+	</script>
+{% endblock %}

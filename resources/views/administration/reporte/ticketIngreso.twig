@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=1.0, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>{{ SITE_NAME }}</title>
+    <link rel="stylesheet" href="{{ PUBLIC_PATH }}/css/ticket_style.css">
+</head>
+<body>
+	<header class="t_center">
+        <div id="logo">
+            <img src="{{ PUBLIC_PATH }}/img/logo.png" style="width:50px">
+            <div class="t_center">MZ. D1 LT. 62 </div>
+            <div class="t_center">CHOSICA DEL NORTE - LA VICTORIA - CHICLAYO</div>
+            <div class="t_center">TELF. 074 - 431993</div>
+            <div class="t_center">RUC 20479771856</div>
+        </div>
+    </header>
+    <br>
+    {% if data.datosTicket is not empty %}
+    	{% set datosGenerales = data.datosTicket[0] %}
+        <main>
+            <div class="t_center name">RECIBO DE INGRESO</div>
+            <div class="t_center num"> {{ datosGenerales.CODIGO }}</div>
+            <div class="t_right">OP.: {{ datosGenerales.FEC_EMISION }}</div>
+            
+            {% if data.ingresoTipo == "RBO" %}
+                <div class="datos">
+                    <div>CO. CLIENTE: {{ datosGenerales.COD_CLIENTE }}</div>
+                    <div>NOMBRES: {{ datosGenerales.NOMBRES }}</div>
+                    <div>CONCEPTO: {{ datosGenerales.SERVICIO }}</div>
+                    <div>PERIODO: {{ datosGenerales.REF }}</div>
+                </div>
+                </br>
+                <table class="t_detalles">
+                    <tr>    
+                        <td>OP. GRAVADA</td>
+                        <td>: S/. **********</td>
+                        <td class="total">{{ (datosGenerales.CANTIDAD - datosGenerales.IGV)|number_format(2, '.', ',') }}</td>
+                    </tr>
+                    <tr>    
+                        <td>I.G.V.</td>
+                        <td>: S/. **********</td>
+                        <td class="total">{{ datosGenerales.IGV|number_format(2, '.', ',') }}</td>
+                    </tr>
+                    <tr>    
+                        <td>TOTAL A PAGAR</td>
+                        <td>: S/. **********</td>
+                        <td class="total">{{ datosGenerales.CANTIDAD|number_format(2, '.', ',') }}</td>
+                    </tr>
+                </table>
+
+            {% elseif data.ingresoTipo == "CUE" %}
+                <div class="datos">
+                    <div>USUARIO: {{ datosGenerales.COD_CONTRATO }}</div>
+                    <div>NOMBRES: {{ datosGenerales.NOMBRES }}</div>
+                    <div>CONCEPTO: PROYECTO - {{ datosGenerales.PROYECTO }}</div>
+                    <div>CUOTA: {{ datosGenerales.REF }}</div>
+                </div>
+                </br>
+                <table class="t_detalles">
+                    <tr>    
+                        <td>TOTAL A PAGAR</td>
+                        <td>: S/. **********</td>
+                        <td class="total">{{ datosGenerales.CANTIDAD|number_format(2, '.', ',') }}</td>
+                    </tr>
+                </table>
+        	{% elseif data.ingresoTipo == "OTRO" %}
+                <div class="datos">
+                    <div>CONCEPTO: {{ datosGenerales.CONCEPTO }}</div>
+                </div>
+                </br>
+                <table class="t_detalles">
+                    <tr>    
+                        <td>TOTAL A PAGAR</td>
+                        <td>: S/. **********</td>
+                        <td class="total">{{ datosGenerales.CANTIDAD|number_format(2, '.', ',') }}</td>
+                    </tr>
+                </table>
+        	{% endif %}
+        	
+                <table class="t_operacion">
+                <tr>    
+                    <td colspan="3">SON: {{ data.cantidadLetras }}</td>
+                </tr>
+                <tr>    
+                    <td>PAGA CON</td>
+                    <td>: S/. </td>
+                    <td class="qty">{{ datosGenerales.MNTO_RECIBIDO|number_format(2, '.', ',') }}</td>
+                </tr>
+                <tr>    
+                    <td>VUELTO</td>
+                    <td>: S/. </td>
+                    <td class="qty">{{ (datosGenerales.MNTO_RECIBIDO - datosGenerales.CANTIDAD)|number_format(2, '.', ',') }}</td>
+                </tr>
+                <tr>    
+                    <td>TIPO DE PAGO</td>
+                    <td colspan="2">: {{ datosGenerales.TIPO_PAGO }}</td>
+                </tr>
+                <tr>    
+                    <td>CAJERO</td>
+                    <td colspan="2">: {{ datosGenerales.CAJERO }}</td>
+                </tr>
+            </table>
+        </main>
+        <footer>
+            <p>NOTA: Este ticket es constancia del pago efectuado.</p>
+        </footer>
+    {% endif %}
+</body>
+</html>

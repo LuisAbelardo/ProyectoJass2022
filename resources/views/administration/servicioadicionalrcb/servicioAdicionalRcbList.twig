@@ -1,0 +1,180 @@
+{% set menuLItem, menuLLink = 'montoadicionalrecibo', 'lista' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+	{# Formulario para busqueda por tabla #}
+  	<form method="get" action="{{ PUBLIC_PATH }}/montoadicionalrecibo/lista/filtro" id="formFilterListServAdicionalRcb">
+  	
+  		<div class="row">
+  			<div class="col-12">
+  				<div class="f_cardheader">
+                    <div class=""> 
+                    	<i class="fas fa-file-invoice-dollar mr-3"></i>Montos adicionales para recibo
+                    	<span>({{ data.pagination.paginaCantidadRegistros }})</span>
+                	</div>
+                  </div>
+  			</div>
+  		</div><!-- /.card-header -->
+  		
+  		
+  		<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  		
+  		<div class="row">
+  			<div class="col-12">
+      			
+  				{# Paginador #}
+  				<div class="d-flex justify-content-end align-items-center pb-2">
+  					<div>
+                    	<ul class="pagination f_pagination-basic pagination-sm m-0">
+                            <li class="page-item {% if data.pagination.paginaAnterior == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link"
+                            		id="paginaAnterior" 
+                            		data-page="{{ data.pagination.paginaAnterior }}" 
+                            		href="#" ><i class="fas fa-chevron-left"></i></a>
+                        	</li>
+                            <li class="page-item">
+                            	<span class="page-link info">
+                                	<input type="text" id="filterPaginaActual" name="filterPaginaActual" class="f_inputflat" required size="10"
+                            				value="{{ data.pagination.paginaActual }}">
+                        			de {{ data.pagination.paginaCantidad }}
+                            	</span>
+                            </li>
+                            <li class="page-item {% if data.pagination.paginaSiguiente == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link" id="paginaSiguiente"
+                            		data-page="{{ data.pagination.paginaSiguiente }}"
+                            		href="#"><i class="fas fa-chevron-right"></i></a>
+                        	</li>
+                        </ul>
+                    </div>
+                    <div class="px-2">
+                    	<button type="submit" class="f_btnflat" name="btnBuscarFiltros">
+                    		<span class="fas fa-search"></span>
+                		</button>
+                		<a href="{{ PUBLIC_PATH }}/montoadicionalrecibo/lista" class="f_link">
+                			<i class="fas fa-times"></i>
+            			</a>
+                    </div>
+  				</div>{# /Paginador #}
+  				
+  			
+    			<div class="table-responsive">
+                    <table class="table f_table f_tableliste f_listwidthfilterbefore">
+                      <thead>
+                      	<tr class="liste_title_filter">
+                          <td class="liste_title f_minwidth125">
+                          	<i class="fas fa-filter mr-1"></i>
+    						<input class="f_inputflat f_maxwidth80imp" type="text" name="filterCodigo"
+                          		value='{% if data.formFilterListServAdicionalRcb.filterCodigo is defined %}{{ data.formFilterListServAdicionalRcb.filterCodigo }}{% endif %}'></td>
+                    	  <td class="liste_title">
+                    	  	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterDescipcion" disabled
+                    	  		value="{% if data.formFilterListSectores.filterDescripcion is defined %}{{ data.formFilterListServAdicionalRcb.filterDescripcion }}{% endif %}"></td>
+                    	  <td class="liste_title">
+    						<input class="f_inputflat f_maxwidth80imp" type="text" name="filterCosto" disabled
+                          		value='{% if data.formFilterListServAdicionalRcb.filterCosto is defined %}{{ data.formFilterListServAdicionalRcb.filterCosto }}{% endif %}'></td>
+                    	  <td class="liste_title">
+                    	  	<input class="f_inputflat f_maxwidth150imp" type="date" name="filterFecha"
+                    	  		value="{% if data.formFilterListServAdicionalRcb.filterFecha is defined %}{{ data.formFilterListServAdicionalRcb.filterFecha }}{% endif %}"></td>
+                        </tr>
+                        <tr class="liste_title">
+                          <th class="wrapcolumntitle liste_title">Ref.</th>
+                          <th class="wrapcolumntitle liste_title">Descripción</th>
+                          <th class="wrapcolumntitle liste_title">Costo</th>
+                          <th class="wrapcolumntitle liste_title">Fecha</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      
+                      	{% if data.serviciosAdicionalRcb is not empty %}
+                      	
+                      		{% for servicioAdicionalRcb in data.serviciosAdicionalRcb %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/montoadicionalrecibo/detalle/{{ servicioAdicionalRcb.SAR_CODIGO }}" class="f_link">
+                                  		<span style=" color: #a69944">
+                                  			<i class="fas fa-file-invoice-dollar mr-1"></i>
+                              			</span>
+                                  		<span class="align-middtle">{{ servicioAdicionalRcb.SAR_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax200">{{ servicioAdicionalRcb.SAR_DESCRIPCION }}</td>
+                                  <td class="f_overflowmax150">{{ servicioAdicionalRcb.SAR_COSTO|number_format(2, '.', ',') }}</td>
+                                  <td class="f_overflowmax150">{{ servicioAdicionalRcb.SAR_CREATED }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..3 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      
+                      	
+                      </tbody>
+                    </table>
+                </div>
+    		</div>
+  		</div><!-- /.card-body -->
+  		
+  		<div class="row">
+      		<div class="col-12 f_cardfooter text-right"></div>
+      	</div><!-- /.card-footer -->
+  		
+    </form>{# /Formulario para busqueda por tabla #}
+    
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#paginaAnterior').click(function(event){
+			if($('#paginaAnterior').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) - 1);
+				$('#formFilterListServAdicionalRcb').submit();
+			}
+			return false;
+		});
+		
+		$('#paginaSiguiente').click(function(event){
+			if($('#paginaSiguiente').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) + 1);
+				$('#formFilterListServAdicionalRcb').submit();
+			}
+			return false;
+		});
+	</script>
+	
+{% endblock %}

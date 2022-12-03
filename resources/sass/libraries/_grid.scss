@@ -1,0 +1,42 @@
+// Función que retorna el ancho del item de cuadricula basado en el número de columnas y el gutter
+@function item-width($width,$gutter){
+  @return calc(#{$width} - #{$gutter});
+}
+
+// Mixin auxiliar de "grid" para calcular el ancho de cada item para cada breakpoint
+@mixin columnWidth($currentBp, $prevBp, $coreBp,$gutter,$selector){
+  // verificar que el breakpoint actual no sea igual al breakpoint anterior
+  @if $currentBp != $prevBp{
+    @media (min-width: map-get($map: $breakpoints, $key: $coreBp)) {
+      $width: 100% / $currentBp;
+      & > #{$selector}{
+        width : item-width($width,$gutter);
+      }
+    }
+  }
+}
+
+// Mixin para hacer cuadricula
+// @param selector - etiqueta html que formara cada item de la cuadricula (ejm: div)
+// @param  $sm - Cantidad de columnas para tamaños small
+// @param  $md - Cantidad de columnas para tamaños medium (si no se completa será igual que en tamaños small)
+// @param  $lg - Cantidad de columnas para tamaños large (si no se completa será igual que en tamaños medium)
+// @param  $xl - Cantidad de columnas para tamaños xlarge (si no se completa será igual que en tamaños large)
+// @param  $gutter - Ancho de separación entre los item de la cuadricula (si no se completa será igual a 1em)
+@mixin grid($selector, $sm, $md:$sm, $lg:$md, $xl:$lg, $gutter:1em){
+  $width       : 100% / $sm;
+  display      : flex;
+  flex-wrap    : wrap;
+  margin-left  : -($gutter / 2);
+  margin-right : -($gutter / 2);
+
+  & > #{$selector} {
+    width  : item-width($width,$gutter);
+    margin : $gutter / 2;
+  }
+
+  // Calcular el ancho de cada item para cada breakpoint
+  @include columnWidth($md,$sm,md,$gutter,$selector);    // medium
+  @include columnWidth($lg,$md,lg,$gutter,$selector);  // large
+  @include columnWidth($xl,$lg,xl,$gutter,$selector);  // xlarge
+}

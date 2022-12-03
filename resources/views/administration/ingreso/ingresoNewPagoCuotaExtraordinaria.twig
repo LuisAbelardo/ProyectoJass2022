@@ -1,0 +1,263 @@
+{% set menuLItem = 'ingreso' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario pago de cuota extraordinaria #}
+	<form class="f_inputflat" id="formNuevoPagoCuotaExtra" method="post" action="{{ PUBLIC_PATH }}/ingreso/cuotaextraordinaria/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-project-diagram mr-3"></i>Pago de cuota extraordinaria
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+      	
+  		<div class="f_divwithbartop f_divwithbarbottom pr-3">
+          	<div class="row">
+          		<div class="col-sm-12 col-md-8 col-xl-7">
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpCliente">Cliente DNI / RUC</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set clienteDocumento = "" %}
+                        	{% if data.cliente is defined %}{% set clienteDocumento = data.cliente.CLI_DOCUMENTO %}
+                        	{% elseif data.formNuevoPagoCuotaExtra is defined %}
+                        	    {% set clienteDocumento = data.formNuevoPagoCuotaExtra.clienteDocumento %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpClienteDocumento" disabled value='{{ clienteDocumento }}'>
+                			<input type="hidden" name="clienteDocumento" value='{{ clienteDocumento }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpClienteNombre">Cliente nombre</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set clienteNombre = "" %}
+                        	{% if data.cliente is defined %}{% set clienteNombre = data.cliente.CLI_NOMBRES %}
+                        	{% elseif data.formNuevoPagoCuotaExtra is defined %}
+                        	    {% set clienteNombre = data.formNuevoPagoCuotaExtra.clienteNombre %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpClienteNombre" disabled value='{{ clienteNombre }}'>
+                        	<input type="hidden" name="clienteNombre" value='{{ clienteNombre }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpClienteNombre">Predio dirección</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set predioDireccion = "" %}
+                        	{% if data.predio is defined %}{% set predioDireccion = data.predio.PRE_DIRECCION %}
+                        	{% elseif data.formNuevoPagoCuotaExtra is defined %}
+                        	    {% set predioDireccion = data.formNuevoPagoCuotaExtra.predioDireccion %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpPredioDireccion" disabled value='{{ predioDireccion }}'>
+                        	<input type="hidden" name="predioDireccion" value='{{ predioDireccion }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpCuotaExtraCodigo">Cuota extra. Ref.</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set cuotaExtraCodigo = "" %}
+                        	{% if data.cuotaExtra is defined %}{% set cuotaExtraCodigo = data.cuotaExtra.CUE_CODIGO %}
+                        	{% elseif data.formNuevoPagoCuotaExtra is defined %}
+                        	    {% set cuotaExtraCodigo = data.formNuevoPagoCuotaExtra.cuotaExtraCodigo %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpCuotaExtraCodigo" disabled value='{{ cuotaExtraCodigo }}'>
+                        	<input type="hidden" name="cuotaExtraCodigo" value='{{ cuotaExtraCodigo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpCuotaExtraNro">Nro. Cuota</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set cuotaExtraNro = "" %}
+                        	{% if data.cuotaExtra is defined %}{% set cuotaExtraNro = data.cuotaExtra.CUE_NUM_CUOTA %}
+                        	{% elseif data.formNuevoPagoCuotaExtra is defined %}
+                        	    {% set cuotaExtraNro = data.formNuevoPagoCuotaExtra.cuotaExtraNro %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpCuotaExtraNro" disabled value='{{ cuotaExtraNro }}'>
+                        	<input type="hidden" name="cuotaExtraNro" value='{{ cuotaExtraNro }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpCuotaExtraEstado">Estado</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set cuotaExtraEstado = "" %}
+                        	{% if data.cuotaExtra is defined %}{% set cuotaExtraEstado = data.cuotaExtra.CUE_ESTADO %}
+                        	{% elseif data.formNuevoPagoCuotaExtra is defined %}
+                        	    {% set cuotaExtraEstado = data.formNuevoPagoCuotaExtra.cuotaExtraEstado %}{% endif %}
+                        	    
+                    	    {% if  cuotaExtraEstado is defined %}
+                          		{% if cuotaExtraEstado == 1 %}
+                                	<span class="badge badge-warning">{{ 'Pendiente' }}</span>
+                                {% elseif  cuotaExtraEstado == 2 %}
+                                	<span class="badge badge-success">{{ 'Pagado' }}</span>
+                                {% endif %}
+                          	{% endif %}
+                        	<input type="hidden" name="cuotaExtraEstado" value='{{ cuotaExtraEstado }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-xl-2 f_field" for="inpMontoTotal">Total a pagar</label>
+                        <div class="col-12 col-md-9 col-xl-10">
+                        	{% set montoTotal = "" %}
+                        	{% if data.cuotaExtra is defined %}{% set montoTotal = data.cuotaExtra.CUE_MNTO_CUOTA %}
+                        	{% elseif data.formNuevoPagoCuotaExtra is defined %}
+                        	    {% set montoTotal = data.formNuevoPagoCuotaExtra.montoTotal %}{% endif %}
+                    	    <span>S/. </span>
+                        	<input type="text" class="f_minwidth100" id="inpMontoTotal" disabled value='{{ montoTotal }}'>
+                        	<input type="hidden" name="montoTotal" value='{{ montoTotal }}'>
+                        </div>
+                    </div>
+          		</div>
+          		
+          		<div class="col-sm-12 col-md-4 col-xl-5">
+          			<div class="form-group row">
+                    	<label class="col-12 f_fieldrequired" for="inpMontoRecibido">Monto recibido</label>
+                        <div class="col-12">
+                            {% set montoRecibido = "" %}
+                        	{% if data.formNuevoPagoCuotaExtra is defined %}
+                        	    {% set montoRecibido = data.formNuevoPagoCuotaExtra.montoRecibido %}{% endif %}
+                        	<div style="background-color:#b9ceac" class="d-inline-block">
+                        		<span class="pl-1">S/. </span>
+                        		<input type="text" class="f_minwidth100" id="inpMontoRecibido" name="montoRecibido" required 
+                        			style="background-color:#b9ceac" value='{{ montoRecibido }}'>
+                        	</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 f_fieldrequired" for="cmbComprobaneTipo">Comprobante</label>
+                        <div class="col-12">
+                        	<select name="comprobanteTipo" class="f_minwidth200" id="cmbComprobanteTipo" required>
+                            	<option value="{{ 1 }}"
+                        				{% if data.formNuevoPagoCuotaExtra is defined 
+                        				        and data.formNuevoPagoCuotaExtra.comprobanteTipo ==  1 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'TICKED' }}
+                				</option>
+                				<option value="{{ 2 }}"
+                        				{% if data.formNuevoPagoCuotaExtra is defined 
+                        				        and data.formNuevoPagoCuotaExtra.comprobanteTipo ==  2 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'BOLETA' }}
+                				</option>
+                				<option value="{{ 3 }}"
+                        				{% if data.formNuevoPagoCuotaExtra is defined 
+                        				        and data.formNuevoPagoCuotaExtra.comprobanteTipo ==  3 %}{{ 'selected' }}{% endif %}>
+                    				{{ 'FACTURA' }}
+                				</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 f_fieldrequired" for="inpComprobanteNro">Nro. Comprobante</label>
+                        <div class="col-12">
+                            {% set comprobanteNro = "" %}
+                        	{% if data.formNuevoPagoCuotaExtra is defined and data.formNuevoPagoCuotaExtra.comprobanteNro is defined %}
+                        	    {% set comprobanteNro = data.formNuevoPagoCuotaExtra.comprobanteNro %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpComprobanteNro" name="comprobanteNro" required 
+                        			value='{{ comprobanteNro }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 f_fieldrequired" for="cmbCaja">Caja</label>
+                        <div class="col-12">
+                            <select name="caja" class="f_minwidth200" id="cmbCaja" required>
+                            	{% if data.cajas is defined %}
+                                    {% set selectedCaja = false %}
+                                    {% for caja in data.cajas %}
+                                    	<option value="{{ caja.CAJ_CODIGO }}"
+                                				{% if not selectedCaja and data.formNuevoPagoCuotaExtra is defined 
+                                				        and data.formNuevoPagoCuotaExtra.caja ==  caja.CAJ_CODIGO %}
+                                					{{ 'selected' }}{% set selectedCaja = true %}
+                                                {% endif %}>
+                            				{{ caja.CAJ_NOMBRE }}
+                        				</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+          		</div>
+          		
+          	</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+      				{% set styleBtnPagarCuotaExtra, titleBtnPagarCuotaExtra, typeBtnPagarCuotaExtra = "f_buttonaction", "", "submit" %}
+    				{% if cuotaExtraEstado == 2 %}
+    				    {% set styleBtnPagarCuotaExtra = "f_buttonactionrefused" %}
+    				    {% set titleBtnPagarCuotaExtra = "Desactivado porque la cuota ya está pagado" %}
+    				    {% set typeBtnPagarCuotaExtra = "button" %}
+    			    {% endif %}
+        			<button type="{{ typeBtnPagarCuotaExtra }}" class="f_button {{ styleBtnPagarCuotaExtra }} classfortooltip"
+        					 title="{{ titleBtnPagarCuotaExtra }}">Registra pago</button>
+        			<a href="{{ PUBLIC_PATH }}/cuotaextraordinaria/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario pago de cuota extraordinaria #}
+  
+</div><!-- /.card -->
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoPagoCuotaExtra').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbComprobanteTipo");
+        f_select2("#cmbCaja");
+        
+        
+        if($("#cmbComprobanteTipo").val() != 1){
+    		$("#inpComprobanteNro").prop("disabled", false);
+    	}else{
+    		$("#inpComprobanteNro").val("");
+    		$("#inpComprobanteNro").prop("disabled", true);
+    	}
+        
+        $("#cmbComprobanteTipo").change(function(){
+        	if($("#cmbComprobanteTipo").val() != 1){
+        		$("#inpComprobanteNro").prop("disabled", false);
+        	}else{
+        		$("#inpComprobanteNro").val("");
+        		$("#inpComprobanteNro").prop("disabled", true);
+        	}
+        });
+        
+	</script>
+{% endblock %}

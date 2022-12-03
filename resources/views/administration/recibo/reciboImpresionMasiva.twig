@@ -1,0 +1,234 @@
+{% set menuLItem, menuLLink = 'recibo', 'verporperiodo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario ver recibos por periodo #}
+	<form class="f_inputflat" id="formVerRecibosPorperiodo" method="post">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-invoice mr-3"></i>Recibos para impresión masiva
+                	</div>
+      			</div>
+      		</div>
+      		<div class="col-12 pb-2 text-secondary">
+      			<span>Generar los recibos de forma masiva es un proceso que puede tomar varios minutos.
+      					Utilize esta función sólo cuando sea necesario.</span>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbSector">Sector</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<select name="sector" class="f_minwidth200" id="cmbSector" required>
+                        		<option value="-1" class="f_opacitymedium"></option>
+                            	{% set selectedSector= false %}
+                                {% for sector in data.sectores %}
+                                	<option value="{{ sector.STR_CODIGO }}"
+                            				{% if not selectedSector and data.formVerRecibosPorperiodo is defined 
+                            				        and data.formVerRecibosPorperiodo.sector ==  sector.STR_CODIGO %}
+                            					{{ 'selected' }}{% set selectedSector = true %}
+                                            {% endif %}>
+                        				{{ sector.STR_NOMBRE }}
+                    				</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbMonth">Mes</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set mes = "" %}
+                        	{% if data.mes is defined %}{% set mes = data.mes %}
+                        	{% elseif data.formNuevosRecibos is defined %}
+                        	    {% set mes = data.formNuevosRecibos.mes %}{% endif %}
+                        	<select class="f_inputflat f_minwidth200" name="month" id="cmbMonth">
+                        		<option value="-1" class="f_opacitymedium"></option>
+                                <option value="ENERO" 
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "ENERO" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					ENERO
+            					</option>
+                                <option value="FEBRERO"
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "FEBRERO" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					FEBRERO
+            					</option>
+            					<option value="MARZO"
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "MARZO" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					MARZO
+            					</option>
+            					<option value="ABRIL" 
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "ABRIL" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					ABRIL
+            					</option>
+                                <option value="MAYO"
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "MAYO" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					MAYO
+            					</option>
+            					<option value="JUNIO"
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "JUNIO" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					JUNIO
+            					</option>
+            					<option value="JULIO" 
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "JULIO" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					JULIO
+            					</option>
+                                <option value="AGOSTO"
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "AGOSTO" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					AGOSTO
+            					</option>
+            					<option value="SEPTIEMBRE"
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "SEPTIEMBRE" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					SEPTIEMBRE
+            					</option>
+            					<option value="OCTUBRE" 
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "OCTUBRE" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					OCTUBRE
+            					</option>
+                                <option value="NOVIEMBRE"
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "NOVIEMBRE" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					NOVIEMBRE
+            					</option>
+            					<option value="DICIEMBRE"
+                                    {% if data.formVerRecibosPorperiodo.month is defined and data.formVerRecibosPorperiodo.month ==  "DICIEMBRE" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					DICIEMBRE
+            					</option>
+                              </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbYear">Año</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set year = "" %}
+                        	{% if data.year is defined %}{% set year = data.year %}
+                        	{% elseif data.formVerRecibosPorperiodo is defined %}
+                        	    {% set year = data.formVerRecibosPorperiodo.year %}{% endif %}
+                        	<input type="text" class="f_minwidth200" id="inpYear" name="year" maxlength="4" required value='{{ year }}'>
+                        </div>
+                    </div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+      				<button type="button" class="f_button f_buttonaction" id="btnVerRecibos">Ver recibos</button>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario ver recibos por periodo #}
+  
+</div><!-- /.card -->
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formVerRecibosPorperiodo').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbSector");
+        f_select2("#cmbMonth");
+        
+        $('#btnVerRecibos').click(function(){
+        	$("#inpYear").val($("#inpYear").val().trim());
+        	var sector = $('#cmbSector').val();
+        	var month = $('#cmbMonth').val();
+        	var year = $('#inpYear').val();
+        	
+        	if(sector != "" && month != "" && year != "" && sector != -1 && month != -1 ){
+        		if(year.length == 4){
+        			var href = "{{ PUBLIC_PATH }}/reporte/recibos"+"/"+sector+"/"+month+"/"+year;
+                	window.location.href = href;
+        		}else{
+        			$(document).Toasts('create', {
+                    	class: 'bg-danger',
+                        title: 'Error de validación',
+                        position: 'topRight',
+                        autohide: true,
+    					delay: 4000,
+                        body: "El año debe estar en formato de 4 digitos"
+                    });
+        		}
+        	}else{
+            	$(document).Toasts('create', {
+                	class: 'bg-danger',
+                    title: 'Error de validación',
+                    position: 'topRight',
+                    autohide: true,
+					delay: 4000,
+                    body: "Debe completar todos los campos"
+                });
+        	}
+        	return false;
+        });
+	</script>
+{% endblock %}

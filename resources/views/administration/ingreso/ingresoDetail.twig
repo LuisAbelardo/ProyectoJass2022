@@ -1,0 +1,250 @@
+{% set menuLItem = 'ingreso' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class=""> 
+                	<i class="fas fa-money-bill mr-3"></i>Detalle de ingreso
+            	</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			{# Contenedor de alertas #}
+            {% set classAlert = "" %}
+            {% if estadoDetalle is empty %}
+            	{% set classAlert = "d-none" %}
+            {% elseif codigo >= 200 and codigo <300 %}
+                {% set classAlert = "alert-success" %}
+            {% elseif codigo >= 400 %}
+                {% set classAlert = "alert-danger" %}
+            {% endif %}
+  			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+             	<ul class="mb-0" id="f_alertsUl">
+             		{% if estadoDetalle is not empty %}
+                      {% for msj in estadoDetalle %}
+                        <li>{{ msj }}</li>
+                      {% endfor %}
+                    {% endif %}
+             	</ul>
+             	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+             		<span aria-hidden="true">&times;</span>
+             	</button>
+            </div>{# /Contenedor de alertas #}
+  		</div>
+  	</div>
+  	
+  
+  	<div class="row">
+  		<div class="col-12 d-flex justify-content-between f_arearef">
+  			<div>
+  				<div class="d-inline-block mr-2 mr-md-4">
+          			<div class="f_imageref"><span class="fas fa-money-bill" style=" color: #a69944"></span></div>
+  				</div>
+  				<div class="d-inline-block align-top">
+  					<span class="font-weight-bold f_inforef">
+  					    {% if data.ingreso is defined %}{{ data.ingreso.IGR_CODIGO }}{% endif %}
+  					</span><br/>
+  				</div>
+  			</div>
+  			<div class="d-none d-sm-block">
+  				<span><a href="{{ PUBLIC_PATH }}/ingreso/lista" class="f_link font-weight-bold">Volver a Lista</a></span>
+  			</div>
+  		</div>
+  		<div class="col-12 col-lg-6 table-responsive">
+  			<table class="table f_table f_tableforfield">
+              <tbody>
+              	<tr>
+                  <td>Ref.</td>
+                  <td>{% if data.ingreso is defined %}{{ data.ingreso.IGR_CODIGO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Monto</td>
+                  <td>{% if data.ingreso is defined %}{{ 'S/. ' ~ data.ingreso.IGR_CANTIDAD|number_format(2, '.', ',') }}{% endif %}</td>
+                </tr>
+                </tr>
+                <tr>
+                  <td>Tipo comprobante</td>
+                  <td>
+                  	{% if  data.ingreso is defined %}
+                  		{% if data.ingreso.IGR_TIPO_COMPROBANTE == 1 %}{{ 'TICKET' }}
+                        {% elseif data.ingreso.IGR_TIPO_COMPROBANTE == 2 %}{{ 'BOLETA' }}
+                        {% elseif data.ingreso.IGR_TIPO_COMPROBANTE == 3 %}{{ 'FACTURA' }}
+                        {% elseif data.ingreso.IGR_TIPO_COMPROBANTE == 4 %}{{ 'SIN COMPROBANTE' }}
+                        {% endif %}
+                  	{% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Nro. Comprobante</td>
+                  <td>{% if data.ingreso is defined %}{{ data.ingreso.IGR_COD_COMPROBANTE }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Caja</td>
+                  <td>
+                  	{% if  data.caja is defined %}{{ data.caja.CAJ_NOMBRE }}{% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Fecha</td>
+                  <td>{% if data.ingreso is defined %}{{ data.ingreso.IGR_CREATED }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Estado</td>
+                  <td>
+                  	{% if  data.ingreso is defined %}
+                  		{% if data.ingreso.IGR_ESTADO == 0 %}
+                  			<span class="badge badge-warning">{{ 'Anulado' }}</span>
+                        {% elseif data.ingreso.IGR_ESTADO == 1 %}{{ 'Activo' }}
+                        {% endif %}
+                  	{% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Descripción</td>
+                  <td>{% if data.ingreso is defined %}{{ data.ingreso.IGR_DESCRIPCION }}{% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+  		</div>
+  		<div class="col-12 col-lg-6 mt-3 mt-lg-0 table-responsive">
+    		<table class="table f_table f_tableforfield">
+              <tbody>
+              	<tr>
+                  <td>Usuario/Ref.</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_CODIGO }}{% endif %}</td>
+                </tr>
+                <tr>
+                  <td>Usuario/Nombre</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_NOMBRES }}{% endif %}</td>
+                </tr>
+              	<tr>
+                  <td>Usuario/Apellidos</td>
+                  <td>{% if data.usuario is defined %}{{ data.usuario.USU_APELLIDOS }}{% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+    	</div>
+  	</div><!-- /.card-body -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardfooter f_cardfooteractions text-right">
+  				{% set ingresoAnulado = false %}
+  				{% set styleBtnAnular, titleBtnAnular = "f_buttonactiondelete", "" %}
+				{% if data.ingreso is defined and data.ingreso.IGR_ESTADO == 0 %}
+				    {% set styleBtnAnular = "f_buttonactionrefused" %}
+					{% set titleBtnAnular = "Desactivado porque el ingreso ya fue anulado" %}
+					{% set ingresoAnulado = true %}
+			    {% endif %}
+			    
+			    {% set styleBtnImprimir, titleBtnImprimir = "f_buttonaction", "" %}
+				{% if data.ingreso is defined and data.ingreso.IGR_TIPO_COMPROBANTE != 1 %}
+				    {% set styleBtnImprimir = "f_buttonactionrefused" %}
+					{% set titleBtnImprimir = "Desactivado porque el comprobante no fue emitido por el sistema" %}
+			    {% endif %}
+			    
+			    {% if not ingresoAnulado and data.ingreso is defined and data.ingreso.IGR_TIPO != "TRANSF" %}
+    			    {% if data.ingreso.IGR_TIPO_COMPROBANTE == 1 %}
+    			    	<a href="{{ PUBLIC_PATH }}/reporte/ingreso/{{ data.ingreso.IGR_CODIGO }}" 
+      						class="f_linkbtn f_linkbtnaction classfortooltip" id="btnImprimir" title="{{ titleBtnImprimir }}">Imprimir</a>
+    			    {% else %}
+    			    	<a href="#" class="f_linkbtn f_linkbtnactionrefused classfortooltip" id="btnImprimir" title="{{ titleBtnImprimir }}">Imprimir</a>
+    			    {% endif %}
+			    {% endif %}
+  				<button type="button" class="f_button {{ styleBtnAnular }} classfortooltip" data-toggle="modal" 
+  						data-target="#modalAnularIngreso" title="{{ titleBtnAnular }}">
+  					Anular ingreso</button>
+  					
+				<div class="mt-2">
+					<a href="https://api-seguridad.sunat.gob.pe/v1/clientessol/4f3b88b3-d9d6-402a-b85d-6a0bc857746a/oauth2/loginMenuSol?originalUrl=https://e-menu.sunat.gob.pe/cl-ti-itmenu/AutenticaMenuInternet.htm&state=rO0ABXNyABFqYXZhLnV0aWwuSGFzaE1hcAUH2sHDFmDRAwACRgAKbG9hZEZhY3RvckkACXRocmVzaG9sZHhwP0AAAAAAAAx3CAAAABAAAAADdAAEZXhlY3B0AAZwYXJhbXN0AEsqJiomL2NsLXRpLWl0bWVudS9NZW51SW50ZXJuZXQuaHRtJmI2NGQyNmE4YjVhZjA5MTkyM2IyM2I2NDA3YTFjMWRiNDFlNzMzYTZ0AANleGVweA==" 
+      						class="f_link classfortooltip" title="Ingresar a SUNAT para registar el ingreso" target="__blank">INGRESAR A SUNAT</a>
+				</div>
+  			</div>
+  			
+  		</div>
+  	</div><!-- /.card-footer -->
+  
+</div><!-- /.card -->
+
+
+
+{# Modal anular ingreso #}
+{% if data.ingreso is defined and data.ingreso.IGR_ESTADO == 1 %}
+<div class="modal fade f_modal" id="modalAnularIngreso" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Anular un Ingreso</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i><span>¿Está seguro de querer anular este ingreso?</span>
+            	<form class="d-none" id="formAnularIngreso" action="{{ PUBLIC_PATH }}/ingreso/annular" method="post">
+            		<input type="hidden" name="codigo" value="{% if data.ingreso is defined %}{{ data.ingreso.IGR_CODIGO }}{% endif %}">
+            	</form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnAnularIngreso">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{# /Modal anular ingreso #}
+
+
+{# Modal ver ticket #}
+{% if data.ingreso is defined and data.ingreso.IGR_ESTADO == 1 and data.ingreso.IGR_TIPO_COMPROBANTE == 1 %}
+<div class="modal fade f_modal" id="modalMostrarTicket" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Ticket</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<div id="contentTicket" src="">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %} {# /Modal ver ticket #}
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#btnAnularIngreso').click(function(event){
+			$('#formAnularIngreso').submit();
+			return false;
+		});
+		
+		
+		$('#btnImprimir').click(function(){
+            $('#contentTicket').empty();
+            $('#modalMostrarTicket').modal('show');
+            $('#contentTicket').html('<object style="width:100%;height: 600px" id="pdf" data="'+$(this).attr('href')+'" type="application/pdf"></object>');
+            return false;
+        });
+	</script>
+	
+{% endblock %}

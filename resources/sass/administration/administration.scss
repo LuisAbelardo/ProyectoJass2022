@@ -1,0 +1,27 @@
+//// ================== Hoja de estilos a exportar ======================
+
+// Breakpoints
+$breakpoints : (
+    xs  : 0,
+    sm  : 576px,
+    md  : 768px,
+    lg  : 992px,
+    xl  : 1200
+);
+
+//Importar variables
+@import '../variables';
+
+//Importar base
+@import '../css_helppers';
+@import '../cambios_adminLte';
+
+//Importar stilos select2
+@import '../libraries/select2';
+
+//Importar stylos para la pagina 404
+@import '../404';
+
+//Importar stylos para las paginas de administración
+@import 'partials/menu_derecha';
+@import 'partials/detalle_informacion';

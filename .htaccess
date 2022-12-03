@@ -1,0 +1,42 @@
+# Redireccionar con https
+RewriteCond %{HTTPS} off
+RewriteCond %{REQUEST_URI} !^/[0-9]+\..+\.cpaneldcv$
+RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/[0-9a-zA-Z_-]+$
+RewriteCond %{REQUEST_URI} !^/\.well-known/pki-validation/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
+RewriteRule ^(.*)$ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Fin - Redireccionar con https
+
+
+# Transporte estricto a HTTPS (HSTS)
+<IfModule mod_headers.c>
+Header set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" env=HTTPS
+</IfModule>
+# Fin - Transporte estricto a HTTPS (HSTS)
+
+
+# Redireccionar con www
+RewriteCond %{HTTP_HOST} !^www\.
+RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
+# Fin - Redireccionar con www
+
+
+# Asignar la versión de PHP a 7.2
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php72 .php .php7 .phtml
+</IfModule>
+# Fin - Asignar la versión de PHP a 7.2
+
+
+# Redireccionar a la carpeta public
+RewriteEngine On
+RewriteCond %{THE_REQUEST} /public/([^\s?]*) [NC]
+RewriteRule ^ %1 [L,NE,R=302]
+RewriteRule ^((?!public/).*)$ public/$1 [L,NC]
+# Fin - Redireccionar a la carpeta public
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php74” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php74 .php .php7 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

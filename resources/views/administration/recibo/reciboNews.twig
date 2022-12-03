@@ -1,0 +1,179 @@
+{% set menuLItem, menuLLink = 'recibo', 'generar' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevos recibos #}
+	<form class="f_inputflat" id="formNuevosRecibos" method="post" action="{{ PUBLIC_PATH }}/recibo/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-invoice mr-3"></i>Generar recibos
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbMes">Mes</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set mes = "" %}
+                        	{% if data.mes is defined %}{% set mes = data.mes %}
+                        	{% elseif data.formNuevosRecibos is defined %}
+                        	    {% set mes = data.formNuevosRecibos.mes %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpMes" name="mes" required disabled value='{{ mes }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="cmbYear">Año</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set year = "" %}
+                        	{% if data.year is defined %}{% set year = data.year %}
+                        	{% elseif data.formNuevosRecibos is defined %}
+                        	    {% set year = data.formNuevosRecibos.year %}{% endif %}
+                        	<input type="text" class="f_minwidth300" id="inpYear" name="year" required disabled value='{{ year }}'>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="button" class="f_button f_buttonaction" id="btnOpenModalGR" data-toggle="modal" data-target="#modalGenerarRecibos">
+  						Generar recibos
+  						<span><i class="fas fa-spinner f_classforrotatespinner d-none" id="spinnerGenerarRecibos"></i></span>
+					</button>
+        			<a href="{{ PUBLIC_PATH }}/recibo/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevos recibos #}
+  
+</div><!-- /.card -->
+
+
+{# Modal confirmación generar recibos #}
+<div class="modal fade f_modal" id="modalGenerarRecibos" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Recibos</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                	<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<i class="fas fa-info-circle text-secondary mr-1"></i><span>¿Está seguro de querer generar los recibos?</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="f_btnactionmodal" id="btnGenerarRecibos">Si</button>
+                <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>{# /Modal confirmación generar recibos #}
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevosRecibos').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        
+        $("#btnGenerarRecibos").click(function(){
+        	
+        	$("#btnOpenModalGR").attr("disabled", true);
+    		var spinnerGenerarRecibos = $("#spinnerGenerarRecibos");
+    		spinnerGenerarRecibos.removeClass("d-none");
+    		$('#modalGenerarRecibos').modal('hide');
+    	
+    		$.ajax({
+                method: "POST",
+                url: "{{ PUBLIC_PATH }}/recibo/create",
+                dataType: "json",
+                data: {},
+                complete: function(){
+                	spinnerGenerarRecibos.addClass("d-none");
+                	$("#btnOpenModalGR").attr("disabled", false);
+                },
+    			error: function(jqXHR ){
+    				
+    				var msjRta = "Ocurrio un error inesperado, vuelva a intentarlo";
+    				if(jqXHR.responseJSON != undefined){
+    					msjRta = '<ul class="pl-3">';
+    					dataDetalle = jqXHR.responseJSON.estadoDetalle;
+    					for (const property in dataDetalle) {
+                          msjRta += "<li>" + dataDetalle[property] + "</li>";
+                        }
+                        msjRta += "</ul>";
+    				}
+    			
+    				$(document).Toasts('create', {
+                    	class: 'bg-danger',
+                        title: 'Respuesta de solicitud',
+                        position: 'topRight',
+                        autohide: true,
+						delay: 8000,
+                        body: msjRta
+                     })
+    			},
+    			success: function(respons){
+    				$(document).Toasts('create', {
+                    	class: 'bg-success',
+                        title: 'Respuesta de solicitud',
+                        position: 'topRight',
+                        autohide: true,
+						delay: 8000,
+                        body: "Recibos facturados exitosamente"
+                     })
+    			}
+            });
+        });
+	</script>
+{% endblock %}

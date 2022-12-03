@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=1.0, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>{{ SITE_NAME }}</title>
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="{{ PUBLIC_PATH }}/img/favicon.ico"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" integrity="sha512-L7MWcK7FNPcwNqnLdZq86lTHYLdQqZaz5YcAgE+5cnGmlw8JT03QB2+oxL100UeB6RlzZLUxCGSS4/++mNZdxw==" crossorigin="anonymous" />
+  <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <!-- AdminLTE -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
+  <!-- Custom Theme -->
+  <link rel="stylesheet" href="{{ PUBLIC_PATH }}/css/private.css">
+  
+  
+  <style type="text/css">
+    /* Estilos para logo de empresa desarrolladora */
+  	.creador{
+  		 font-size: .65rem;
+  	}
+    /* Estilos para el nombre de la empresa */
+    .empresa{
+      font-size: .45em;
+      color: #c0c0c0;
+    }
+  </style>
+  
+</head>
+<body class="hold-transition login-page" style="background-color:#155db1">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="{{ PUBLIC_PATH }}/img/logo.png" width="80" height="80"/>
+      <div class="empresa">JUNTA ADMINISTRADORA DE SERVICIOS DE SANEAMIENTO</div>
+    </div>
+    <!-- /.login-logo -->
+    <div class="card pb-4 mt-4">
+      <div class="card-body login-card-body text-xs">
+        <p class="login-box-msg f-color-co h5">Autentificación</p>
+
+        {# Contenedor de alertas #}
+        {% set classAlert = "" %}
+        {% if estadoDetalle is empty %}
+        	{% set classAlert = "d-none" %}
+        {% elseif codigo >= 400 %}
+            {% set classAlert = "alert-danger" %}
+        {% endif %}
+        <div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+          <ul class="mb-0" id="f_alertsUl">
+            {% if estadoDetalle is not empty %}
+              {% for msj in estadoDetalle %}
+                <li>{{ msj }}</li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {# /Contenedor de alertas #}
+
+        <form id="formLogin" class="f-form" action="{{ PUBLIC_PATH }}/login/verify" method="POST">
+          <div class="input-group mb-3">
+            <input type="text" id="inpUsuario" class="form-control text-sm" placeholder="Usuario" name="user" required>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            <input type="password" id="inpPassword" class="form-control text-sm" placeholder="Password" name="password" required>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-key"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row text-xs d-flex align-items-center">
+            <div class="col-5 text-center">
+                <button type="submit" id="btnEnviarLogin" 
+                		class="btn btn-default text-sm px-5">
+                	Entrar</button>
+            </div>
+            <div class="col-7 text-right">
+              <a class="f_link " href="{{ PUBLIC_PATH }}/recuperarpassword">Olvidaste tu contraseña?</a>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- /.login-card-body -->
+    </div>
+  </div>
+  <!-- /.login-box -->
+  
+  <div class="text-small text-muted text-center mt-4 creador">
+  	<span><b>BUNKER ERP</b></span>
+  	<div>DESARROLLO DE APLICACIONES</div>
+  	<div>E-mail: informes@bunker.com</div>
+  	<div>J.A.S.S V1.0.0</div>
+  </div>
+
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+  <!-- AdminLTE -->
+  <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
+  <!-- Commons -->
+  <script src="{{ PUBLIC_PATH }}/js/commons.js"></script>
+  <!-- Custom Theme -->
+  <script src="{{ PUBLIC_PATH }}/js/private.js"></script>
+  
+</body>
+</html>

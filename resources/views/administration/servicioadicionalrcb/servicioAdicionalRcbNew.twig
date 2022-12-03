@@ -1,0 +1,200 @@
+{% set menuLItem, menuLLink = 'montoadicionalrecibo', 'nuevo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Nuevo servicio adicional recibo #}
+	<form class="f_inputflat" id="formNuevoServAdicionalRcb" method="post" action="{{ PUBLIC_PATH }}/montoadicionalrecibo/create">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-invoice-dollar mr-3"></i>Nuevo monto para adicionar a recibo
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpCosto">Monto</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                            {% set costo = "" %}
+                        	{% if data.formNuevoServAdicionalRcb is defined %}
+                        	    {% set costo = data.formNuevoServAdicionalRcb.costo %}{% endif %}
+                        	<div style="background-color:#b9ceac" class="d-inline-block">
+                        		<span class="pl-1">S/. </span>
+                        		<input type="text" class="f_minwidth100" id="inpCosto" name="costo" required 
+                        			style="background-color:#b9ceac" value='{{ costo }}'>
+                        	</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpContrato">Codigo contrato</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set contrato = "" %}
+                        	{% if data.formNuevoServAdicionalRcb is defined %}
+                        	    {% set contrato = data.formNuevoServAdicionalRcb.contrato %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpContrato" name="contrato" required value='{{ contrato }}'>
+                			<button type="button" class="f_btnflat" name="btnBuscarContrato" id="btnBuscarContrato">
+                				<span class="fas fa-search"></span>
+            				</button>
+                			<span><i class="fas fa-spinner f_classforrotatespinner d-none" id="spinnerBuscarContrato"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpPredioCodigo">Predio Ref.</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth400" id="inpPredioCodigo" name="predioCodigo" disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpPredioCalle">Predio calle</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth400" id="inpPredioCalle" name="predioCalle" disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpPredioDireccion">Predio dirección</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth400" id="inpPredioDireccion" name="predioDireccion" disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpClienteDocumento">Cliente DNI / RUC</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth150" id="inpClienteDocumento" name="clienteDocumento" disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field" for="inpClienteNombre">Cliente nombre</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	<input type="text" class="f_minwidth400" id="inpClienteNombre" name="clienteNombre" disabled value=''>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDescripcion">Descripción</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set descripcion = '' %}
+                        	{% if data.formNuevoServAdicionalRcb.descripcion is defined %}
+                        	    {% set descripcion = data.formNuevoServAdicionalRcb.descripcion %}{% endif %}
+                        	<textarea class="f_minwidth400" id="inpDescripcion" rows="2" maxlength="256" 
+                        				name="descripcion" required>{{ descripcion }}</textarea>
+                        </div>
+                    </div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar</button>
+        			<a href="{{ PUBLIC_PATH }}/montoadicionalrecibo/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Nuevo servicio adicional recibo #}
+  
+</div><!-- /.card -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formNuevoServAdicionalRcb').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        $("#btnBuscarContrato").click(function(){
+        
+        	$("#inpPredioCodigo").val("");
+        	$("#inpPredioCalle").val("");
+			$("#inpPredioDireccion").val("");
+			$("#inpClienteDocumento").val("");
+			$("#inpClienteNombre").val("");
+        	
+        	$("#inpContrato").val($("#inpContrato").val().trim());
+        	var inpContrato = $("#inpContrato").val();
+        	
+        	if(inpContrato != ""){
+        	
+        		var spinnerBuscarContrato = $("#spinnerBuscarContrato");
+        		spinnerBuscarContrato.removeClass("d-none");
+        	
+        		$.ajax({
+                    method: "GET",
+                    url: "{{ PUBLIC_PATH }}/contrato/detalle/json/"+inpContrato,
+                    dataType: "json",
+                    complete: function(){
+                    	spinnerBuscarContrato.addClass("d-none");
+                    },
+        			error: function(jqXHR ){
+        				var msj = "";
+        				if(jqXHR.status == 404){
+        					msj = "No se encontro el contrato solicitado";
+        					console.log(msj);
+        				}else{
+        					msj = "Ocurrio un error inesperado, vuelva a intentarlo";
+        					console.log(msj);
+        				}
+        				$(document).Toasts('create', {
+                            	class: 'bg-danger',
+                                title: 'Respuesta de busqueda',
+                                position: 'topRight',
+                                autohide: true,
+       							delay: 4000,
+                                body: msj
+                            })
+        			},
+        			success: function(respons){
+        				$("#inpPredioCodigo").val(respons.data.predio.codigo);
+        				$("#inpPredioCalle").val(respons.data.calle.nombre);
+        				$("#inpPredioDireccion").val(respons.data.predio.direccion);
+        				$("#inpClienteDocumento").val(respons.data.cliente.documento);
+        				$("#inpClienteNombre").val(respons.data.cliente.nombre);
+        			}
+                });
+        	}
+        });
+	</script>
+{% endblock %}

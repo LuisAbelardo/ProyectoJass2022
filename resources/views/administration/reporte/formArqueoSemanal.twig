@@ -1,0 +1,102 @@
+{% set menuLItem, menuLLink = 'reporteconsolidado', 'arqueosemanal' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario generar arqueo semanal #}
+	<form class="f_inputflat" id="formArqueoSemanal" method="post" action="{{ PUBLIC_PATH }}/reporte/generararqueosemanal">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-invoice mr-3"></i>Arqueo Semanal
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpFechaInicio">Fecha Inicio</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set fechaInicio = "" %}
+                        	{% if data.fechaInicio is defined %}{% set fechaInicio = data.fechaInicio %}
+                        	{% elseif data.formAqueoSemanal is defined %}
+                        	    {% set fechaInicio = data.formArqueoSemanal.fechaInicio %}{% endif %}
+                        	<input type="date" class="f_minwidth200" id="inpFechaInicio" name="fechaInicio" required value='{{ fechaInicio }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpFechaInicio">Fecha Final</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set fechaFin = "" %}
+                        	{% if data.fechaFin is defined %}{% set fechaFin = data.fechaFin %}
+                        	{% elseif data.formAqueoSemanal is defined %}
+                        	    {% set fechaFin = data.formArqueoSemanal.fechaFin %}{% endif %}
+                        	<input type="date" class="f_minwidth200" id="inpFechaFin" name="fechaFin" required value='{{ fechaFin }}'>
+                        </div>
+                    </div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardfooter f_cardfooteractions text-center">
+      				<button type="submit" class="f_button f_buttonaction" id="btnVerArqueoSemanal">Ver arqueo</button>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario Arqueo Semanal #}
+  
+</div><!-- /.card -->
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formArqueoSemanal').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+	</script>
+{% endblock %}

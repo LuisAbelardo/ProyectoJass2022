@@ -1,0 +1,272 @@
+{% set menuLItem = 'calle' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+
+  	<div class="row">
+  		<div class="col-12">
+  			<div class="f_cardheader">
+  				<div class=""> 
+                	<i class="fas fa-road mr-3"></i>Calles
+            	</div>
+  			</div>
+  		</div>
+  	</div><!-- /.card-header -->
+  	
+  	<div class="row">
+  		<div class="col-12">
+  			{# Contenedor de alertas #}
+            {% set classAlert = "" %}
+            {% if estadoDetalle is empty %}
+            	{% set classAlert = "d-none" %}
+            {% elseif codigo >= 200 and codigo <300 %}
+                {% set classAlert = "alert-success" %}
+            {% elseif codigo >= 400 %}
+                {% set classAlert = "alert-danger" %}
+            {% endif %}
+  			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+             	<ul class="mb-0" id="f_alertsUl">
+             		{% if estadoDetalle is not empty %}
+                      {% for msj in estadoDetalle %}
+                        <li>{{ msj }}</li>
+                      {% endfor %}
+                    {% endif %}
+             	</ul>
+             	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+             		<span aria-hidden="true">&times;</span>
+             	</button>
+            </div>{# /Contenedor de alertas #}
+  		</div>
+  	</div>
+  	
+  	<div class="row">
+  		<div class="col-12">
+      		<div class="f_tabs">
+      			<div class="f_tabunactive">
+      				<a href="{{ PUBLIC_PATH }}/calle/lista" class="f_link">Lista</a>
+      			</div>
+      			<div class="f_tabunactive">
+      				<a href="{{ PUBLIC_PATH }}/calle/nuevo" class="f_link">Nuevo</a>
+      			</div>
+      			<div class="f_tabactive">
+      				<a href="#" class="f_link">Detalle</a>
+      			</div>
+          	</div>
+  		</div>
+  	</div><!-- /.tabs de contenido -->
+  	
+  	<div class="f_divwithbartop">
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="d-flex justify-content-between f_arearef">
+          			<div>
+          				<div class="d-inline-block mr-2 mr-md-4">
+                  			<div class="f_imageref"><span class="fas fa-road" style=" color: #a69944"></span></div>
+          				</div>
+          				<div class="d-inline-block align-top">
+          					<span class="font-weight-bold f_inforef">
+          					    {% if data.calle is defined %}{{ data.calle.CAL_CODIGO }}{% endif %}
+          					</span><br/>
+          					<span class="font-weight-bold f_inforef">
+          					    {% if data.calle is defined %}{{ data.calle.CAL_NOMBRE }}{% endif %}
+        				    </span><br/>
+          				</div>
+          			</div>
+        		</div>
+      		</div>
+      		
+      		<div class="col-12 table-responsive">
+      			<table class="table f_table f_tableforfield">
+                  <tbody>
+                  	<tr>
+                      <td>Ref.</td>
+                      <td>{% if data.calle is defined %}{{ data.calle.CAL_CODIGO }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                      <td>Nombre</td>
+                      <td>{% if data.calle is defined %}{{ data.calle.CAL_NOMBRE }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                    <tr>
+                      <td>Fecha de creación</td>
+                      <td>{% if data.calle is defined %}{{ data.calle.CAL_CREATED }}{% endif %}</td>
+                    </tr>
+                  </tbody>
+                </table>
+      		</div>
+      		
+    	</div><!-- /.card-body -->
+  	</div>
+  	
+  	<div class="row">
+  		<div class="col-12 text-right">
+  			<div class="f_cardfooter f_cardfooteractions">
+  				<a href="{{ PUBLIC_PATH }}/calle/editar/{% if data.calle is defined %}{{ data.calle.CAL_CODIGO }}{% endif %}" 
+  					class="f_linkbtn f_linkbtnaction">Modificar</a>
+				{% set styleBtnEliminar, titleBtnEliminar = "f_buttonactiondelete", "" %}
+				{% if data.predios is defined and data.predios is not empty %}
+				    {% set styleBtnEliminar = "f_buttonactionrefused" %}
+				    {% set titleBtnEliminar = "Desactivado porque la calle no se puede borrar. Se han creado predios en esta calle" %}
+			    {% endif %}
+			    <button type="button" class="f_button {{ styleBtnEliminar }} classfortooltip" data-toggle="modal" data-target="#modalEliminarCalle"
+  						title="{{ titleBtnEliminar }}">
+  					Eliminar</button>
+  			</div>
+  			
+  		</div>
+  	</div><!-- /.card-footer -->
+
+</div><!-- /.card -->
+
+
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <div class="f_card">
+        
+          	<div class="row">
+          		<div class="col-12">
+          			<div class="f_cardheader">
+          				<div class="">Sectores Vinculados</div>
+          			</div>
+          		</div>
+          	</div><!-- /.card-header -->
+          	
+          	<div class="row">
+              	<div class="col-12 table-responsive">
+          			<table class="table f_table f_tableliste">
+          			  <thead>
+          			  	<tr class="liste_title">
+          			  		<td class="liste_title" colspan="2">Sectores</td>
+          			  	</tr>
+          			  </thead>
+                      <tbody>
+                      	{% if data.sectores is defined and data.sectores is not empty %}
+                                  	
+                      		{% for sector in data.sectores %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/sector/detalle/{{ sector.STR_CODIGO }}" class="f_link">
+                                  		<span class="align-middtle">{{ sector.STR_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax150">{{ sector.STR_NOMBRE }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..2 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      </tbody>
+                    </table>
+            	</div>
+          	</div><!-- /.card-body -->
+          	
+          	<div class="row">
+          		<div class="col-12 f_cardfooter text-right"></div>
+          	</div><!-- /.card-footer -->
+        
+        </div><!-- /.card -->
+    </div>
+
+	<div class="col-12 col-lg-6 mt-3 mt-lg-0">
+		<div class="f_card">
+        
+          	<div class="row">
+          		<div class="col-12">
+          			<div class="f_cardheader">
+          				<div class="">Predios Vinculados</div>
+          			</div>
+          		</div>
+          	</div><!-- /.card-header -->
+          	
+          	<div class="row">
+              	<div class="col-12 table-responsive">
+          			<table class="table f_table f_tableliste">
+          			  <thead>
+          			  	<tr class="liste_title">
+          			  		<td class="liste_title" colspan="2">Predios</td>
+          			  	</tr>
+          			  </thead>
+                      <tbody>
+                      	{% if data.predios is defined and data.predios is not empty %}
+                                  	
+                      		{% for predio in data.predios %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/predio/detalle/{{ predio.PRE_CODIGO }}" class="f_link">
+                                  		<span class="align-middtle">{{ predio.PRE_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax150">{{ predio.PRE_DIRECCION }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..2 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      </tbody>
+                    </table>
+            	</div>
+          	</div><!-- /.card-body -->
+          	
+          	<div class="row">
+          		<div class="col-12 f_cardfooter text-right"></div>
+          	</div><!-- /.card-footer -->
+        
+        </div><!-- /.card -->
+	</div>
+
+</div>
+
+{# Modal Eliminar Calle #}
+{% if data.predios is defined and data.predios is empty %}
+    <div class="modal fade f_modal" id="modalEliminarCalle" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">Eliminar una calle</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    	<span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                	<i class="fas fa-info-circle text-secondary mr-1"></i><span>¿Está seguro de querer eliminar esta calle?</span>
+                	<form class="d-none" id="formEliminarCalle" action="{{ PUBLIC_PATH }}/calle/delete" method="post">
+                		<input type="hidden" name="codigo" value="{% if data.calle is defined %}{{ data.calle.CAL_CODIGO }}{% endif %}">
+                	</form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="f_btnactionmodal" id="btnEliminarCalle">Si</button>
+                    <button type="button" class="f_btnactionmodal" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{# /Modal Eliminar Calle #}
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#btnEliminarCalle').click(function(event){
+			$('#formEliminarCalle').submit();
+			return false;
+		});
+	</script>
+	
+{% endblock %}

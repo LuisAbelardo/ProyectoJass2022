@@ -1,0 +1,105 @@
+//// =====================  Estilos para cambiar el diseno del template adminLte  ========================
+
+// Estilos del body : doly --------------------------------------------------------------------------------------------------------------------
+body {
+	font-size: 0.90em;
+	line-height: 1.4;
+	font-family: arial,tahoma,verdana,helvetica;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-right: 0;
+	margin-left: 0;
+	font-weight: 400;
+	background-color: $colorbackbody;
+	direction: ltr;
+}
+
+// Estilos de Link : doly --------------------------------------------------------------------------------------------------------------------
+a:hover {
+    text-decoration: underline;
+    color: $colortextlink;
+}
+
+// Personalizar aside (izquierda) de navegacion ---------------------------------------------------------------------------------------------------
+
+aside.elevation-4 {
+	background-color: $colortema;
+	box-shadow: none;
+}
+
+// Personalizar aside (derecha) de navegacion ---------------------------------------------------------------------------------------------------
+
+.control-sidebar {
+    background-color: $colortema;
+	color: #c2c7d0;
+	
+	& a, & a:hover {
+		color: #c2c7d0;
+	}
+}
+
+// Personalizar iconos del nav del dashboard de administración -------------------------------------------------------------------------------------
+
+.nav.nav-sidebar .nav-treeview > .nav-item > .nav-link:focus {
+    background-color: inherit;
+    color: #bccee4;
+}
+
+.nav.nav-sidebar .nav-treeview > .nav-item > .nav-link:hover {
+    background-color: inherit;
+	color: #8391a2;
+}
+
+.nav.nav-sidebar .nav-treeview > .nav-item > .nav-link.active:focus,
+.nav.nav-sidebar .nav-treeview > .nav-item > .nav-link.active:hover,
+.nav.nav-sidebar .nav-treeview > .nav-item > .nav-link.active{
+	background-color: inherit;
+	color: #ffffff;
+}
+
+// Alertas : ------------------------------------------------------------------------------------------------------------------------------------
+
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.alert-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+.alert-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+
+.alert-danger, .alert-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.alert ul {
+  padding-left : 15px;
+  text-align: left;
+}
+
+
+// Estilos para la seccion de contenido principal   --------------------------------------------------------------------------------------------------
+
+.wrapper .content-wrapper{
+	background-color: inherit;
+	@media screen and (min-width: map-get($map: $breakpoints, $key: lg)) {
+	  padding: 0 1rem 0 1.5rem;
+	}
+}
+
+// Estilo para el fondo de los modales
+
+.modal-backdrop.show {
+	opacity: .3;
+}

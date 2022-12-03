@@ -1,0 +1,127 @@
+{% set menuLItem = 'montoadicionalrecibo' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+
+<div class="f_card">
+	{# Formulario Editar monto adicional recibo #}
+	<form class="f_inputflat" id="formEditarServAdicionalRcb" method="post" action="{{ PUBLIC_PATH }}/montoadicionalrecibo/update">
+	
+      	<div class="row">
+      		<div class="col-12">
+      			<div class="f_cardheader">
+      				<div class=""> 
+                    	<i class="fas fa-file-invoice-dollar mr-3"></i>Editar monto adicional
+                	</div>
+      			</div>
+      		</div>
+      	</div><!-- /.card-header -->
+      	
+      	<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  
+      	<div class="row">
+      		<div class="col-12">
+      		
+      			<div class="f_divwithbartop f_divwithbarbottom">
+      				<div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_field">Ref.</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set codigoServAdicionalRcb = "" %}
+                        	{% if data.servicioAdicionalRcb is defined %}
+                        	    {% set codigoServAdicionalRcb = data.servicioAdicionalRcb.SAR_CODIGO %}
+                        	    {{ data.servicioAdicionalRcb.SAR_CODIGO }}
+                        	{% elseif data.formEditarServAdicionalRcb is defined %}
+                        	    {% set codigoServAdicionalRcb = data.formEditarServAdicionalRcb.codigo %}
+                        	    {{ data.formEditarServAdicionalRcb.codigo }}{% endif %}
+                        	<input type="hidden" class="f_minwidth300" id="inpCodigo" name="codigo" value='{{ codigoServAdicionalRcb }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpCosto">Costo</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set costo = "" %}
+                        	{% if data.servicioAdicionalRcb is defined %}{% set costo = data.servicioAdicionalRcb.SAR_COSTO %}
+                        	{% elseif data.formEditarServAdicionalRcb is defined %}{% set costo = data.formEditarServAdicionalRcb.costo %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpCosto" name="costo" required value='{{ costo }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpContrato">Codigo contrato</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set contrato = "" %}
+                        	{% if data.servicioAdicionalRcb is defined %}{% set contrato = data.servicioAdicionalRcb.CTO_CODIGO %}
+                        	{% elseif data.formEditarServAdicionalRcb is defined %}{% set contrato = data.formEditarServAdicionalRcb.contrato %}{% endif %}
+                        	<input type="text" class="f_minwidth150" id="inpContrato" name="contrato" required value='{{ contrato }}'>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-12 col-md-3 col-lg-2 f_fieldrequired" for="inpDescripcion">Descripción</label>
+                        <div class="col-12 col-md-9 col-lg-10">
+                        	{% set descripcion = '' %}
+                        	{% if data.servicioAdicionalRcb is defined %}{% set descripcion = data.servicioAdicionalRcb.SAR_DESCRIPCION %}
+                        	{% elseif data.formEditarServAdicionalRcb is defined %}
+                        	    {% set descripcion = data.formEditarServAdicionalRcb.descripcion %}{% endif %}
+                        	<textarea class="f_minwidth400" id="inpDescripcion" rows="2" maxlength="256" 
+                        				name="descripcion" required>{{ descripcion }}</textarea>
+                        </div>
+                    </div>
+                    
+      			</div>
+      		</div>
+      	</div><!-- /.card-body -->
+  	
+      	<div class="row">
+      		<div class="col-12">
+          		<div class="f_cardfooter f_cardfooteractions text-center">
+        			<button type="submit" class="f_button f_buttonaction">Guardar cambios</button>
+        			<a href="{{ PUBLIC_PATH }}/montoadicionalrecibo/lista" class="f_linkbtn f_linkbtnaction">Cancelar</a>
+    			</div>
+      		</div>
+      	</div><!-- /.card-footer -->
+  	
+  	</form>{# /Formulario editar monto adicional recibo #}
+  
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+  
+	<script type="text/javascript">
+		$('#formEditarServAdicionalRcb').keypress(function(e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        
+        f_select2("#cmbCalle");
+	</script>
+{% endblock %}

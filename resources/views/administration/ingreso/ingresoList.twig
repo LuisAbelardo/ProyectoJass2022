@@ -1,0 +1,280 @@
+{% set menuLItem, menuLLink = 'ingreso', 'lista' %}
+
+{% extends "administration/templateAdministration.twig" %}
+
+{% block content_main %}
+	
+<div class="f_card">
+	{# Formulario para busqueda por tabla #}
+  	<form method="get" action="{{ PUBLIC_PATH }}/ingreso/lista/filtro" id="formFilterListIngresos">
+  	
+  		<div class="row">
+  			<div class="col-12">
+  				<div class="f_cardheader">
+                    <div> 
+                    	<i class="fas fa-money-bill mr-3"></i>Listado de ingresos
+                    	<span>({{ data.pagination.paginaCantidadRegistros }})</span>
+                	</div>
+                  </div>
+  			</div>
+  		</div><!-- /.card-header -->
+  		
+  		<div class="row">
+      		<div class="col-12">
+      			{# Contenedor de alertas #}
+                {% set classAlert = "" %}
+                {% if estadoDetalle is empty %}
+                	{% set classAlert = "d-none" %}
+                {% elseif codigo >= 200 and codigo <300 %}
+                    {% set classAlert = "alert-success" %}
+                {% elseif codigo >= 400 %}
+                    {% set classAlert = "alert-danger" %}
+                {% endif %}
+      			<div class="alert {{ classAlert }} alert-dismissible fade show" id="f_alertsContainer" role="alert">
+                 	<ul class="mb-0" id="f_alertsUl">
+                 		{% if estadoDetalle is not empty %}
+                          {% for msj in estadoDetalle %}
+                            <li>{{ msj }}</li>
+                          {% endfor %}
+                        {% endif %}
+                 	</ul>
+                 	<button type="button" class="close" class="close" data-dismiss="alert" aria-label="Close" id="f_alertsDismiss">
+                 		<span aria-hidden="true">&times;</span>
+                 	</button>
+                </div>{# /Contenedor de alertas #}
+      		</div>
+      	</div>
+      	
+  		
+  		<div class="row">
+  			<div class="col-12">
+  			
+  				{# Paginador #}
+  				<div class="d-flex justify-content-end align-items-center pb-2">
+  					<div>
+                    	<ul class="pagination f_pagination-basic pagination-sm m-0">
+                            <li class="page-item {% if data.pagination.paginaAnterior == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link"
+                            		id="paginaAnterior" 
+                            		data-page="{{ data.pagination.paginaAnterior }}" 
+                            		href="#" ><i class="fas fa-chevron-left"></i></a>
+                        	</li>
+                            <li class="page-item">
+                            	<span class="page-link info">
+                                	<input type="text" id="filterPaginaActual" name="filterPaginaActual" class="f_inputflat" required size="10"
+                            				value="{{ data.pagination.paginaActual }}">
+                        			de {{ data.pagination.paginaCantidad }}
+                            	</span>
+                            </li>
+                            <li class="page-item {% if data.pagination.paginaSiguiente == -1 %}{{ 'disabled' }}{% endif %}">
+                            	<a class="page-link" id="paginaSiguiente"
+                            		data-page="{{ data.pagination.paginaSiguiente }}"
+                            		href="#"><i class="fas fa-chevron-right"></i></a>
+                        	</li>
+                        </ul>
+                    </div>
+                    <div class="px-2">
+                    	<button type="submit" class="f_btnflat" name="btnBuscarFiltros">
+                    		<span class="fas fa-search"></span>
+                		</button>
+                		<a href="{{ PUBLIC_PATH }}/ingreso/lista" class="f_link">
+                			<i class="fas fa-times"></i>
+            			</a>
+                    </div>
+  				</div>{# /Paginador #}
+  				
+  				
+      			<div class="table-responsive">
+                    <table class="table f_table f_tableliste f_listwidthfilterbefore">
+                      <thead>
+                      	<tr class="liste_title_filter">
+                          <td class="liste_title f_minwidth125">
+                          	<i class="fas fa-filter mr-1"></i>
+    						<input class="f_inputflat f_maxwidth80imp" type="text" name="filterCodigo" 
+                          		value='{% if data.formFilterListIngresos.filterCodigo is defined %}{{ data.formFilterListIngresos.filterCodigo }}{% endif %}'></td>
+                    	  <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth150imp" type="date" name="filterFecha"
+                          		value="{% if data.formFilterListIngresos.filterFecha is defined %}{{ data.formFilterListIngresos.filterFecha }}{% endif %}"></td>
+                  		  <td class="liste_title">
+                  		  	<select class="f_inputflat" name="filterEstado" id="cmbFilterEstado">
+                                <option value="-1" class="f_opacitymedium"></option>
+                                <option value="0" 
+                                    {% if data.formFilterListIngresos.filterEstado is defined and data.formFilterListIngresos.filterEstado ==  "0" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Anulado
+            					</option>
+                                <option value="1"
+                                    {% if data.formFilterListIngresos.filterEstado is defined and data.formFilterListIngresos.filterEstado ==  "1" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					Activo
+            					</option>
+                              </select>
+                          </td>
+                          <td class="liste_title">
+                          	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterMonto" disabled value=""></td>
+                          <td class="liste_title">
+                              <select class="f_inputflat" name="filterCaja" id="cmbFilterCaja">
+                                <option value="-1" class="f_opacitymedium"></option>
+                                {% if data.cajas is defined %}
+                                	{% set selectedCaja = false %}
+                            		{% for caja in data.cajas %}
+                                    	<option value="{{ caja.CAJ_CODIGO }}"
+                                				{% if not selectedCaja 
+                                				        and data.formFilterListIngresos is defined 
+                        					            and data.formFilterListIngresos.filterCaja ==  caja.CAJ_CODIGO %}
+                    					            {{ 'selected' }}{% set formFilterListIngresos = true %}{% endif %}>
+                            				{{ caja.CAJ_NOMBRE }}
+                        				</option>
+                                    {% endfor %}
+                            	{% endif %}
+                              </select>
+                          </td>
+                          <td class="liste_title">
+                  		  	<select class="f_inputflat" name="filterComprobanteTipo" id="cmbFilterComprobanteTipo">
+                                <option value="-1" class="f_opacitymedium"></option>
+                                <option value="1" 
+                                    {% if data.formFilterListIngresos.filterComprobanteTipo is defined and data.formFilterListIngresos.filterComprobanteTipo ==  "1" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					TICKET
+            					</option>
+                                <option value="2"
+                                    {% if data.formFilterListIngresos.filterComprobanteTipo is defined and data.formFilterListIngresos.filterComprobanteTipo ==  "2" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					BOLETA
+            					</option>
+            					<option value="3"
+                                    {% if data.formFilterListIngresos.filterComprobanteTipo is defined and data.formFilterListIngresos.filterComprobanteTipo ==  "3" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					FACTURA
+            					</option>
+            					<option value="4"
+                                    {% if data.formFilterListIngresos.filterComprobanteTipo is defined and data.formFilterListIngresos.filterComprobanteTipo ==  "4" %}
+                        					{{ 'selected' }}
+                					{% endif %}>
+                					SIN COMPROBANTE
+            					</option>
+                              </select>
+                          </td>
+                          <td class="liste_title">
+                    	  	<input class="f_inputflat f_maxwidth150imp" type="text" name="filterComprobanteNro"
+                    	  		value="{% if data.formFilterListIngresos.filterComprobanteNro is defined %}{{ data.formFilterListIngresos.filterComprobanteNro }}{% endif %}"></td>
+                          <td class="liste_title">
+                    	  	<input class="f_inputflat f_maxwidth100imp" type="text" name="filterUsuario"
+                    	  		value="{% if data.formFilterListIngresos.filterUsuario is defined %}{{ data.formFilterListIngresos.filterUsuario }}{% endif %}"></td>
+                          <td class="liste_title">
+                    	  	<input class="f_inputflat f_maxwidth150imp" type="text" name="filterDescripcion" disabled value=""></td>
+                        </tr>
+                        <tr class="liste_title">
+                          <th class="wrapcolumntitle liste_title">Ref.</th>
+                          <th class="wrapcolumntitle liste_title">Fecha</th>
+                          <th class="wrapcolumntitle liste_title">Estado</th>
+                          <th class="wrapcolumntitle liste_title">Monto</th>
+                          <th class="wrapcolumntitle liste_title">Caja</th>
+                          <th class="wrapcolumntitle liste_title">Tipo comprobante</th>
+                          <th class="wrapcolumntitle liste_title">Nro. Comprobante</th>
+                          <th class="wrapcolumntitle liste_title">Usuario</th>
+                          <th class="wrapcolumntitle liste_title">Descripción</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      
+                      	{% if data.ingresos is not empty %}
+                      	
+                      		{% for ingreso in data.ingresos %}
+                                <tr class="f_oddeven">
+                                  <td>
+                                      <a href="{{ PUBLIC_PATH }}/ingreso/detalle/{{ ingreso.IGR_CODIGO }}" class="f_link">
+                                  		<span style=" color: #a69944">
+                                  			<i class="fas fa-money-bill mr-1"></i>
+                              			</span>
+                                  		<span class="align-middtle">{{ ingreso.IGR_CODIGO }}</span>
+                                      </a>
+                                  </td>
+                                  <td class="f_overflowmax150">{{ ingreso.IGR_CREATED is empty ? "" : ingreso.IGR_CREATED|date("d/m/Y") }}</td>
+                                  <td class="f_overflowmax250">
+                                    {% if ingreso.IGR_ESTADO == 0 %}
+                                    	<span class="badge badge-warning">{{ 'Anulado' }}</span>
+                                    {% elseif ingreso.IGR_ESTADO == 1 %}{{ 'Activo' }}
+                                    {% endif %}
+                                  </td>
+                                  <td class="f_overflowmax150">{{ ingreso.IGR_CANTIDAD|number_format(2, '.', ',') }}</td>
+                                  <td class="f_overflowmax250">{{ ingreso.CAJ_NOMBRE }}</td>
+                                  <td class="f_overflowmax250">
+                                    {% if ingreso.IGR_TIPO_COMPROBANTE == 1 %}{{ 'TICKET' }}
+                                    {% elseif ingreso.IGR_TIPO_COMPROBANTE == 2 %}{{ 'BOLETA' }}
+                                    {% elseif ingreso.IGR_TIPO_COMPROBANTE == 3 %}{{ 'FACTURA' }}
+                                    {% elseif ingreso.IGR_TIPO_COMPROBANTE == 4 %}{{ 'SIN COMPROBANTE' }}
+                                    {% endif %}
+                                  </td>
+                                  <td class="f_overflowmax150">{{ ingreso.IGR_COD_COMPROBANTE }}</td>
+                                  <td class="f_overflowmax250">
+                                    <a href="{{ PUBLIC_PATH }}/usuario/detalle/{{ ingreso.USU_CODIGO }}" class="f_link">
+                                    	<span style=" color: #a69944">
+                                  			<i class="fas fa-user-shield mr-1"></i>
+                              			</span>
+                                    	<span class="align-middtle">{{ ingreso.USU_CODIGO }}</span>
+                                    </a>
+                                  </td>
+                                  <td class="f_overflowmax150">{{ ingreso.IGR_DESCRIPCION }}</td>
+                                </tr>
+                            {% endfor %}
+                        
+                      	{% else %}
+                      		{% for i in 0..3 %}
+                          		<tr>
+        							<td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            {% endfor %}
+                      	{% endif %}
+                      
+                      	
+                      </tbody>
+                    </table>
+                </div>
+  			</div>
+  			
+  		</div><!-- /.card-body -->
+  		
+  		<div class="row">
+      		<div class="col-12 f_cardfooter text-right"></div>
+      	</div><!-- /.card-footer -->
+  		
+    </form>{# /Formulario para busqueda por tabla #}
+    
+</div><!-- /.card -->
+    
+{% endblock %}
+
+{% block scripts %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$('#paginaAnterior').click(function(event){
+			if($('#paginaAnterior').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) - 1);
+				$('#formFilterListIngresos').submit();
+			}
+			return false;
+		});
+		
+		$('#paginaSiguiente').click(function(event){
+			if($('#paginaSiguiente').attr("data-page") != -1){
+				$('#filterPaginaActual').val(parseInt($('#filterPaginaActual').val()) + 1);
+				$('#formFilterListIngresos').submit();
+			}
+			return false;
+		});
+		
+		f_select2("#cmbFilterTipo");
+		f_select2("#cmbFilterEstado");
+		f_select2("#cmbFilterCaja");
+		f_select2("#cmbFilterComprobanteTipo");
+	</script>
+	
+{% endblock %}

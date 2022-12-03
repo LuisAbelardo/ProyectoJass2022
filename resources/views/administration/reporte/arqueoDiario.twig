@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=1.0, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>{{ SITE_NAME }}</title>
+  <link rel="stylesheet" href="{{ PUBLIC_PATH }}/css/report_style.css">
+  
+</head>
+<body>
+    <header class="clearfix">
+        <div id="logo">
+            <img src="{{ PUBLIC_PATH }}/img/logo.png" style="width:50px">
+        </div>
+        <div class="titulo_reporte">
+            <small>REPORTE DIARIO ({{ data.fechaArqueo|date("d/m/Y") }})<small>
+        </div>
+        <div id="company" class="clearfix">
+            <div>MZ. D1 LT. 62 - CHOSICA DEL NORTE</div>
+            <div>TELF. 074 - 431993</div>
+            <div>R.U.C. 20479771856</div>
+            <div><a href="mailto:jasschosica@gmail.com">jasschosica@gmail.com</a></div>
+        </div>
+        <div id="project" >
+            <div><span>USUARIO :</span>{{ data.usuario }}</div>
+            <div><span>FECHA :</span>{{ "now"|date("d/m/Y h:i:s a") }}</div>
+        </div>
+    </header>
+    <main>
+        <table>
+        <caption class="text_left_l">1.- Ingresos</caption>
+        <thead>
+            <tr>
+              <th class="service">N°</th>
+              <th class="desc">NOMBRES Y APELLIDOS</th>
+              <th>RECIBO N°</th>
+              <th>CONCEPTO</th>
+              <th>ESTADO</th>
+              <th>IGV</th>
+              <th>MONTO S/.</th>
+            </tr>
+        </thead>
+        <tbody>
+        	{% set registrosBanco = false %}
+        
+            {% set t_ingresos = 0 %}
+            {% set suma_igv = 0 %}
+            {% set items = 0 %}
+            
+            {% for ingreso in data.ingresos %}
+            
+            	{% if ingreso.CAJA == 1 %}
+                    {% set items = items + 1 %}
+                    <tr>
+                      <td class="service">{{ items }}</td>
+                      <td class="desc">{{ ingreso.NOMBRES }}</td>
+                      <td class="desc">{{ ingreso.RBO_NUMERO }}</td>
+                      <td class="desc">{{ ingreso.DETALLE }}</td>
+                      <td class="desc">{{ ingreso.ESTADO }}</td>
+                      <td class="desc">{{ ingreso.IGV }}</td>
+                      <td class="total">{{ ingreso.TOTAL }}</td>
+                    </tr>
+                    
+                    {% if ingreso.ESTADO != "ANULADO" %}
+                        {% set t_ingresos = t_ingresos + ingreso.TOTAL %}
+                        {% set suma_igv = suma_igv + ingreso.IGV %}
+                    {% endif %}
+                    
+                {% elseif ingreso.CAJA == 2 %}
+                	{% set registrosBanco = true %}
+                {% endif %}
+                
+			{% endfor %}
+			
+            <tr>
+              <td colspan="5" class="grand total">TOTAL</td>
+              <td class="grand total">S/. {{ suma_igv }}</td>
+              <td class="grand total">S/. {{ t_ingresos }}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        
+        {% set t_ing_bancos = 0 %}
+        {% set suma_igv = 0 %}
+        {% set items = 0 %}
+        
+        {% if registrosBanco == true %}
+
+            <table>
+            <caption class="text_left_l">1.1.- Ingresos Bancos</caption>
+            <thead>
+                <tr>
+                  <th class="service">N°</th>
+                  <th class="desc">NOMBRES Y APELLIDOS</th>
+                  <th>RECIBO N°</th>
+                  <th>CONCEPTO</th>
+                  <th>ESTADO</th>
+                  <th>IGV</th>
+                  <th>MONTO S/.</th>
+                </tr>
+            </thead>
+            <tbody>
+                  
+                {% for ingreso in data.ingresos %}
+                    
+                    {% if ingreso.CAJA == 2 %}
+                        {% set items = items + 1 %}	
+                        <tr>
+                          <td class="service">{{ items }}</td>
+                          <td class="desc">{{ ingreso.NOMBRES }}</td>
+                          <td class="desc">{{ ingreso.RBO_NUMERO }}</td>
+                          <td class="desc">{{ ingreso.DETALLE }}</td>
+                          <td class="desc">{{ ingreso.ESTADO }}</td>
+                          <td class="desc">{{ ingreso.IGV }}</td>
+                          <td class="total">{{ ingreso.TOTAL }}</td>
+                        </tr>
+                        
+                        {% if ingreso.ESTADO != "ANULADO" %}
+                            {% set t_ing_bancos = t_ing_bancos + ingreso.TOTAL %}
+                            {% set suma_igv = suma_igv + ingreso.IGV %}
+                        {% endif %}
+                        
+                    {% endif %}
+                    
+                {% endfor %}
+                
+                <tr>
+                  <td colspan="5" class="grand total">TOTAL</td>
+                  <td class="grand total">S/. {{ suma_igv }}</td>
+                  <td class="grand total">S/. {{ t_ing_bancos }}</td>
+                </tr>
+              </tbody>
+            </table>
+            
+        {% endif %}
+        
+
+        <table>
+          <caption class="text_left_l">2.- Egresos</caption>
+          <thead>
+            <tr>
+              <th class="service">N°</th>
+              <th class="desc">CONCEPTO</th>
+              <th>RECIBO N°</th>
+              <th>CAJA</th>
+              <th>ESTADO</th>
+              <th>MONTO S/.</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% set t_egresos = 0 %}
+            {% set suma_igv = 0 %}
+            {% set items = 0 %}
+            
+            {% for egreso in data.egresos %}
+                {% set items = items + 1 %}
+                
+                <tr>
+                  <td class="service">{{ items }}</td>
+                  <td class="desc">{{ egreso.DETALLE }}</td>
+                  <td class="desc">{{ egreso.RBO_NUMERO }}</td>
+                  <td class="desc">{{ egreso.CAJA }}</td>
+                  <td class="desc">{{ egreso.ESTADO }}</td>
+                  <td class="total">{{ egreso.TOTAL }}</td>
+                  
+                </tr>
+            
+                {% if egreso.ESTADO != "ANULADO" %}
+                    {% set t_egresos = t_egresos + egreso.TOTAL %}
+                {% endif %}
+              
+              {% endfor %}
+              
+            <tr>
+              <td colspan="5" class="grand total">TOTAL</td>
+              <td class="grand total">S/. {{ t_egresos }}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <table class="t-detalle">
+          <caption class="text_left_l">3.- Detalles</caption>
+          <tr>
+            <th>DETALLE</th>
+            <th> S/. </th>
+          </tr>
+          <tr>
+              <td class="desc">INGRESOS</td>
+              <td class="total">S/. {{ t_ingresos + t_ing_bancos }}</td>
+          </tr>
+          <tr>
+              <td class="desc">EGRESOS</td>
+              <td class="total">S/. {{ t_egresos }}</td>
+          </tr>
+          <tr>
+              <td class="grand total">INGRESO NETO</td>
+              <td class="grand total">S/. {{ t_ingresos + t_ing_bancos - t_egresos }}</td>
+          </tr>
+        </table>
+
+      <div id="notices">
+        <div>NOTA:</div>
+        <div class="notice"> ANULADO: No se consideran en la suma diario .</div>
+      </div>
+    </main>
+    <footer>
+        Sistema J.A.S.S. v1.0.1.
+    </footer>
+  </body>
+</html>
